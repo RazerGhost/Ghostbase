@@ -48,7 +48,13 @@ Powers the recently-played history section of [SpotifyWidget.svelte](../src/lib/
 
 1. Create an app at https://developer.spotify.com/dashboard.
 2. `SPOTIFY_CLIENT_ID` / `SPOTIFY_CLIENT_SECRET` come from that app.
-3. `SPOTIFY_REFRESH_TOKEN` requires a one-time OAuth authorization-code flow with the `user-read-currently-playing user-read-recently-played` scopes (space-separated in the authorize URL's `scope` param), exchanged for a refresh token — a manual step done once, not part of the app itself. The recently-played history section of the widget silently hides itself if the token only has `user-read-currently-playing`.
+3. `SPOTIFY_REFRESH_TOKEN` requires a one-time OAuth authorization-code flow with the `user-read-currently-playing user-read-recently-played` scopes, exchanged for a refresh token — a manual step done once, not part of the app itself. The recently-played history section of the widget silently hides itself if the token only has `user-read-currently-playing`.
+
+   [scripts/spotify-refresh-token.mjs](../scripts/spotify-refresh-token.mjs) does the whole flow: it serves the callback on `http://127.0.0.1:8888/callback` (register that exact URI on the Spotify app first — Spotify rejects `localhost`, and loopback-IP URIs are the documented exception to its HTTPS-only rule), prints an authorize URL to open, and prints the resulting token plus its granted scopes.
+
+   ```
+   node scripts/spotify-refresh-token.mjs <client_id> <client_secret>
+   ```
 
 See [integrations.md](integrations.md) for how the token is used at runtime.
 
@@ -62,7 +68,15 @@ See [listens.md](listens.md) for the import/parsing details.
 
 ### `SPOTIFY_SCROBBLE_SECRET`
 
-Optional — enables live scrobbling into `spotify-history.db` between manual exports ([+server.ts](../src/routes/api/spotify/scrobble/+server.ts)). Requires the Spotify vars above with the `user-read-recently-played` scope. If set, hit `GET /api/spotify/scrobble` with an `Authorization: Bearer <this value>` header on a schedule (every 15-30 min — Spotify's recently-played endpoint only returns the last 50 plays, so longer gaps lose history) via Coolify's cron or an external scheduler. `?secret=<this value>` also works, but the header is preferred — query strings tend to end up in proxy/access logs. Leave unset to disable the endpoint (it 503s without this).
+Optional — enables live scrobbling into `spotify-history.db` between manual exports ([+server.ts](../src/routes/api/spotify/scrobble/+server.ts)). Requires the Spotify vars above with the `user-read-recently-played` scope.
+
+Nothing issues this value — it's a shared secret you invent, like `SESSION_SECRET` and `BACKUP_SECRET`, and the only requirement is that the scheduler sends the same string this var holds:
+
+```
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+If set, hit `GET /api/spotify/scrobble` with an `Authorization: Bearer <this value>` header on a schedule (every 15-30 min — Spotify's recently-played endpoint only returns the last 50 plays, so longer gaps lose history) via Coolify's cron or an external scheduler. `?secret=<this value>` also works, but the header is preferred — query strings tend to end up in proxy/access logs. Leave unset to disable the endpoint (it 503s without this).
 
 ## Simkl (watching/watchlist)
 
