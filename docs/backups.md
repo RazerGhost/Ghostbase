@@ -42,10 +42,15 @@ Gated the same way as the scrobble endpoint: prefer `Authorization: Bearer <BACK
    - `BACKUP_SECRET` — any random string, e.g. `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
    - `BACKUP_GIT_REMOTE` — `https://x-access-token:<PAT>@github.com/you/ghostbase-backups.git`
    - Optionally `BACKUP_GIT_BRANCH`, `BACKUP_GIT_USER_NAME`, `BACKUP_GIT_USER_EMAIL` (all have sane defaults — see [.env.example](../.env.example))
-4. **Schedule it**: Coolify's **Scheduled Tasks** (or an external cron / GitHub Actions cron hitting the deployed URL) running something like:
+4. **Schedule it**: Coolify's **Scheduled Tasks** run their command *inside* the container, where there is no `curl` (the runtime image is `node:22-slim` plus git — see [deployment.md](deployment.md)). Use the bundled helper, which reads the secret from the container's own environment and calls the app directly rather than back through the proxy:
+   ```
+   node scripts/hit-endpoint.mjs /api/backup BACKUP_SECRET
+   ```
+   Give the task a generous timeout — 900s rather than Coolify's default 300s — since pushing tens of MB of dumps regularly runs past five minutes. From an *external* scheduler (GitHub Actions cron, another box), hit the public URL instead:
    ```
    curl -fsS -H "Authorization: Bearer $BACKUP_SECRET" https://razerghost.xyz/api/backup
    ```
+   Note that an external caller goes through the reverse proxy, whose read timeout a long backup can outlive — the run itself still completes, so judge it by whether a new commit lands, not by the caller's exit code.
    Nightly is plenty — everything backed up here changes slowly (watch history, listening stats), unlike the scrobble endpoint which needs a tight interval to avoid losing Spotify history.
 
 ## Credential exposure notes

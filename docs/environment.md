@@ -76,7 +76,13 @@ Nothing issues this value — it's a shared secret you invent, like `SESSION_SEC
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-If set, hit `GET /api/spotify/scrobble` with an `Authorization: Bearer <this value>` header on a schedule (every 15-30 min — Spotify's recently-played endpoint only returns the last 50 plays, so longer gaps lose history) via Coolify's cron or an external scheduler. `?secret=<this value>` also works, but the header is preferred — query strings tend to end up in proxy/access logs. Leave unset to disable the endpoint (it 503s without this).
+If set, hit `GET /api/spotify/scrobble` with an `Authorization: Bearer <this value>` header on a schedule (every 15-30 min — Spotify's recently-played endpoint only returns the last 50 plays, so longer gaps lose history). From a Coolify Scheduled Task, which runs inside the container (no `curl` there), that's:
+
+```
+node scripts/hit-endpoint.mjs /api/spotify/scrobble SPOTIFY_SCROBBLE_SECRET
+```
+
+An external scheduler hits the public URL with `curl` instead. `?secret=<this value>` also works, but the header is preferred — query strings tend to end up in proxy/access logs. Leave unset to disable the endpoint (it 503s without this).
 
 ## Simkl (watching/watchlist)
 

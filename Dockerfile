@@ -60,6 +60,10 @@ ENV BODY_SIZE_LIMIT=200M
 COPY --from=build /app/build ./build
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
+# Called by Coolify's Scheduled Tasks, which exec inside this container — so
+# it has to ship in the image. Only this one script: the rest of scripts/ is
+# for local one-off use.
+COPY scripts/hit-endpoint.mjs ./scripts/hit-endpoint.mjs
 COPY src/content ./src/content
 # Read from disk at request time by src/lib/server/og.ts (satori needs real
 # font bytes — it doesn't use system fonts), same disk-read convention as
