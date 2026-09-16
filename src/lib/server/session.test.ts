@@ -1,7 +1,23 @@
 import { createHmac } from 'node:crypto';
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { env } from '$env/dynamic/private';
 import { createSessionToken, verifySessionToken } from './session';
+
+// Pin a known secret for the whole file instead of inheriting one: otherwise
+// the suite passes or fails depending on whether the machine running it has
+// SESSION_SECRET in its .env or shell — and when it does, the tests sign with
+// that real secret.
+const TEST_SECRET = 'test-session-secret';
+let originalSecret: string | undefined;
+
+beforeAll(() => {
+	originalSecret = env.SESSION_SECRET;
+	env.SESSION_SECRET = TEST_SECRET;
+});
+
+afterAll(() => {
+	env.SESSION_SECRET = originalSecret as string;
+});
 
 // Mirrors session.ts's own signing (createHmac sha256 base64url) so tests can
 // construct a validly-signed token with an arbitrary payload — sign() isn't
