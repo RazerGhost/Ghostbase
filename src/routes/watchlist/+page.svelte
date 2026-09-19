@@ -260,14 +260,6 @@
         const minutes = Math.round(totalMinutes % 60);
         return { days, hours, minutes };
     });
-    // Runtime is only known once a title's detail entry has been fetched and
-    // cached (see enrichLibrary in simkl.ts) — until then this undercounts.
-    const hasIncompleteRuntimeData = $derived(
-        watchedGroups.some(
-            (item) => item.watchedEpisodes > 0 && item.runtime == null,
-        ),
-    );
-
     const peakYear = $derived.by(() => {
         const counts = new Map<number, number>();
         for (const item of watchedGroups) {
@@ -594,17 +586,6 @@
                     >
                     <span class="text-sm text-dim">m</span>
                 </p>
-                <p class="mt-2 text-xs text-dim">
-                    Estimated from average episode runtime — may differ
-                    slightly from Simkl's own totals.
-                </p>
-                {#if hasIncompleteRuntimeData}
-                    <p class="mt-1 text-xs text-dim">
-                        Still warming up — some runtimes haven't been fetched
-                        yet.
-                    </p>
-                {/if}
-
                 <div
                     class="mt-5 grid grid-cols-3 gap-4 border-t border-border pt-5 text-center"
                 >

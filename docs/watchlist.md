@@ -8,6 +8,12 @@
 
 Poster URLs are composed from the path fragment Simkl returns, proxied through `wsrv.nl` for resizing (`_c` = 170×250 compact card size, `q=90`).
 
+## Auth
+
+[simkl-auth.ts](../src/lib/server/simkl-auth.ts) hands out a Simkl AUTH V2 access token, refreshed from `SIMKL_REFRESH_TOKEN` a day before its 7-day expiry, or on a 401 from `sync/all-items`. That 401 retry happens once per request. A refresh invalidates the previous access token immediately, so concurrent callers share one in-flight refresh, and a 401 only triggers a refresh if the rejected token is still the current one. That way the three parallel `fetchAll` calls don't cut each other off. After a failed refresh it waits 5 minutes before trying again, and the page serves its snapshot meanwhile. The token lives in memory only, for the reason given in [environment.md](environment.md#simkl_client_id--simkl_refresh_token). The legacy V1 `SIMKL_ACCESS_TOKEN` is still used as-is if no refresh token is set.
+
+Detail (catalog) calls deliberately send no `Authorization` header. Simkl serves those from Cloudflare's cache, and a token would bypass it; they also don't count against the per-user daily quota (500 requests a day on a free Simkl account).
+
 ## Detail enrichment (genres/overview/runtime)
 
 The bulk sync-all-items response doesn't include genres, overview, or runtime — only a **per-title** detail endpoint does. Fetching that for every title (~250) on every page load would be slow and hammer Simkl's public endpoint, so:
@@ -25,7 +31,7 @@ This caching approach is explicitly permitted by [Simkl's API rules](https://api
 
 ## Background refresh
 
-[simkl-refresh.ts](../src/lib/server/simkl-refresh.ts) runs `getLibraryWithFallback()` once immediately and then every 24h via `setInterval(...).unref()`, started once from [hooks.server.ts](../src/hooks.server.ts). This keeps the fallback snapshot warm independent of page traffic, so a Simkl outage right after a quiet period doesn't leave a stale snapshot. Uses a `globalThis` symbol flag (not a module-level variable) specifically so Vite's dev-mode HMR re-evaluating this module doesn't stack a second interval on top of the first.
+[simkl-refresh.ts](../src/lib/server/simkl-refresh.ts) runs `refreshLibrarySnapshot()` once immediately and then every 24h via `setInterval(...).unref()`, started once from [hooks.server.ts](../src/hooks.server.ts). It calls that directly rather than `getLibraryWithFallback()`, whose 15-minute freshness check would just return the snapshot this loop is supposed to be refreshing. This keeps the fallback snapshot warm independent of page traffic, so a Simkl outage right after a quiet period doesn't leave a stale snapshot. It also keeps the Simkl refresh token's 180-day window sliding even with no visitors. Uses a `globalThis` symbol flag (not a module-level variable) specifically so Vite's dev-mode HMR re-evaluating this module doesn't stack a second interval on top of the first.
 
 ## Testing
 
