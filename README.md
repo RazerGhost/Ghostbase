@@ -49,7 +49,7 @@ Every integration below is optional and degrades gracefully — the site runs fi
 | --- | --- | --- |
 | `ORIGIN` | adapter-node absolute URLs | **Required in production** behind a reverse proxy. Set in Coolify's UI, not a committed `.env`. |
 | `SPOTIFY_CLIENT_ID/SECRET`, `SPOTIFY_REFRESH_TOKEN` | Recently-played history + `/listens` live scrobbling | One-time OAuth authorization-code flow to mint the refresh token. The "now playing" widget itself gets live track data from Lanyard/Discord presence, not this. |
-| `SIMKL_CLIENT_ID`, `SIMKL_ACCESS_TOKEN` | `/watchlist` | Simkl's PIN device flow; token is long-lived (~5yr), no refresh needed. |
+| `SIMKL_CLIENT_ID`, `SIMKL_REFRESH_TOKEN` | `/watchlist` | Simkl AUTH V2 device flow via `scripts/simkl-token.mjs`; the app refreshes its 7-day access tokens itself. |
 | `GITHUB_CLIENT_ID/SECRET`, `SESSION_SECRET` | `/admin`, `/spotify-import` login gate | GitHub OAuth App restricted to a single allow-listed username (`site.githubUsername`). |
 | `MEDIA_DIR` | `/admin/media`, devlog/project cover/gallery/body images | Default to `./data/media`; must live on a persistent volume in production. Served publicly (no login). |
 | `SIMKL_CACHE_DB_PATH` | Simkl lookup cache | Losing this is non-destructive — it just re-warms. |

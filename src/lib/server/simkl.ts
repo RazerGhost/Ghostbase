@@ -1,8 +1,6 @@
 import { env } from '$env/dynamic/private';
 import { getCachedDetails, upsertDetail, cacheKey, getLibrarySnapshot, saveLibrarySnapshot } from './simkl-cache';
-
-const APP_NAME = 'ghostbase';
-const APP_VERSION = '1.0';
+import { APP_NAME, APP_VERSION, getSimklAccessToken, simklAuthMode } from './simkl-auth';
 
 export type LibraryItem = {
 	title: string;
@@ -36,7 +34,18 @@ export type Library = {
 };
 
 export function simklConfigured(): boolean {
-	return Boolean(env.SIMKL_CLIENT_ID && env.SIMKL_ACCESS_TOKEN);
+	return simklAuthMode() !== null;
+}
+
+// Simkl asks for these on every request, catalog and user alike
+// (https://api.simkl.org/conventions/headers).
+function appParams(extra: Record<string, string> = {}): URLSearchParams {
+	return new URLSearchParams({
+		client_id: env.SIMKL_CLIENT_ID ?? '',
+		'app-name': APP_NAME,
+		'app-version': APP_VERSION,
+		...extra
+	});
 }
 
 // Composes a full poster image URL from the path fragment the API returns
@@ -64,21 +73,25 @@ type AllItemsEntry = {
 };
 
 async function fetchAll(type: SimklType): Promise<{ status: string; item: LibraryItem }[]> {
-	const params = new URLSearchParams({
-		client_id: env.SIMKL_CLIENT_ID ?? '',
-		'app-name': APP_NAME,
-		'app-version': APP_VERSION
-	});
-
 	// status=all returns every bucket (watching/completed/plantowatch/hold/dropped)
 	// in one call — cheaper than one request per bucket we care about.
-	const res = await fetch(`https://api.simkl.com/sync/all-items/${type}/all?${params}`, {
-		headers: {
-			Authorization: `Bearer ${env.SIMKL_ACCESS_TOKEN}`,
-			'User-Agent': `${APP_NAME}/${APP_VERSION}`
-		},
-		signal: AbortSignal.timeout(10_000)
-	});
+	const request = (token: string) =>
+		fetch(`https://api.simkl.com/sync/all-items/${type}/all?${appParams()}`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+				'User-Agent': `${APP_NAME}/${APP_VERSION}`
+			},
+			signal: AbortSignal.timeout(10_000)
+		});
+
+	const token = await getSimklAccessToken();
+	let res = await request(token);
+	// A 401 on V2 usually means the 7-day access token expired early (or was
+	// replaced) — refresh once and retry. getSimklAccessToken dedupes, so the
+	// three parallel fetchAll calls share one refresh.
+	if (res.status === 401 && simklAuthMode() === 'v2') {
+		res = await request(await getSimklAccessToken({ rejected: token }));
+	}
 
 	if (!res.ok) throw new Error(`Simkl ${type} fetch failed: ${res.status}`);
 
@@ -148,8 +161,10 @@ async function fetchDetail(
 	simklId: number,
 	type: SimklType
 ): Promise<{ genres: string[]; overview: string; runtime: number | null } | null> {
-	const params = new URLSearchParams({ client_id: env.SIMKL_CLIENT_ID ?? '', extended: 'full' });
-	const res = await fetch(`https://api.simkl.com/${SIMKL_PATH[type]}/${simklId}?${params}`, {
+	// No Authorization here on purpose: catalog summaries are Cloudflare-cached
+	// and a token would bypass that cache. They also don't need one on V2 and
+	// don't count against the per-user daily quota.
+	const res = await fetch(`https://api.simkl.com/${SIMKL_PATH[type]}/${simklId}?${appParams({ extended: 'full' })}`, {
 		headers: { 'User-Agent': `${APP_NAME}/${APP_VERSION}` },
 		signal: AbortSignal.timeout(10_000)
 	});

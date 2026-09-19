@@ -86,29 +86,24 @@ An external scheduler hits the public URL with `curl` instead. `?secret=<this va
 
 ## Simkl (watching/watchlist)
 
-### `SIMKL_CLIENT_ID` / `SIMKL_ACCESS_TOKEN`
+### `SIMKL_CLIENT_ID` / `SIMKL_REFRESH_TOKEN`
 
-Powers `/watching` ([simkl.ts](../src/lib/server/simkl.ts)). Shows "Simkl not connected" if unset. Simkl's access tokens are long-lived (~5 years) and don't need a refresh flow, unlike Spotify's above.
+Powers `/watchlist` ([simkl.ts](../src/lib/server/simkl.ts)). Shows "Simkl not connected" if unset. Uses Simkl's **AUTH V2**: access tokens only last 7 days, so the app keeps just the refresh token in env and mints access tokens from it itself ([simkl-auth.ts](../src/lib/server/simkl-auth.ts)).
 
-1. Register an app at https://simkl.com/settings/developer/ to get a `SIMKL_CLIENT_ID` (no client secret needed for the PIN flow below).
-2. Get `SIMKL_ACCESS_TOKEN` via Simkl's PIN flow (built for devices without a browser — a good fit for a one-time server-side setup too). Run once:
+1. Register an AUTH V2 app at https://simkl.com/settings/developer/ with the app type **TV, devices & command line** (no client secret, no redirect URL). Its `client_id` is public and safe to commit; Ghostbase's is `767808ee648e75daad56ea303fa9a3379212740a8f119d20b6a468a5d8288ecc`.
+2. Get `SIMKL_REFRESH_TOKEN` via the device (PIN) flow:
    ```
-   node -e "
-     const clientId = 'YOUR_CLIENT_ID';
-     (async () => {
-       const headers = { 'User-Agent': 'ghostbase/1.0' };
-       const params = 'client_id=' + clientId + '&app-name=ghostbase&app-version=1.0';
-       const pin = await (await fetch('https://api.simkl.com/oauth/pin?' + params, { headers })).json();
-       console.log('Go to', pin.verification_uri, 'and enter code:', pin.user_code);
-       const poll = async () => {
-         const r = await (await fetch('https://api.simkl.com/oauth/pin/' + pin.user_code + '?' + params, { headers })).json();
-         if (r.result === 'OK' && r.access_token) { console.log('SIMKL_ACCESS_TOKEN=' + r.access_token); return; }
-         setTimeout(poll, (pin.interval || 5) * 1000);
-       };
-       poll();
-     })();
-   "
+   node scripts/simkl-token.mjs <client_id>
    ```
+   Go to simkl.com/pin, enter the code it shows, approve, and it prints `SIMKL_REFRESH_TOKEN=...`. It asks for no scope, so the token is read-only (`media:read`), which is all this page needs.
+
+Things to know about the refresh token:
+
+- **Never commit it anywhere, including the backup repo.** Simkl automatically revokes tokens it finds on GitHub, private repos included, and revoking either token kills the whole grant. That's why the access token is only held in memory, not in `data/` (which [backups](backups.md) push to git).
+- **Use one grant per environment.** Refreshing invalidates the previous access token right away, so prod and a local `pnpm dev` sharing one refresh token would keep cutting each other off. Run the script once for Coolify and again for your local `.env`.
+- **It lasts 180 days, and the window resets on every refresh.** The 24h background loop ([simkl-refresh.ts](../src/lib/server/simkl-refresh.ts)) refreshes about once a week, so it only expires if the app is down for six months. It also dies if you revoke the app under Simkl's Connected Apps. Either way the logs show `Simkl token refresh failed: 400 invalid_grant`, `/watchlist` keeps serving its last snapshot, and the fix is to re-run the script.
+
+**Legacy `SIMKL_ACCESS_TOKEN`:** the old AUTH V1 long-lived token (V1 PIN flow, 5-year expiry) is still honoured when `SIMKL_REFRESH_TOKEN` is unset, so existing deployments keep working. Simkl retires V1 around April 2027. It must be paired with the old V1 `SIMKL_CLIENT_ID`; a V1 token doesn't work with a V2 client ID and can't be converted. Once `SIMKL_REFRESH_TOKEN` is set, remove `SIMKL_ACCESS_TOKEN`.
 
 See [watchlist.md](watchlist.md) for caching/enrichment details.
 
