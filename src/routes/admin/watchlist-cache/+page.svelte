@@ -40,7 +40,7 @@
 <Seo title="Watchlist cache — RazerGhost" description="Private Simkl cache inspector." path="/admin/watchlist-cache" noindex />
 
 <main class="mx-auto max-w-4xl px-6 py-16">
-	<h1 class="text-3xl font-extrabold tracking-tight text-white">Watchlist cache</h1>
+	<h1 class="h-page">Watchlist cache</h1>
 	<p class="mt-2 text-sm text-dim">
 		Cached genre/synopsis/runtime lookups backing the Watchlist page's per-title enrichment.
 		{#if !data.configured}
@@ -69,7 +69,7 @@
 			</button>
 		</form>
 		{#if form?.bulk}
-			<p class="text-xs text-dim">
+			<p class="meta">
 				{form.filled} of {form.total} now have a runtime.
 				{#if form.stillMissing}
 					{form.stillMissing} still have none — Simkl itself has no runtime data for {form.stillMissing === 1 ? 'that title' : 'those titles'}.
@@ -85,12 +85,12 @@
 		type="search"
 		bind:value={query}
 		placeholder="Filter by title…"
-		class="mt-6 w-full rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-white placeholder:text-dim focus:border-primary focus:outline-none sm:max-w-xs"
+		class="input mt-6 w-full text-sm sm:max-w-xs"
 	/>
 
 	<div class="mt-4 overflow-x-auto rounded-lg border border-border">
 		<table class="w-full text-left text-sm">
-			<thead class="border-b border-border text-xs text-dim">
+			<thead class="meta border-b border-border">
 				<tr>
 					<th class="sticky left-0 bg-bg px-4 py-2 font-medium">
 						<button type="button" onclick={() => toggleSort('title')} class="link hover:text-white">

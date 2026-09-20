@@ -79,7 +79,7 @@
 	});
 </script>
 
-<div class="card relative rounded-lg border border-border bg-surface p-4 font-mono text-sm">
+<div class="card relative p-4 font-mono text-sm">
 	{#each visible as step, i (i)}
 		<p class={step.type === 'cmd' ? 'text-gray' : 'text-dim'}>
 			{#if step.type === 'cmd'}<span class="text-primary">$</span>{' '}{/if}{step.text}
@@ -95,7 +95,7 @@
 		<button
 			type="button"
 			onclick={() => replayKey++}
-			class="absolute top-3 right-3 flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs text-dim transition-colors hover:border-primary hover:text-primary"
+			class="meta absolute top-3 right-3 flex items-center gap-1 rounded-md border border-border px-2 py-1 transition-colors hover:border-primary hover:text-primary"
 		>
 			<RotateCcw size={12} aria-hidden="true" /> Replay
 		</button>

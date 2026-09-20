@@ -4,7 +4,6 @@
     import Music from "@lucide/svelte/icons/music";
     import Search from "@lucide/svelte/icons/search";
     import X from "@lucide/svelte/icons/x";
-    import { reveal } from "$lib/actions/reveal";
     import { goto } from "$app/navigation";
     import { fly } from "svelte/transition";
     import { albumArt } from "$lib/stores/album-art.svelte";
@@ -258,11 +257,11 @@
     path="/listens"
 />
 
-<main class="mx-auto max-w-6xl px-6 py-16">
+<main class="page page--wide">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <h1
-                class="text-3xl font-extrabold tracking-tight text-white"
+                class="h-page"
                 data-hero-reveal="0"
             >
                 Listens
@@ -299,7 +298,7 @@
             <ListeningNowCard />
         </div>
 
-        <div class="mt-6" use:reveal>
+        <div class="mt-6">
             <div class="relative">
                 <Search
                     size={15}
@@ -309,7 +308,7 @@
                 <input
                     type="search"
                     placeholder="Search your listening history…"
-                    class="w-full rounded-lg border border-border bg-surface py-2 pr-9 pl-9 text-sm text-white placeholder:text-dim focus:border-primary focus:outline-none"
+                    class="card w-full py-2 pr-9 pl-9 text-sm text-white placeholder:text-dim focus:border-primary focus:outline-none"
                     bind:value={query}
                     oninput={onSearchInput}
                     onkeydown={onSearchKeydown}
@@ -327,9 +326,9 @@
             </div>
 
             {#if searching}
-                <p class="mt-4 text-xs text-dim">Searching…</p>
+                <p class="meta mt-4">Searching…</p>
             {:else if searchedFor && !searchResults.length}
-                <p class="mt-4 text-xs text-dim">
+                <p class="meta mt-4">
                     No plays match "{searchedFor}".
                 </p>
             {:else if searchResults.length}
@@ -344,7 +343,7 @@
                             target={href ? "_blank" : undefined}
                             rel="noreferrer"
                             in:fly={{ y: 8, duration: 200, delay: i * 20 }}
-                            class="group flex flex-col gap-2 rounded-lg border border-border bg-surface p-3 transition-colors hover:border-primary hover:bg-surface-2"
+                            class="card group flex flex-col gap-2 p-3 transition-colors hover:border-primary hover:bg-surface-2"
                         >
                             <div
                                 class="relative aspect-square w-full overflow-hidden rounded-md bg-surface-2"
@@ -373,9 +372,9 @@
                                 >
                                     {r.track}
                                 </p>
-                                <p class="truncate text-xs text-dim">{r.artist}</p>
+                                <p class="meta truncate">{r.artist}</p>
                             </div>
-                            <p class="text-xs text-dim">
+                            <p class="meta">
                                 {r.plays} play{r.plays === 1 ? "" : "s"}
                             </p>
                         </a>
@@ -386,9 +385,8 @@
 
         <div
             class="mt-6 rounded-lg border border-border p-5 sm:p-6"
-            use:reveal
         >
-            <p class="text-xs font-medium uppercase tracking-wide text-dim">
+            <p class="label">
                 Spent listening
             </p>
             <p class="mt-2 flex items-baseline gap-1.5 text-white">
@@ -410,36 +408,36 @@
                 class="mt-5 grid grid-cols-2 gap-4 border-t border-border pt-5 text-center sm:grid-cols-3 lg:grid-cols-5"
             >
                 <div>
-                    <p class="text-xl font-bold text-white">
+                    <p class="h-section">
                         {data.stats.totalPlays.toLocaleString()}
                     </p>
-                    <p class="mt-0.5 text-xs text-dim">Total plays</p>
+                    <p class="meta mt-0.5">Total plays</p>
                 </div>
                 <div>
-                    <p class="text-xl font-bold text-white">
+                    <p class="h-section">
                         {data.stats.peakYear ?? "—"}
                     </p>
-                    <p class="mt-0.5 text-xs text-dim">Peak year</p>
+                    <p class="meta mt-0.5">Peak year</p>
                 </div>
                 <div>
-                    <p class="text-xl font-bold text-white">
+                    <p class="h-section">
                         {data.stats.peakWeekday != null
                             ? WEEKDAY_NAMES[data.stats.peakWeekday]
                             : "—"}
                     </p>
-                    <p class="mt-0.5 text-xs text-dim">Most active day</p>
+                    <p class="meta mt-0.5">Most active day</p>
                 </div>
                 <div>
-                    <p class="text-xl font-bold text-white">
+                    <p class="h-section">
                         {formatDate(data.stats.firstPlayedAt)}
                     </p>
-                    <p class="mt-0.5 text-xs text-dim">Earliest play</p>
+                    <p class="meta mt-0.5">Earliest play</p>
                 </div>
                 <div>
-                    <p class="text-xl font-bold text-white">
+                    <p class="h-section">
                         {formatDate(data.stats.lastPlayedAt)}
                     </p>
-                    <p class="mt-0.5 text-xs text-dim">Most recent play</p>
+                    <p class="meta mt-0.5">Most recent play</p>
                 </div>
             </div>
 
@@ -449,34 +447,34 @@
                 >
                     {#if data.skipShuffle.skipRate != null}
                         <div>
-                            <p class="text-xl font-bold text-white">
+                            <p class="h-section">
                                 {Math.round(data.skipShuffle.skipRate)}%
                             </p>
-                            <p class="mt-0.5 text-xs text-dim">Skip rate</p>
+                            <p class="meta mt-0.5">Skip rate</p>
                         </div>
                     {/if}
                     {#if data.skipShuffle.shuffleRate != null}
                         <div>
-                            <p class="text-xl font-bold text-white">
+                            <p class="h-section">
                                 {Math.round(data.skipShuffle.shuffleRate)}%
                             </p>
-                            <p class="mt-0.5 text-xs text-dim">Shuffle plays</p>
+                            <p class="meta mt-0.5">Shuffle plays</p>
                         </div>
                     {/if}
                     {#if data.streaks.longest}
                         <div>
-                            <p class="text-xl font-bold text-white">
+                            <p class="h-section">
                                 {data.streaks.longest.days} day{data.streaks.longest.days === 1 ? "" : "s"}
                             </p>
-                            <p class="mt-0.5 text-xs text-dim">Longest streak</p>
+                            <p class="meta mt-0.5">Longest streak</p>
                         </div>
                     {/if}
                     {#if data.streaks.current}
                         <div>
-                            <p class="text-xl font-bold text-white">
+                            <p class="h-section">
                                 {data.streaks.current.days} day{data.streaks.current.days === 1 ? "" : "s"}
                             </p>
-                            <p class="mt-0.5 text-xs text-dim">Current streak</p>
+                            <p class="meta mt-0.5">Current streak</p>
                         </div>
                     {/if}
                 </div>
@@ -489,10 +487,9 @@
                 {#if data.stats.topArtists.length}
                     <div
                         class="rounded-lg border border-border p-5 sm:p-6"
-                        use:reveal
                     >
                         <p
-                            class="text-xs font-medium uppercase tracking-wide text-dim"
+                            class="label"
                         >
                             Top artists
                         </p>
@@ -594,10 +591,9 @@
                 {#if data.stats.topTracks.length}
                     <div
                         class="rounded-lg border border-border p-5 sm:p-6"
-                        use:reveal
                     >
                         <p
-                            class="text-xs font-medium uppercase tracking-wide text-dim"
+                            class="label"
                         >
                             Top tracks
                         </p>
@@ -680,10 +676,9 @@
                 {#if data.topAlbums.length}
                     <div
                         class="rounded-lg border border-border p-5 sm:p-6"
-                        use:reveal
                     >
                         <p
-                            class="text-xs font-medium uppercase tracking-wide text-dim"
+                            class="label"
                         >
                             Top albums
                         </p>
@@ -749,10 +744,9 @@
                 {#if data.discoveries.length}
                     <div
                         class="rounded-lg border border-border p-5 sm:p-6"
-                        use:reveal
                     >
                         <p
-                            class="text-xs font-medium uppercase tracking-wide text-dim"
+                            class="label"
                         >
                             Discovered in {data.selectedYear}
                         </p>
@@ -778,9 +772,8 @@
         {#if hourlyByHour.some((n) => n > 0)}
             <div
                 class="mt-4 rounded-lg border border-border p-5 sm:p-6"
-                use:reveal
             >
-                <p class="text-xs font-medium uppercase tracking-wide text-dim">
+                <p class="label">
                     Listening clock
                 </p>
                 <div class="mt-3 flex h-16 items-end gap-[3px]">
@@ -806,9 +799,8 @@
         {#if monthlyBars.length}
             <div
                 class="mt-4 rounded-lg border border-border p-5 sm:p-6"
-                use:reveal
             >
-                <p class="text-xs font-medium uppercase tracking-wide text-dim">
+                <p class="label">
                     Monthly trend
                 </p>
                 <div class="mt-3 flex h-20 items-end gap-[3px] pb-1">
@@ -837,9 +829,8 @@
         {#if heatmapWeeks.length}
             <div
                 class="mt-4 rounded-lg border border-border p-5 sm:p-6"
-                use:reveal
             >
-                <p class="text-xs font-medium uppercase tracking-wide text-dim">
+                <p class="label">
                     {data.selectedYear} activity
                 </p>
                 <div class="mt-3 flex gap-[3px] pb-1">
@@ -869,9 +860,8 @@
         {#if weekdayHourGrid.length}
             <div
                 class="mt-4 rounded-lg border border-border p-5 sm:p-6"
-                use:reveal
             >
-                <p class="text-xs font-medium uppercase tracking-wide text-dim">
+                <p class="label">
                     Listening habits by day &amp; hour
                 </p>
                 <div class="mt-3 pb-1">
@@ -921,9 +911,8 @@
         {#if data.onThisDay.length}
             <div
                 class="mt-4 rounded-lg border border-border p-5 sm:p-6"
-                use:reveal
             >
-                <p class="text-xs font-medium uppercase tracking-wide text-dim">
+                <p class="label">
                     On this day
                 </p>
                 <ul class="mt-4 flex flex-col gap-3">

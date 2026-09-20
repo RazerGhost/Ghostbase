@@ -38,7 +38,7 @@
 	{#if badges.length}
 		<ul class="mt-3 flex flex-wrap gap-2">
 			{#each badges as badge}
-				<li class="chip rounded-full border border-border px-3 py-1 text-xs text-gray">
+				<li class="chip">
 					{badge}
 				</li>
 			{/each}
@@ -46,7 +46,7 @@
 	{/if}
 
 	{#if project.href}
-		<div class="mt-3 flex items-center gap-1.5 text-xs text-dim">
+		<div class="meta mt-3 flex items-center gap-1.5">
 			<GithubIcon size={13} aria-hidden="true" />
 			<span>{project.href.replace('https://github.com/', '')}</span>
 		</div>

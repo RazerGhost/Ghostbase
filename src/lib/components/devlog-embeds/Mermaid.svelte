@@ -45,7 +45,7 @@
 	});
 </script>
 
-<div class="card rounded-lg border border-border bg-surface p-4">
+<div class="card p-4">
 	{#if error}
 		<p class="text-sm text-danger">{error}</p>
 	{:else}

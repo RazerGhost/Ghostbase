@@ -14,15 +14,15 @@
 
 <Seo title="Access denied — RazerGhost" description="Access denied." path="/auth/denied" noindex />
 
-<main class="mx-auto max-w-2xl px-6 py-16">
+<main class="page page--narrow">
 	<section class="flex flex-col items-center py-16 text-center">
-		<h1 class="text-3xl font-extrabold tracking-tight text-white">Access denied</h1>
+		<h1 class="h-page">Access denied</h1>
 		<p class="mt-3 max-w-sm text-gray">{message}</p>
 
 		<div class="mt-8">
 			<a
 				href="/"
-				class="link rounded-full border border-border px-4 py-2 text-sm text-gray transition-colors hover:border-primary hover:text-primary"
+				class="btn link"
 			>
 				Back home
 			</a>

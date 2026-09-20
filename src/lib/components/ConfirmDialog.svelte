@@ -38,7 +38,7 @@
 			role="alertdialog"
 			aria-modal="true"
 			aria-label={title}
-			class="w-full max-w-sm rounded-lg border border-border bg-surface p-5"
+			class="card w-full max-w-sm p-5"
 		>
 			<p class="text-sm text-white">{title}</p>
 			<div class="mt-4 flex justify-end gap-2">

@@ -145,7 +145,7 @@
 		role="presentation"
 	>
 		<div
-			class="w-full max-w-lg rounded-lg border border-border bg-surface shadow-2xl"
+			class="card w-full max-w-lg shadow-2xl"
 			onclick={(e) => e.stopPropagation()}
 			role="presentation"
 		>
@@ -159,7 +159,7 @@
 					placeholder="Jump to a page or post…"
 					class="w-full bg-transparent text-sm text-white placeholder:text-dim focus:outline-none"
 				/>
-				<kbd class="rounded border border-border px-1.5 py-0.5 text-xs text-dim">Esc</kbd>
+				<kbd class="meta rounded border border-border px-1.5 py-0.5">Esc</kbd>
 			</div>
 			<ul bind:this={listEl} class="max-h-80 overflow-y-auto p-2">
 				{#each filtered as item, i (item.label + i)}
@@ -176,7 +176,7 @@
 						>
 							<span>{item.label}</span>
 							{#if item.hint}
-								<span class="text-xs text-dim">{item.hint}</span>
+								<span class="meta">{item.hint}</span>
 							{/if}
 						</button>
 					</li>

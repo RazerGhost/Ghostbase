@@ -43,7 +43,7 @@
 	});
 </script>
 
-<div class="card rounded-lg border border-border bg-surface p-4 font-mono text-sm">
+<div class="card p-4 font-mono text-sm">
 	{#each visible as line, i}
 		<p class="text-gray">
 			{#if i % 2 === 0}<span class="text-primary">$</span>{/if}

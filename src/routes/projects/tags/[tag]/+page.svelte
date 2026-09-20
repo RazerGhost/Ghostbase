@@ -1,7 +1,6 @@
 <script lang="ts">
 	import ProjectCard from '$lib/components/ProjectCard.svelte';
 	import Seo from '$lib/components/Seo.svelte';
-	import { reveal } from '$lib/actions/reveal';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import type { PageData } from './$types';
 
@@ -14,12 +13,12 @@
 	path="/projects/tags/{data.tag}"
 />
 
-<main class="mx-auto max-w-2xl px-6 py-16">
+<main class="page page--narrow">
 	<a href="/projects" class="link flex items-center gap-1 text-sm text-primary hover:opacity-85">
 		<ArrowLeft size={15} aria-hidden="true" /> Projects
 	</a>
 
-	<h1 class="mt-4 text-3xl font-extrabold tracking-tight text-white">#{data.tag}</h1>
+	<h1 class="h-page mt-4">#{data.tag}</h1>
 	<p class="mt-2 text-gray">
 		{data.projects.length}
 		{data.projects.length === 1 ? 'project' : 'projects'} tagged &ldquo;{data.tag}&rdquo;.
@@ -42,7 +41,7 @@
 		</ul>
 	{/if}
 
-	<div class="mt-8 grid gap-4" use:reveal>
+	<div class="mt-8 grid gap-4">
 		{#each data.projects as project (project.slug)}
 			<ProjectCard {project} />
 		{:else}

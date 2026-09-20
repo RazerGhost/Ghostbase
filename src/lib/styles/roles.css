@@ -1,0 +1,297 @@
+/* ── Role layer — Ghostbase ──────────────────────────────────────────
+   This is the file to edit when a design decision changes.
+
+   Before this existed, the design lived inline: the string
+   "rounded-lg border border-border bg-surface p-6" appeared 32 times across
+   18 files, "text-xl font-bold text-white" 30 times, the input recipe 38
+   times. A design change meant rewriting thousands of utility strings, which
+   is why the site could not be redesigned. Now a role is declared once here
+   and markup asks for it by name.
+
+   Rule: reach for a role. Only reach for a raw utility when no role fits —
+   and when that happens twice, add a role here.
+
+   Every value consumes a token from tokens.css. No raw hex, no magic sizes.
+   ──────────────────────────────────────────────────────────────────── */
+
+/* Wrapped in Tailwind's `components` layer, deliberately. Unlayered CSS beats
+   layered CSS regardless of specificity, so an unlayered .card would silently
+   win over every utility put on top of it — `class="card p-4"` would render at
+   p-6. In the components layer, roles set the default and a utility can still
+   override one value without abandoning the role. */
+@layer components {
+
+	/* ── Page container ──────────────────────────────────────────────────
+	   No page sets its own mx-auto / max-w-* / px-* / py-*. Width is a
+	   modifier, because the data pages want more room than the prose ones. */
+	.page {
+		margin-inline: auto;
+		max-width: var(--max-w);
+		padding-inline: var(--pad);
+		padding-block: var(--space-16);
+	}
+	.page--narrow {
+		max-width: 42rem;
+	}
+	.page--prose {
+		max-width: 48rem;
+	}
+	.page--wide {
+		max-width: 72rem;
+	}
+
+	/* ── Headings ────────────────────────────────────────────────────────
+	   Roles, not sizes. .h-page is the one h1 per page; .h-section titles a
+	   block of UI; .h-card titles a card, in two sizes (small = a compact card
+	   in a dense list, large = a card in a 2- or 3-column grid). */
+	.h-page {
+		font-size: var(--fs-title);
+		font-weight: var(--fw-extrabold);
+		line-height: var(--lh-heading);
+		letter-spacing: var(--track-tight);
+		color: var(--white);
+	}
+	.h-section {
+		font-size: var(--fs-section-head);
+		font-weight: var(--fw-bold);
+		line-height: 1.4;
+		color: var(--white);
+	}
+	.h-card {
+		font-size: var(--fs-body);
+		font-weight: var(--fw-semibold);
+		color: var(--white);
+	}
+	.h-card-lg {
+		font-size: var(--fs-subheading);
+		font-weight: var(--fw-semibold);
+		line-height: var(--lh-heading);
+		color: var(--white);
+	}
+
+	/* Subtitle under an .h-page */
+	.lead {
+		font-size: var(--fs-body);
+		line-height: var(--lh-body);
+		color: var(--gray);
+	}
+
+	/* ── Label register ──────────────────────────────────────────────────
+	   Small uppercase section markers ("CURRENTLY", "TOP GENRES", "NOW
+	   PLAYING"). --label-icon is the same label with a leading icon. */
+	.label {
+		font-size: var(--fs-label);
+		font-weight: var(--fw-medium);
+		text-transform: uppercase;
+		letter-spacing: 0.025em;
+		color: var(--dim);
+	}
+	.label--strong {
+		font-weight: var(--fw-semibold);
+	}
+	.label--icon {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	/* Secondary line: dates, counts, "3 min read", byline fragments. */
+	.meta {
+		font-size: var(--fs-label);
+		color: var(--dim);
+	}
+
+	/* ── Numeral register ────────────────────────────────────────────────
+	   Mono + tabular figures, for stat values, counters, durations, play and
+	   episode counts. ONE role — do not spread mono into body copy. This is
+	   the instrument-panel signal: on the data pages, the number is meant to
+	   be the biggest thing on the screen. */
+	.num {
+		font-family: var(--font-mono);
+		font-variant-numeric: tabular-nums;
+		font-weight: var(--fw-bold);
+		color: var(--white);
+		letter-spacing: var(--track-display);
+	}
+	.num-lg {
+		font-size: var(--fs-section-head);
+		line-height: var(--lh-heading);
+	}
+	.num-xl {
+		font-size: var(--fs-display);
+		font-weight: var(--fw-extrabold);
+		line-height: var(--lh-tight);
+	}
+
+	/* ── Card / panel ────────────────────────────────────────────────────
+	   Elevation level 1. The default block. */
+	.card {
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-lg);
+		padding: var(--space-6);
+		transition:
+			border-color var(--dur-base),
+			box-shadow var(--dur-base);
+	}
+
+	/* A card never contains another card (design.md § Elevation). Nesting the
+	   same surface inside itself is what made the home page read as one flat
+	   grey field, so a nested .card silently gives up its fill and border and
+	   keeps only its spacing — the mistake cannot reach the screen. */
+	.card .card {
+		background: none;
+		border: 0;
+		border-radius: 0;
+		padding: 0;
+	}
+
+	/* Outline-only variant: structure without another filled surface. */
+	.card--ghost {
+		background: none;
+	}
+
+	/* No padding — for cards whose child manages its own insets (media, tables). */
+	.card--flush {
+		padding: 0;
+	}
+
+	/* Clickable card. One hover signal, per design.md § Microinteractions. */
+	.card--interactive:hover {
+		border-color: var(--primary-glow-border);
+		box-shadow:
+			0 0 0 1px var(--primary-glow),
+			var(--shadow-card-hover);
+	}
+
+	/* ── Buttons / pill links ────────────────────────────────────────────
+	   There is no sales CTA on this site (design.md § CTA voice) — these are
+	   links that need a hit area, not conversion buttons. */
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-full);
+		padding: var(--space-2) var(--space-4);
+		font-size: var(--fs-body-sm);
+		color: var(--gray);
+		transition:
+			color var(--dur-fast),
+			border-color var(--dur-fast),
+			background-color var(--dur-fast);
+	}
+	.btn:hover {
+		color: var(--color-primary);
+		border-color: var(--color-primary);
+	}
+
+	/* Accent variant — the affirmative action in a pair (import, refresh, save). */
+	.btn--accent {
+		border-color: var(--color-primary);
+		color: var(--color-primary);
+	}
+	.btn--accent:hover {
+		background: var(--primary-glow);
+		border-color: var(--color-primary);
+		color: var(--color-primary);
+	}
+
+	/* Square variant — sits next to an .input in a row. */
+	.btn--sq {
+		border-radius: var(--radius-lg);
+		padding: var(--space-2) var(--space-3);
+	}
+
+	.btn:disabled,
+	.btn[aria-disabled='true'] {
+		cursor: not-allowed;
+		opacity: 0.5;
+	}
+
+	/* ── Chip ────────────────────────────────────────────────────────────
+	   Tags, filters, stack badges. */
+	.chip {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-1);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-full);
+		padding: var(--space-1) var(--space-3);
+		font-size: var(--fs-label);
+		color: var(--gray);
+		transition:
+			color var(--dur-fast),
+			border-color var(--dur-fast);
+	}
+	.chip:hover {
+		color: var(--color-primary);
+		border-color: var(--color-primary);
+	}
+	.chip--active {
+		border-color: var(--color-primary);
+		color: var(--color-primary);
+	}
+
+	/* ── Form controls ───────────────────────────────────────────────────
+	   Mostly the admin area, but shared so the two halves of the site do not
+	   drift apart. */
+	.input,
+	.textarea {
+		border: 1px solid var(--border);
+		border-radius: var(--radius-lg);
+		background: transparent;
+		padding: var(--space-2) var(--space-4);
+		color: var(--white);
+		font-family: inherit;
+		font-size: inherit;
+	}
+	.input::placeholder,
+	.textarea::placeholder {
+		color: var(--dim);
+	}
+	.input:focus,
+	.textarea:focus {
+		border-color: var(--color-primary);
+		outline: none;
+	}
+	.textarea {
+		font-family: var(--font-mono);
+		font-size: var(--fs-body-sm);
+		line-height: var(--lh-body);
+	}
+
+	/* ── Live-event flash ────────────────────────────────────────────────
+	   The one place --color-action is allowed (design.md § Theme). Applied
+	   when a Lanyard/Spotify/GitHub value actually changes — never on load,
+	   never on a loop, never as idle chrome. */
+	.flash-in {
+		animation: flash-in var(--dur-enter) var(--ease-out);
+	}
+	@keyframes flash-in {
+		0% {
+			box-shadow: var(--ring-action);
+		}
+		100% {
+			box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-action) 0%, transparent);
+		}
+	}
+
+	/* ── Page chrome ─────────────────────────────────────────────────────
+	   Faint ambient glow behind the page, anchored top-centre — gives the dark
+	   surface some depth without turning into a marketing gradient. */
+	.bg-glow {
+		position: fixed;
+		inset: 0;
+		z-index: -1;
+		pointer-events: none;
+		background: radial-gradient(ellipse 60% 40% at 50% 0%, var(--primary-glow) 0%, transparent 70%);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.flash-in {
+			animation: none;
+		}
+	}
+
+}

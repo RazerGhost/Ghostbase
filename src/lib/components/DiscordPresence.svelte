@@ -79,20 +79,20 @@
 			{#if activityImage}
 				<img src={activityImage} alt="" class="h-14 w-14 shrink-0 rounded-md object-cover" />
 			{:else}
-				<span class="grid h-14 w-14 shrink-0 place-items-center rounded-md bg-surface-2 text-xs text-dim">
+				<span class="meta grid h-14 w-14 shrink-0 place-items-center rounded-md bg-surface-2">
 					{activity.name.slice(0, 1).toUpperCase()}
 				</span>
 			{/if}
 			<div class="min-w-0 flex-1">
 				<p class="truncate text-sm font-medium text-white">{activity.name}</p>
 				{#if activity.details}
-					<p class="truncate text-xs text-dim">{activity.details}</p>
+					<p class="meta truncate">{activity.details}</p>
 				{/if}
 				{#if activity.state}
-					<p class="truncate text-xs text-dim">{activity.state}</p>
+					<p class="meta truncate">{activity.state}</p>
 				{/if}
 				{#if activity.timestamps?.start}
-					<p class="mt-1 text-xs text-dim">{formatElapsed(activity.timestamps.start)}</p>
+					<p class="meta mt-1">{formatElapsed(activity.timestamps.start)}</p>
 				{/if}
 			</div>
 		</div>
@@ -101,11 +101,11 @@
 	{/if}
 {:else if compact}
 	{#if status === 'loading'}
-		<p class="text-xs text-dim">Checking Discord…</p>
+		<p class="meta">Checking Discord…</p>
 	{:else if status === 'error' || !data}
-		<p class="text-xs text-dim">Discord unavailable.</p>
+		<p class="meta">Discord unavailable.</p>
 	{:else}
-		<div class="flex items-center gap-1.5 text-xs text-dim">
+		<div class="meta flex items-center gap-1.5">
 			<span class={`h-2 w-2 rounded-full ${statusColor[data.discord_status]}`} aria-hidden="true"
 			></span>
 			<span>{statusLabel[data.discord_status]}</span>
@@ -128,7 +128,7 @@
 			{#if avatarUrl}
 				<img src={avatarUrl} alt="" class="h-10 w-10 rounded-full object-cover" />
 			{:else}
-				<span class="grid h-10 w-10 place-items-center rounded-full bg-surface-2 text-xs text-dim">
+				<span class="meta grid h-10 w-10 place-items-center rounded-full bg-surface-2">
 					{(data.discord_user.global_name ?? data.discord_user.username).slice(0, 1).toUpperCase()}
 				</span>
 			{/if}
@@ -143,7 +143,7 @@
 				<span class="font-medium text-white">
 					{data.discord_user.global_name ?? data.discord_user.username}
 				</span>
-				<span class="text-xs text-dim">{statusLabel[data.discord_status]}</span>
+				<span class="meta">{statusLabel[data.discord_status]}</span>
 				{#if data.active_on_discord_desktop || data.active_on_discord_mobile || data.active_on_discord_web}
 					<span class="flex items-center gap-1 text-dim">
 						{#if data.active_on_discord_desktop}
@@ -174,13 +174,13 @@
 					<div class="min-w-0 flex-1">
 						<p class="truncate text-gray">{activity.name}</p>
 						{#if activity.details}
-							<p class="truncate text-xs text-dim">{activity.details}</p>
+							<p class="meta truncate">{activity.details}</p>
 						{/if}
 						{#if activity.state}
-							<p class="truncate text-xs text-dim">{activity.state}</p>
+							<p class="meta truncate">{activity.state}</p>
 						{/if}
 						{#if activity.timestamps?.start}
-							<p class="text-xs text-dim">{formatElapsed(activity.timestamps.start)}</p>
+							<p class="meta">{formatElapsed(activity.timestamps.start)}</p>
 						{/if}
 					</div>
 				</div>

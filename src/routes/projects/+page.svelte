@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { reveal } from '$lib/actions/reveal';
 	import Seo from '$lib/components/Seo.svelte';
 	import ProjectCard from '$lib/components/ProjectCard.svelte';
 	import Rss from '@lucide/svelte/icons/rss';
@@ -90,9 +89,9 @@
 
 <Seo title="Projects — RazerGhost" description="Things I've built." path="/projects" />
 
-<main class="mx-auto max-w-6xl px-6 py-16">
+<main class="page page--wide">
 	<div class="flex items-baseline justify-between" data-hero-reveal="0">
-		<h1 class="text-3xl font-extrabold tracking-tight text-white">Projects</h1>
+		<h1 class="h-page">Projects</h1>
 		<a
 			href="/projects/rss.xml"
 			data-sveltekit-reload
@@ -105,22 +104,22 @@
 
 	<div class="mt-6 grid grid-cols-3 gap-4 rounded-lg border border-border p-4 text-center" data-hero-reveal="2">
 		<div>
-			<p class="text-xl font-bold text-white">{data.projects.length}</p>
-			<p class="mt-0.5 text-xs text-dim">Projects</p>
+			<p class="h-section">{data.projects.length}</p>
+			<p class="meta mt-0.5">Projects</p>
 		</div>
 		<div>
-			<p class="text-xl font-bold text-white">{tags.length}</p>
-			<p class="mt-0.5 text-xs text-dim">Tags</p>
+			<p class="h-section">{tags.length}</p>
+			<p class="meta mt-0.5">Tags</p>
 		</div>
 		<div>
-			<p class="text-xl font-bold text-white">{latestDate ? formatDate(latestDate) : '—'}</p>
-			<p class="mt-0.5 text-xs text-dim">Latest build</p>
+			<p class="h-section">{latestDate ? formatDate(latestDate) : '—'}</p>
+			<p class="meta mt-0.5">Latest build</p>
 		</div>
 	</div>
 
 	{#if featuredProject}
 		<div class="mt-6">
-			<p class="text-xs font-semibold uppercase tracking-wide text-dim">Featured</p>
+			<p class="label label--strong">Featured</p>
 			<div class="mt-2">
 				<ProjectCard project={featuredProject} featured />
 			</div>
@@ -191,7 +190,7 @@
 	{/if}
 
 	{#if data.projects.length - (featuredProject ? 1 : 0) > 0}
-		<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" use:reveal>
+		<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 			{#each filtered as project, i}
 				<div style="transition-delay: {i * 60}ms">
 					<ProjectCard {project} />

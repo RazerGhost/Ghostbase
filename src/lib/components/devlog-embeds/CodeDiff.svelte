@@ -17,7 +17,7 @@
 	}
 </script>
 
-<div class="card overflow-x-auto rounded-lg border border-border bg-surface p-4 font-mono text-sm">
+<div class="card overflow-x-auto p-4 font-mono text-sm">
 	{#each lines as line}
 		{@const type = kind(line)}
 		<p

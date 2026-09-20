@@ -60,8 +60,8 @@
 
 <Seo title="New project — RazerGhost" description="Private projects editor." path="/admin/projects/new" noindex />
 
-<main class="mx-auto max-w-2xl px-6 py-16">
-	<h1 class="text-3xl font-extrabold tracking-tight text-white">New project</h1>
+<main class="page page--narrow">
+	<h1 class="h-page">New project</h1>
 
 	<form
 		method="POST"
@@ -84,7 +84,7 @@
 			placeholder="Name"
 			value={form?.name ?? ''}
 			required
-			class="rounded-lg border border-border bg-transparent px-4 py-2 text-white placeholder:text-dim focus:border-primary focus:outline-none"
+			class="input"
 		/>
 
 		<textarea
@@ -92,7 +92,7 @@
 			placeholder="Short description"
 			rows="2"
 			required
-			class="rounded-lg border border-border bg-transparent px-4 py-2 text-white placeholder:text-dim focus:border-primary focus:outline-none"
+			class="input"
 			>{form?.description ?? ''}</textarea
 		>
 
@@ -102,14 +102,14 @@
 				name="href"
 				placeholder="Repo URL (optional)"
 				value={form?.href ?? ''}
-				class="flex-1 rounded-lg border border-border bg-transparent px-4 py-2 text-white placeholder:text-dim focus:border-primary focus:outline-none"
+				class="input flex-1"
 			/>
 			<input
 				type="url"
 				name="live"
 				placeholder="Live URL (optional)"
 				value={form?.live ?? ''}
-				class="flex-1 rounded-lg border border-border bg-transparent px-4 py-2 text-white placeholder:text-dim focus:border-primary focus:outline-none"
+				class="input flex-1"
 			/>
 		</div>
 
@@ -119,14 +119,14 @@
 				name="date"
 				value={form?.date ?? today}
 				required
-				class="rounded-lg border border-border bg-transparent px-4 py-2 text-white focus:border-primary focus:outline-none"
+				class="input"
 			/>
 			<input
 				type="text"
 				name="tags"
 				placeholder="Tags (comma separated)"
 				value={form?.tags ?? ''}
-				class="flex-1 rounded-lg border border-border bg-transparent px-4 py-2 text-white placeholder:text-dim focus:border-primary focus:outline-none"
+				class="input flex-1"
 			/>
 		</div>
 
@@ -135,7 +135,7 @@
 			name="stack"
 			placeholder="Tech stack (comma separated, optional)"
 			value={form?.stack ?? ''}
-			class="rounded-lg border border-border bg-transparent px-4 py-2 text-white placeholder:text-dim focus:border-primary focus:outline-none"
+			class="input"
 		/>
 
 		<div class="flex gap-2">
@@ -144,12 +144,12 @@
 				name="cover"
 				placeholder="Cover image path (optional)"
 				bind:value={cover}
-				class="flex-1 rounded-lg border border-border bg-transparent px-4 py-2 text-white placeholder:text-dim focus:border-primary focus:outline-none"
+				class="input flex-1"
 			/>
 			<button
 				type="button"
 				onclick={() => (coverPickerOpen = true)}
-				class="link shrink-0 rounded-lg border border-border px-3 py-2 text-sm text-gray transition-colors hover:border-primary hover:text-primary"
+				class="btn btn--sq link shrink-0"
 			>
 				Browse…
 			</button>
@@ -161,12 +161,12 @@
 				name="images"
 				placeholder="Gallery image paths (comma separated, optional)"
 				bind:value={images}
-				class="flex-1 rounded-lg border border-border bg-transparent px-4 py-2 text-white placeholder:text-dim focus:border-primary focus:outline-none"
+				class="input flex-1"
 			/>
 			<button
 				type="button"
 				onclick={() => (galleryPickerOpen = true)}
-				class="link shrink-0 rounded-lg border border-border px-3 py-2 text-sm text-gray transition-colors hover:border-primary hover:text-primary"
+				class="btn btn--sq link shrink-0"
 			>
 				Add image…
 			</button>
@@ -176,7 +176,7 @@
 			<select
 				name="status"
 				value={form?.status ?? 'active'}
-				class="rounded-lg border border-border bg-transparent px-4 py-2 text-white focus:border-primary focus:outline-none"
+				class="input"
 			>
 				<option value="active">Active</option>
 				<option value="paused">Paused</option>
@@ -224,7 +224,7 @@
 			placeholder="Write something..."
 			rows="16"
 			hidden={mode === 'preview'}
-			class="rounded-lg border border-border bg-transparent px-4 py-2 text-white placeholder:text-dim focus:border-primary focus:outline-none"
+			class="input"
 		></textarea>
 		{#if mode === 'preview'}
 			<div class="devlog-content rounded-lg border border-border px-4 py-2">
@@ -236,13 +236,13 @@
 			<button
 				type="submit"
 				disabled={saving}
-				class="link rounded-full border border-primary px-4 py-2 text-sm text-primary transition-colors hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-50"
+				class="btn btn--accent link disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				{saving ? 'Saving…' : 'Save'}
 			</button>
 			<a
 				href="/admin/projects"
-				class="link rounded-full border border-border px-4 py-2 text-sm text-gray transition-colors hover:border-primary hover:text-primary"
+				class="btn link"
 			>
 				Cancel
 			</a>

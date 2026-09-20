@@ -40,7 +40,7 @@
 			role="dialog"
 			aria-modal="true"
 			aria-label="Media library"
-			class="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-border bg-surface p-5"
+			class="card max-h-[85vh] w-full max-w-2xl overflow-y-auto p-5"
 		>
 			<div class="flex items-center justify-between">
 				<h2 class="text-sm font-medium text-white">Media library</h2>

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { reveal } from '$lib/actions/reveal';
 	import DiscordPresence from '$lib/components/DiscordPresence.svelte';
 	import Logo from '$lib/components/Logo.svelte';
 	import Seo from '$lib/components/Seo.svelte';
@@ -24,9 +23,9 @@
 	path="/about"
 />
 
-<main class="mx-auto max-w-3xl px-6 py-16">
+<main class="page page--prose">
 	<section
-		class="card flex flex-col items-center gap-4 rounded-lg border border-border bg-surface p-6 text-center sm:flex-row sm:text-left"
+		class="card flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left"
 		data-hero-reveal="0"
 	>
 		<div class="relative flex h-14 w-14 shrink-0 items-center justify-center">
@@ -34,7 +33,7 @@
 			<Logo variant="mark" size={56} />
 		</div>
 		<div class="min-w-0 flex-1">
-			<h1 class="text-xl font-bold text-white">{site.name}</h1>
+			<h1 class="h-section">{site.name}</h1>
 			<p class="mt-1 text-sm text-gray">Dimitri de Jong &middot; building random things in public</p>
 			<div class="mt-2 flex justify-center sm:justify-start">
 				<DiscordPresence compact />
@@ -57,23 +56,23 @@
 	</section>
 
 	<div class="mt-4 grid grid-cols-3 gap-3">
-		<div class="card rounded-lg border border-border bg-surface p-4 text-center" use:reveal>
-			<p class="text-xl font-bold text-white">{data.postCount}</p>
-			<p class="mt-1 text-xs text-dim">devlog posts</p>
+		<div class="card p-4 text-center">
+			<p class="num num-lg">{data.postCount}</p>
+			<p class="meta mt-1">devlog posts</p>
 		</div>
-		<div class="card rounded-lg border border-border bg-surface p-4 text-center" use:reveal>
-			<p class="text-xl font-bold text-white">{data.projectCount}</p>
-			<p class="mt-1 text-xs text-dim">projects shipped</p>
+		<div class="card p-4 text-center">
+			<p class="num num-lg">{data.projectCount}</p>
+			<p class="meta mt-1">projects shipped</p>
 		</div>
-		<div class="card rounded-lg border border-border bg-surface p-4 text-center" use:reveal>
-			<p class="text-xl font-bold text-white">{data.currentStreak ?? 0}</p>
-			<p class="mt-1 text-xs text-dim">day listen streak</p>
+		<div class="card p-4 text-center">
+			<p class="num num-lg">{data.currentStreak ?? 0}</p>
+			<p class="meta mt-1">day listen streak</p>
 		</div>
 	</div>
 
 	<div class="mt-4 grid gap-3">
-		<section class="card rounded-lg border border-border bg-surface p-6" use:reveal>
-			<h2 class="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-dim">
+		<section class="card">
+			<h2 class="label label--icon">
 				<User size={13} aria-hidden="true" /> Who's behind this
 			</h2>
 			<p class="mt-3 text-[15px] leading-relaxed text-gray">
@@ -86,8 +85,8 @@
 			</p>
 		</section>
 
-		<section class="card rounded-lg border border-border bg-surface p-6" use:reveal>
-			<h2 class="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-dim">
+		<section class="card">
+			<h2 class="label label--icon">
 				<Code size={13} aria-hidden="true" /> Building in public
 			</h2>
 			<p class="mt-3 text-[15px] leading-relaxed text-gray">
@@ -100,8 +99,8 @@
 			</p>
 		</section>
 
-		<section class="card rounded-lg border border-border bg-surface p-6" use:reveal>
-			<h2 class="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-dim">
+		<section class="card">
+			<h2 class="label label--icon">
 				<GitBranch size={13} aria-hidden="true" /> RazerGhost vs. RG Digital
 			</h2>
 			<p class="mt-3 text-[15px] leading-relaxed text-gray">

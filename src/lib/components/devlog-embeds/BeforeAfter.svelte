@@ -9,7 +9,7 @@
 	let position = $state(50);
 </script>
 
-<div class="card rounded-lg border border-border bg-surface p-4">
+<div class="card p-4">
 	{#if before && after}
 		<div class="relative aspect-video w-full overflow-hidden rounded-md select-none">
 			<img src={after} alt="after" class="absolute inset-0 h-full w-full object-contain" />
@@ -34,6 +34,6 @@
 			aria-label="Before/after comparison slider"
 		/>
 	{:else}
-		<p class="text-xs text-dim">before/after embed needs `before` and `after` image URLs</p>
+		<p class="meta">before/after embed needs `before` and `after` image URLs</p>
 	{/if}
 </div>

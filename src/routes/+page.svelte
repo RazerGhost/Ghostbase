@@ -10,7 +10,6 @@
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import Music from '@lucide/svelte/icons/music';
 	import Clapperboard from '@lucide/svelte/icons/clapperboard';
-	import { reveal } from '$lib/actions/reveal';
 	import { socialLinks, site } from '$lib/config';
 	import Seo from '$lib/components/Seo.svelte';
 
@@ -42,10 +41,10 @@
 
 <Seo title={site.name} description={site.description} path="/" />
 
-<main class="mx-auto max-w-5xl px-6 py-16">
+<main class="page">
 	<div class="grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
 		<section
-			class="card flex flex-col items-center gap-4 rounded-lg border border-border bg-surface p-6 text-center sm:col-span-2 sm:flex-row sm:text-left lg:col-span-3"
+			class="card flex flex-col items-center gap-4 text-center sm:col-span-2 sm:flex-row sm:text-left lg:col-span-3"
 		>
 			<div class="relative flex h-16 w-16 shrink-0 items-center justify-center" data-hero-reveal="0">
 				<div class="absolute inset-0 rounded-full bg-primary/10 blur-xl" aria-hidden="true"></div>
@@ -65,7 +64,7 @@
 					<li>
 						<a
 							href={link.href}
-							class="link flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm text-gray transition-colors hover:border-primary hover:text-primary"
+							class="btn link flex items-center gap-1.5"
 						>
 							<Icon size={15} aria-hidden="true" />
 							{link.label}
@@ -76,14 +75,13 @@
 		</section>
 
 		<section
-			class="card self-start rounded-lg border border-border bg-surface p-6 lg:col-span-2"
-			use:reveal
+			class="card self-start lg:col-span-2"
 		>
-			<h2 class="text-xl font-bold text-white">Right now</h2>
+			<h2 class="h-section">Right now</h2>
 
 			<div class="mt-6 grid items-start gap-6 sm:grid-cols-2">
 				<div>
-					<h3 class="text-xs font-medium uppercase tracking-wide text-dim">Currently</h3>
+					<h3 class="label">Currently</h3>
 					<ul class="mt-3 grid gap-2">
 						{#each data.statusItems as item}
 							<li class="text-sm text-gray">{item}</li>
@@ -91,7 +89,7 @@
 					</ul>
 				</div>
 				<div class="sm:border-l sm:border-border sm:pl-6">
-					<h3 class="text-xs font-medium uppercase tracking-wide text-dim">GitHub</h3>
+					<h3 class="label">GitHub</h3>
 					<div class="mt-3">
 						<GithubActivity limit={8} />
 					</div>
@@ -100,8 +98,8 @@
 		</section>
 
 		<div class="flex flex-col gap-4">
-			<section class="card flex flex-1 flex-col rounded-lg border border-border bg-surface p-6" use:reveal>
-				<h2 class="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-dim">
+			<section class="card flex flex-1 flex-col">
+				<h2 class="label label--icon">
 					<Music size={13} aria-hidden="true" /> Now playing
 				</h2>
 
@@ -114,24 +112,24 @@
 				</div>
 			</section>
 
-			<section class="card flex flex-1 flex-col rounded-lg border border-border bg-surface p-6" use:reveal>
+			<section class="card flex flex-1 flex-col">
 				<div class="flex items-baseline justify-between">
-					<h2 class="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-dim">
+					<h2 class="label label--icon">
 						<Music size={13} aria-hidden="true" /> Listens
 					</h2>
 					<a href="/listens" class="link text-xs text-primary hover:opacity-85">See all</a>
 				</div>
 
 				{#if data.currentStreak}
-					<p class="mt-4 text-2xl font-bold text-white">
+					<p class="num num-lg mt-4 text-2xl">
 						{data.currentStreak} day{data.currentStreak === 1 ? '' : 's'}
 					</p>
-					<p class="mt-1 text-xs text-dim">
+					<p class="meta mt-1">
 						current streak · {data.totalPlays.toLocaleString()} plays logged
 					</p>
 				{:else if data.totalPlays}
-					<p class="mt-4 text-2xl font-bold text-white">{data.totalPlays.toLocaleString()}</p>
-					<p class="mt-1 text-xs text-dim">plays logged</p>
+					<p class="num num-lg mt-4 text-2xl">{data.totalPlays.toLocaleString()}</p>
+					<p class="meta mt-1">plays logged</p>
 				{:else}
 					<p class="mt-4 text-sm text-dim">No listening history imported yet.</p>
 				{/if}
@@ -149,9 +147,9 @@
 				{/if}
 			</section>
 
-			<section class="card flex flex-1 flex-col rounded-lg border border-border bg-surface p-6" use:reveal>
+			<section class="card flex flex-1 flex-col">
 				<div class="flex items-baseline justify-between">
-					<h2 class="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-dim">
+					<h2 class="label label--icon">
 						<Clapperboard size={13} aria-hidden="true" /> Watching
 					</h2>
 					<a href="/watchlist" class="link text-xs text-primary hover:opacity-85">See all</a>
@@ -169,10 +167,10 @@
 						<div class="min-w-0">
 							<p class="truncate text-sm font-medium text-white">{data.watching.title}</p>
 							{#if data.watching.nextToWatch}
-								<p class="mt-1 text-xs text-dim">Next: {data.watching.nextToWatch}</p>
+								<p class="meta mt-1">Next: {data.watching.nextToWatch}</p>
 							{/if}
 							{#if data.watching.totalEpisodes}
-								<p class="mt-1 text-xs text-dim">
+								<p class="meta mt-1">
 									{data.watching.watchedEpisodes}/{data.watching.totalEpisodes} episodes
 								</p>
 							{/if}
@@ -184,9 +182,9 @@
 			</section>
 		</div>
 
-		<section class="card rounded-lg border border-border bg-surface p-6 sm:col-span-2 lg:col-span-3" use:reveal>
+		<section class="card sm:col-span-2 lg:col-span-3">
 			<div class="flex items-baseline justify-between">
-				<h2 class="text-xl font-bold text-white">Latest</h2>
+				<h2 class="h-section">Latest</h2>
 				<a
 					href="/devlog"
 					class="link flex items-center gap-1 text-sm text-primary hover:opacity-85"
@@ -199,7 +197,7 @@
 				{#each data.latest as entry}
 					<li>
 						<a href={`/devlog/${entry.slug}`} class="link group block">
-							<p class="text-xs text-dim">{formatDate(entry.date)} · {entry.readingTime} min read</p>
+							<p class="meta">{formatDate(entry.date)} · {entry.readingTime} min read</p>
 							<p class="mt-0.5 text-sm font-medium text-white group-hover:text-primary">
 								{entry.title}
 							</p>
@@ -213,11 +211,10 @@
 
 		{#if data.projects.length}
 			<section
-				class="card rounded-lg border border-border bg-surface p-6 sm:col-span-2 lg:col-span-3"
-				use:reveal
+				class="card sm:col-span-2 lg:col-span-3"
 			>
 				<div class="flex items-baseline justify-between">
-					<h2 class="text-xl font-bold text-white">Projects</h2>
+					<h2 class="h-section">Projects</h2>
 					<a
 						href="/projects"
 						class="link flex items-center gap-1 text-sm text-primary hover:opacity-85"
@@ -226,7 +223,13 @@
 					</a>
 				</div>
 
-				<div class="mt-6 grid gap-4 sm:grid-cols-3">
+				<div
+					class="mt-6 grid gap-4 {data.projects.length > 2
+						? 'sm:grid-cols-3'
+						: data.projects.length === 2
+							? 'sm:grid-cols-2'
+							: ''}"
+				>
 					{#each data.projects as project}
 						<ProjectCard {project} />
 					{/each}
@@ -235,15 +238,4 @@
 		{/if}
 	</div>
 
-	<section class="cta-band mt-20" use:reveal>
-		<p class="relative text-lg font-semibold text-white">Got something to build together?</p>
-		<a
-			href="https://rg-digital.dev/about"
-			target="_blank"
-			rel="noopener noreferrer"
-			class="link relative mt-2 inline-flex items-center gap-1 text-sm text-primary hover:opacity-85"
-		>
-			See my work at RG Digital <ArrowRight size={15} aria-hidden="true" />
-		</a>
-	</section>
 </main>

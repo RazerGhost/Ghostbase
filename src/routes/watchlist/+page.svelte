@@ -1,7 +1,6 @@
 <script lang="ts">
     import { invalidateAll, replaceState } from "$app/navigation";
     import { page } from "$app/state";
-    import { reveal } from "$lib/actions/reveal";
     import Seo from "$lib/components/Seo.svelte";
     import Tv from "@lucide/svelte/icons/tv";
     import RefreshCw from "@lucide/svelte/icons/refresh-cw";
@@ -356,7 +355,6 @@
                 rel="noreferrer"
                 class="card group overflow-hidden rounded-lg border border-border bg-surface/50 transition-colors hover:border-primary"
                 style="transition-delay: {Math.min(i, 12) * 60}ms"
-                use:reveal
             >
                 <div
                     class="relative aspect-[2/3] w-full overflow-hidden bg-surface-2"
@@ -414,7 +412,7 @@
                     <p class="truncate text-sm font-medium text-white">
                         {item.title}
                     </p>
-                    <p class="mt-0.5 text-xs text-dim">
+                    <p class="meta mt-0.5">
                         {item.totalEpisodes
                             ? `${item.watchedEpisodes}/${item.totalEpisodes} episodes`
                             : "Movie"}
@@ -460,9 +458,9 @@
     path="/watchlist"
 />
 
-<main class="mx-auto max-w-6xl px-6 py-16">
+<main class="page page--wide">
     <h1
-        class="text-3xl font-extrabold tracking-tight text-white"
+        class="h-page"
         data-hero-reveal="0"
     >
         Watchlist
@@ -546,7 +544,7 @@
         </div>
     {:else}
         {#if data.stale}
-            <div class="mt-6 flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs text-dim">
+            <div class="meta mt-6 flex items-center gap-2 rounded-lg border border-border px-3 py-2">
                 <AlertTriangle size={14} class="shrink-0 text-warn" aria-hidden="true" />
                 <p>
                     Simkl's unreachable right now — showing a cached copy from {formatStaleSince(
@@ -569,19 +567,19 @@
             class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
         >
             <div class="rounded-lg border border-border p-5 sm:p-6">
-                <p class="text-xs font-medium uppercase tracking-wide text-dim">
+                <p class="label">
                     Spent watching
                 </p>
                 <p class="mt-2 flex items-baseline gap-1.5 text-white">
-                    <span class="text-4xl font-extrabold sm:text-5xl"
+                    <span class="num num-xl sm:text-5xl"
                         >{watchTime.days}</span
                     >
                     <span class="text-sm text-dim">d</span>
-                    <span class="text-4xl font-extrabold sm:text-5xl"
+                    <span class="num num-xl sm:text-5xl"
                         >{watchTime.hours}</span
                     >
                     <span class="text-sm text-dim">h</span>
-                    <span class="text-4xl font-extrabold sm:text-5xl"
+                    <span class="num num-xl sm:text-5xl"
                         >{watchTime.minutes}</span
                     >
                     <span class="text-sm text-dim">m</span>
@@ -590,26 +588,26 @@
                     class="mt-5 grid grid-cols-3 gap-4 border-t border-border pt-5 text-center"
                 >
                     <div>
-                        <p class="text-xl font-bold text-white">
+                        <p class="h-section">
                             {groupCompleted.length}
                         </p>
-                        <p class="mt-0.5 text-xs text-dim">Completed</p>
+                        <p class="meta mt-0.5">Completed</p>
                     </div>
                     <div>
-                        <p class="text-xl font-bold text-white">
+                        <p class="h-section">
                             {totalEpisodesWatchedTvOnly}{#if moviesCompletedCount > 0}<span
                                     class="text-dim"
                                 >
                                     · +{moviesCompletedCount} movies</span
                                 >{/if}
                         </p>
-                        <p class="mt-0.5 text-xs text-dim">Episodes watched</p>
+                        <p class="meta mt-0.5">Episodes watched</p>
                     </div>
                     <div>
-                        <p class="text-xl font-bold text-white">
+                        <p class="h-section">
                             {completedThisYear}
                         </p>
-                        <p class="mt-0.5 text-xs text-dim">
+                        <p class="meta mt-0.5">
                             Completed this year
                         </p>
                     </div>
@@ -619,22 +617,22 @@
                     class="mt-4 grid grid-cols-3 gap-4 border-t border-border pt-4 text-center"
                 >
                     <div>
-                        <p class="text-xl font-bold text-white">
+                        <p class="h-section">
                             {peakYear ?? "—"}
                         </p>
-                        <p class="mt-0.5 text-xs text-dim">Peak year</p>
+                        <p class="meta mt-0.5">Peak year</p>
                     </div>
                     <div>
-                        <p class="text-xl font-bold text-white">
+                        <p class="h-section">
                             {peakWeekday ?? "—"}
                         </p>
-                        <p class="mt-0.5 text-xs text-dim">Most active day</p>
+                        <p class="meta mt-0.5">Most active day</p>
                     </div>
                     <div>
-                        <p class="text-xl font-bold text-white">
+                        <p class="h-section">
                             {avgRating ? avgRating.toFixed(1) : "—"}
                         </p>
-                        <p class="mt-0.5 text-xs text-dim">Avg rating</p>
+                        <p class="meta mt-0.5">Avg rating</p>
                     </div>
                 </div>
 
@@ -642,18 +640,18 @@
                     class="mt-4 grid grid-cols-2 gap-4 border-t border-border pt-4 text-center"
                 >
                     <div>
-                        <p class="text-xl font-bold text-white">
+                        <p class="h-section">
                             {groupPlanToWatch.length}<span class="text-dim">
                                 · {backlogHours}h</span
                             >
                         </p>
-                        <p class="mt-0.5 text-xs text-dim">Backlog to clear</p>
+                        <p class="meta mt-0.5">Backlog to clear</p>
                     </div>
                     <div>
-                        <p class="text-xl font-bold text-white">
+                        <p class="h-section">
                             {completionRate}%
                         </p>
-                        <p class="mt-0.5 text-xs text-dim">Completion rate</p>
+                        <p class="meta mt-0.5">Completion rate</p>
                     </div>
                 </div>
             </div>
@@ -661,7 +659,7 @@
             {#if topGenres.length}
                 <div class="rounded-lg border border-border p-5 sm:p-6">
                     <p
-                        class="text-xs font-medium uppercase tracking-wide text-dim"
+                        class="label"
                     >
                         Top genres
                     </p>
@@ -764,7 +762,6 @@
             {@const item = pickedItem}
             <div
                 class="relative mt-4 overflow-hidden rounded-xl border border-border bg-surface/50"
-                use:reveal
             >
                 {#if item.posterUrl}
                     <div class="absolute inset-0 -z-10">
@@ -816,11 +813,11 @@
                         >
                             Tonight's pick
                         </p>
-                        <h3 class="mt-1 text-xl font-bold text-white">
+                        <h3 class="h-section mt-1">
                             {item.title}
                         </h3>
                         <div
-                            class="mt-1.5 flex flex-wrap justify-center gap-x-2 gap-y-1 text-xs text-dim sm:justify-start"
+                            class="meta mt-1.5 flex flex-wrap justify-center gap-x-2 gap-y-1 sm:justify-start"
                         >
                             {#if item.rating}
                                 <span class="inline-flex items-center gap-1">

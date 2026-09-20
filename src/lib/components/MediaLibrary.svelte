@@ -137,7 +137,7 @@
 	>
 		<UploadCloud size={20} aria-hidden="true" />
 		{uploading ? 'Uploading…' : 'Drop images here, or click to choose files'}
-		<span class="text-xs text-dim">PNG, JPEG, GIF, or WebP — up to 8MB</span>
+		<span class="meta">PNG, JPEG, GIF, or WebP — up to 8MB</span>
 	</button>
 	<input
 		bind:this={fileInput}
@@ -168,7 +168,7 @@
 					<button
 						type="button"
 						onclick={() => (bulkConfirmOpen = true)}
-						class="link rounded-full border border-border px-3 py-1 text-xs text-dim transition-colors hover:border-red-400 hover:text-red-400"
+						class="meta link rounded-full border border-border px-3 py-1 transition-colors hover:border-red-400 hover:text-red-400"
 					>
 						Delete {selected.size} selected
 					</button>
@@ -176,7 +176,7 @@
 				<button
 					type="button"
 					onclick={() => (selected = new Set())}
-					class="link rounded-full border border-border px-3 py-1 text-xs text-dim transition-colors hover:text-white"
+					class="meta link rounded-full border border-border px-3 py-1 transition-colors hover:text-white"
 				>
 					Clear
 				</button>

@@ -53,8 +53,8 @@
 
 <Seo title="New devlog post — RazerGhost" description="Private devlog editor." path="/admin/devlog/new" noindex />
 
-<main class="mx-auto max-w-2xl px-6 py-16">
-	<h1 class="text-3xl font-extrabold tracking-tight text-white">New devlog post</h1>
+<main class="page page--narrow">
+	<h1 class="h-page">New devlog post</h1>
 
 	<form
 		method="POST"
@@ -77,7 +77,7 @@
 			placeholder="Title"
 			value={form?.title ?? ''}
 			required
-			class="rounded-lg border border-border bg-transparent px-4 py-2 text-white placeholder:text-dim focus:border-primary focus:outline-none"
+			class="input"
 		/>
 
 		<div class="flex gap-3">
@@ -86,14 +86,14 @@
 				name="date"
 				value={form?.date ?? today}
 				required
-				class="rounded-lg border border-border bg-transparent px-4 py-2 text-white focus:border-primary focus:outline-none"
+				class="input"
 			/>
 			<input
 				type="text"
 				name="series"
 				placeholder="Series (optional)"
 				value={form?.series ?? ''}
-				class="flex-1 rounded-lg border border-border bg-transparent px-4 py-2 text-white placeholder:text-dim focus:border-primary focus:outline-none"
+				class="input flex-1"
 			/>
 		</div>
 
@@ -102,7 +102,7 @@
 			name="tags"
 			placeholder="Tags (comma separated)"
 			value={form?.tags ?? ''}
-			class="rounded-lg border border-border bg-transparent px-4 py-2 text-white placeholder:text-dim focus:border-primary focus:outline-none"
+			class="input"
 		/>
 
 		<div class="flex gap-2">
@@ -111,12 +111,12 @@
 				name="cover"
 				placeholder="Cover image path (optional)"
 				bind:value={cover}
-				class="flex-1 rounded-lg border border-border bg-transparent px-4 py-2 text-white placeholder:text-dim focus:border-primary focus:outline-none"
+				class="input flex-1"
 			/>
 			<button
 				type="button"
 				onclick={() => (coverPickerOpen = true)}
-				class="link shrink-0 rounded-lg border border-border px-3 py-2 text-sm text-gray transition-colors hover:border-primary hover:text-primary"
+				class="btn btn--sq link shrink-0"
 			>
 				Browse…
 			</button>
@@ -126,7 +126,7 @@
 			name="excerpt"
 			placeholder="Excerpt"
 			rows="2"
-			class="rounded-lg border border-border bg-transparent px-4 py-2 text-white placeholder:text-dim focus:border-primary focus:outline-none"
+			class="input"
 			>{form?.excerpt ?? ''}</textarea
 		>
 
@@ -167,7 +167,7 @@
 			required
 			rows="16"
 			hidden={mode === 'preview'}
-			class="rounded-lg border border-border bg-transparent px-4 py-2 text-white placeholder:text-dim focus:border-primary focus:outline-none"
+			class="input"
 		></textarea>
 		{#if mode === 'preview'}
 			<div class="devlog-content rounded-lg border border-border px-4 py-2">
@@ -179,13 +179,13 @@
 			<button
 				type="submit"
 				disabled={saving}
-				class="link rounded-full border border-primary px-4 py-2 text-sm text-primary transition-colors hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-50"
+				class="btn btn--accent link disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				{saving ? 'Saving…' : 'Save'}
 			</button>
 			<a
 				href="/admin/devlog"
-				class="link rounded-full border border-border px-4 py-2 text-sm text-gray transition-colors hover:border-primary hover:text-primary"
+				class="btn link"
 			>
 				Cancel
 			</a>

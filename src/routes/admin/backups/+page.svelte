@@ -20,8 +20,8 @@
 
 <Seo title="Backups — RazerGhost" description="Private backup status." path="/admin/backups" noindex />
 
-<main class="mx-auto max-w-2xl px-6 py-16">
-	<h1 class="text-3xl font-extrabold tracking-tight text-white">Backups</h1>
+<main class="page page--narrow">
+	<h1 class="h-page">Backups</h1>
 	<p class="mt-2 text-sm text-dim">
 		Dumps <code>simkl-cache.db</code>, <code>spotify-history.db</code>, and
 		<code>status.db</code> (plus the media library) to a private git repo.
@@ -33,10 +33,10 @@
 		</p>
 	{:else}
 		<div class="mt-6 rounded-lg border border-border p-4 text-sm">
-			<div class="text-xs text-dim">Last backup</div>
+			<div class="meta">Last backup</div>
 			{#if data.last}
 				<div class="mt-0.5 font-medium text-white">{formatDate(data.last.timestamp)}</div>
-				{#if data.last.message}<div class="mt-1 text-xs text-dim">{data.last.message}</div>{/if}
+				{#if data.last.message}<div class="meta mt-1">{data.last.message}</div>{/if}
 			{:else}
 				<div class="mt-0.5 font-medium text-white">Never (or remote unreachable)</div>
 			{/if}
@@ -56,7 +56,7 @@
 			<button
 				type="submit"
 				disabled={running}
-				class="link rounded-full border border-primary px-4 py-2 text-sm text-primary transition-colors hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-50"
+				class="btn btn--accent link disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				{running ? 'Running…' : 'Run backup now'}
 			</button>

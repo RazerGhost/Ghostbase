@@ -15,7 +15,7 @@
 
 <footer class="border-t border-border">
 	<div
-		class="mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 py-10 text-sm text-dim sm:flex-row sm:justify-between"
+		class="page page--wide flex flex-col items-center gap-4 py-10 text-sm text-dim sm:flex-row sm:justify-between"
 	>
 		<p>&copy; {new Date().getFullYear()} RazerGhost</p>
 

@@ -12,30 +12,30 @@
 
 <Seo title="Import Spotify history — RazerGhost" description="Private import tool." path="/spotify-import" noindex />
 
-<main class="mx-auto max-w-2xl px-6 py-16">
-	<a href="/admin" class="link text-xs text-dim transition-colors hover:text-primary">← Admin</a>
-	<h1 class="mt-2 text-3xl font-extrabold tracking-tight text-white">Import Spotify history</h1>
+<main class="page page--narrow">
+	<a href="/admin" class="meta link transition-colors hover:text-primary">← Admin</a>
+	<h1 class="h-page mt-2">Import Spotify history</h1>
 
 	<div class="mt-6 grid grid-cols-2 gap-3 rounded-lg border border-border p-4 text-sm sm:grid-cols-4">
 		<div>
-			<div class="text-xs text-dim">Total plays</div>
+			<div class="meta">Total plays</div>
 			<div class="mt-0.5 font-medium text-white">{data.totalPlays.toLocaleString()}</div>
 		</div>
 		<div>
-			<div class="text-xs text-dim">Earliest</div>
+			<div class="meta">Earliest</div>
 			<div class="mt-0.5 font-medium text-white">{formatDate(data.firstPlayedAt)}</div>
 		</div>
 		<div>
-			<div class="text-xs text-dim">Latest</div>
+			<div class="meta">Latest</div>
 			<div class="mt-0.5 font-medium text-white">{formatDate(data.lastPlayedAt)}</div>
 		</div>
 		<div>
-			<div class="text-xs text-dim">Pending scrobbles</div>
+			<div class="meta">Pending scrobbles</div>
 			<div class="mt-0.5 font-medium text-white">{data.pendingScrobbles.toLocaleString()}</div>
 		</div>
 	</div>
 	{#if data.pendingScrobbles > 0}
-		<p class="mt-2 text-xs text-dim">
+		<p class="meta mt-2">
 			{data.pendingScrobbles} row{data.pendingScrobbles === 1 ? '' : 's'} were added by the live scrobbler
 			with estimated play length — importing an export covering that date range replaces them with
 			real data.
@@ -52,8 +52,8 @@
 		>
 			extended streaming history export
 		</a>
-		 — <code class="text-xs text-dim">Streaming_History_Audio_*.json</code> (or older
-		<code class="text-xs text-dim">endsong_*.json</code>). Re-uploading the same files is safe;
+		 — <code class="meta">Streaming_History_Audio_*.json</code> (or older
+		<code class="meta">endsong_*.json</code>). Re-uploading the same files is safe;
 		duplicate plays are skipped automatically.
 	</p>
 
@@ -73,7 +73,7 @@
 
 		<button
 			type="submit"
-			class="link self-start rounded-full border border-primary px-4 py-2 text-sm text-primary transition-colors hover:bg-primary/10"
+			class="btn btn--accent link self-start"
 		>
 			Import
 		</button>
@@ -87,13 +87,13 @@
 				({form.totalParsed} parsed across {results.length} file{results.length === 1 ? '' : 's'}).
 			</p>
 			{#if form.totalReplacedScrobbles > 0}
-				<p class="mt-1 text-xs text-dim">
+				<p class="meta mt-1">
 					Replaced {form.totalReplacedScrobbles} live-scrobbled play{form.totalReplacedScrobbles === 1
 						? ''
 						: 's'} with real data from this export.
 				</p>
 			{/if}
-			<ul class="mt-3 flex flex-col gap-1 text-xs text-dim">
+			<ul class="meta mt-3 flex flex-col gap-1">
 				{#each results as result}
 					<li>
 						{result.name} —

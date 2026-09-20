@@ -17,6 +17,12 @@
 	let history = $state<HistoryLookup | null>(null);
 	let now = $state(Date.now());
 	let lastTrackId = '';
+	// Set for one animation when the track actually changes, so the card can
+	// flash in --color-action. This is the site's only "something just fired"
+	// signal — see design.md § Motion. Skipped on the first track seen after
+	// mount, which is a page load, not an event.
+	let trackChanged = $state(false);
+	let flashTimer: ReturnType<typeof setTimeout>;
 
 	const spotify = $derived(lanyard.data?.listening_to_spotify ? lanyard.data.spotify : null);
 	const playing = $derived(Boolean(spotify));
@@ -43,8 +49,19 @@
 			return;
 		}
 		if (id !== lastTrackId) {
+			const isFirstSeen = lastTrackId === '';
 			lastTrackId = id;
 			lookupHistory(`spotify:track:${id}`);
+			if (!isFirstSeen) {
+				trackChanged = false;
+				clearTimeout(flashTimer);
+				// Next frame, so removing and re-adding the class restarts the
+				// animation even when two tracks change back to back.
+				requestAnimationFrame(() => {
+					trackChanged = true;
+					flashTimer = setTimeout(() => (trackChanged = false), 700);
+				});
+			}
 		}
 	});
 
@@ -54,6 +71,7 @@
 		return () => {
 			lanyard.stop();
 			clearInterval(tick);
+			clearTimeout(flashTimer);
 		};
 	});
 
@@ -75,7 +93,7 @@
 
 {#snippet nowPlaying()}
 	{#if !bare}
-		<p class="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-dim">
+		<p class="label label--icon">
 			<span class="relative flex h-2 w-2">
 				<span class="absolute h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
 				<span class="h-2 w-2 rounded-full bg-primary"></span>
@@ -83,7 +101,9 @@
 			Listening now
 		</p>
 	{/if}
-	<div class="{bare ? '' : 'mt-3'} flex items-center gap-3">
+	<div class="{bare ? '' : 'mt-3'} flex items-center gap-3 rounded-md {trackChanged
+		? 'flash-in'
+		: ''}">
 		{#if albumArt}
 			<img src={albumArt} alt="" class="h-14 w-14 shrink-0 rounded-md object-cover" />
 		{:else}
@@ -100,9 +120,9 @@
 			>
 				{track}
 			</a>
-			<p class="truncate text-xs text-dim">{artist}</p>
+			<p class="meta truncate">{artist}</p>
 			{#if history?.found}
-				<p class="mt-1 text-xs text-dim">
+				<p class="meta mt-1">
 					Played {history.plays} time{history.plays === 1 ? '' : 's'} before
 					{#if history.firstPlayedAt}
 						&middot; first in {formatDate(history.firstPlayedAt)}

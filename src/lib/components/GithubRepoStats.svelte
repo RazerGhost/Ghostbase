@@ -60,7 +60,7 @@
 </script>
 
 {#if status === 'ready' && stats}
-	<div class="flex items-center gap-3 text-xs text-dim">
+	<div class="meta flex items-center gap-3">
 		<span class="flex items-center gap-1">
 			<Star size={12} aria-hidden="true" />
 			{stats.stars}

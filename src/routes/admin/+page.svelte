@@ -57,8 +57,8 @@
 
 <Seo title="Admin — RazerGhost" description="Private admin dashboard." path="/admin" noindex />
 
-<main class="mx-auto max-w-3xl px-6 py-16">
-	<h1 class="text-3xl font-extrabold tracking-tight text-white">Admin</h1>
+<main class="page page--prose">
+	<h1 class="h-page">Admin</h1>
 	<p class="mt-2 text-sm text-dim">Every private tool for editing this site, in one place.</p>
 
 	<ul class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -81,7 +81,7 @@
 					</div>
 					<div>
 						<h2 class="font-medium text-white group-hover:text-primary">{tool.label}</h2>
-						<p class="mt-1 text-xs text-dim">{tool.description}</p>
+						<p class="meta mt-1">{tool.description}</p>
 					</div>
 				</a>
 			</li>

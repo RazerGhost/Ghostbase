@@ -17,13 +17,13 @@
 
 <a
 	href={`/devlog/${entry.slug}`}
-	class="card card--interactive group block rounded-lg border border-border bg-surface p-6"
+	class="card card--interactive group block"
 >
 	{#if entry.cover}
 		<img src={entry.cover} alt="" class="mb-4 aspect-video w-full rounded-md object-cover" />
 	{/if}
 
-	<p class="text-xs uppercase tracking-wide text-dim">
+	<p class="meta uppercase tracking-wide">
 		{formattedDate} · {entry.readingTime} min read
 	</p>
 	{#if entry.series && seriesInfo}
@@ -40,7 +40,7 @@
 		<ul class="mt-4 flex flex-wrap gap-2">
 			{#each entry.tags as tag}
 				<li
-					class="chip rounded-full border border-border px-3 py-1 text-xs text-gray"
+					class="chip"
 				>
 					{tag}
 				</li>

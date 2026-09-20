@@ -149,7 +149,7 @@
 					{/if}
 					<div class="min-w-0 flex-1">
 						<p class="truncate text-sm font-medium text-white">{track}</p>
-						<p class="truncate text-xs text-dim">{artist}</p>
+						<p class="meta truncate">{artist}</p>
 					</div>
 					<a
 						href={trackUrl}

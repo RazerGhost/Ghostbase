@@ -1,7 +1,6 @@
 <script lang="ts">
 	import DevlogCard from '$lib/components/DevlogCard.svelte';
 	import Seo from '$lib/components/Seo.svelte';
-	import { reveal } from '$lib/actions/reveal';
 	import { replaceState } from '$app/navigation';
 	import { page } from '$app/state';
 	import Rss from '@lucide/svelte/icons/rss';
@@ -64,9 +63,9 @@
 
 <Seo title="Devlog — RazerGhost" description="Notes on whatever I'm building at the moment." path="/devlog" />
 
-<main class="mx-auto max-w-6xl px-6 py-16">
+<main class="page page--wide">
 	<div class="flex items-baseline justify-between" data-hero-reveal="0">
-		<h1 class="text-3xl font-extrabold tracking-tight text-white">Devlog</h1>
+		<h1 class="h-page">Devlog</h1>
 		<a
 			href="/devlog/rss.xml"
 			data-sveltekit-reload
@@ -79,16 +78,16 @@
 
 	<div class="mt-6 grid grid-cols-3 gap-4 rounded-lg border border-border p-4 text-center" data-hero-reveal="2">
 		<div>
-			<p class="text-xl font-bold text-white">{data.entries.length}</p>
-			<p class="mt-0.5 text-xs text-dim">Posts</p>
+			<p class="h-section">{data.entries.length}</p>
+			<p class="meta mt-0.5">Posts</p>
 		</div>
 		<div>
-			<p class="text-xl font-bold text-white">{tags.length}</p>
-			<p class="mt-0.5 text-xs text-dim">Tags</p>
+			<p class="h-section">{tags.length}</p>
+			<p class="meta mt-0.5">Tags</p>
 		</div>
 		<div>
-			<p class="text-xl font-bold text-white">{latestDate ? formatDate(latestDate) : '—'}</p>
-			<p class="mt-0.5 text-xs text-dim">Latest post</p>
+			<p class="h-section">{latestDate ? formatDate(latestDate) : '—'}</p>
+			<p class="meta mt-0.5">Latest post</p>
 		</div>
 	</div>
 
@@ -126,7 +125,7 @@
 		</ul>
 	{/if}
 
-	<div class="mt-8 grid gap-4 sm:grid-cols-2" use:reveal>
+	<div class="mt-8 grid gap-4 sm:grid-cols-2">
 		{#each filtered as entry (entry.slug)}
 			<DevlogCard {entry} seriesInfo={data.seriesInfo[entry.slug]} />
 		{:else}

@@ -9,6 +9,7 @@
 @import '@fontsource-variable/inter/opsz-italic.css';
 @import 'tailwindcss';
 @import './lib/styles/tokens.css';
+@import './lib/styles/roles.css';
 
 /* Map the brand tokens (src/lib/styles/tokens.css) into Tailwind's theme so
    utilities like bg-surface, text-primary, border-border, rounded-lg resolve
@@ -53,20 +54,6 @@
 	--spacing-12: var(--space-12);
 	--spacing-14: var(--space-14);
 	--spacing-16: var(--space-16);
-}
-
-/* Faint ambient glow behind the page, anchored top-center — gives the dark
-   surface some depth without turning into a "marketing page" gradient. */
-.bg-glow {
-	position: fixed;
-	inset: 0;
-	z-index: -1;
-	pointer-events: none;
-	background: radial-gradient(
-		ellipse 60% 40% at 50% 0%,
-		var(--primary-glow) 0%,
-		transparent 70%
-	);
 }
 
 /* Minimal styling for devlog post bodies rendered via {@html} — kept
@@ -287,29 +274,10 @@
 	animation-delay: 0.33s;
 }
 
-/* ── Scroll-reveal ─────────────────────────────────────────────── */
-.reveal-init {
-	opacity: 0;
-	transform: translateY(28px);
-	transition:
-		opacity var(--dur-enter) var(--ease-out),
-		transform var(--dur-enter) var(--ease-out);
-}
-.reveal-init.revealed {
-	opacity: 1;
-	transform: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
 	[data-hero-reveal] {
 		animation: none !important;
 		opacity: 1 !important;
 		transform: none !important;
-	}
-	.reveal-init,
-	.reveal-init.revealed {
-		opacity: 1 !important;
-		transform: none !important;
-		transition: none !important;
 	}
 }

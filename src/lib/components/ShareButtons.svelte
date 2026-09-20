@@ -26,7 +26,7 @@
 </script>
 
 <div class="flex items-center gap-2">
-	<span class="text-xs uppercase tracking-wide text-dim">Share</span>
+	<span class="meta uppercase tracking-wide">Share</span>
 	<button
 		type="button"
 		onclick={copyLink}

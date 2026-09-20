@@ -75,10 +75,10 @@
 			/>
 		{/if}
 
-		<p class="text-xs uppercase tracking-wide text-dim">
+		<p class="meta uppercase tracking-wide">
 			{formattedDate} · {data.entry.readingTime} min read
 		</p>
-		<h1 class="mt-2 text-3xl font-extrabold tracking-tight text-white">
+		<h1 class="h-page mt-2">
 			{data.entry.title}
 		</h1>
 
@@ -88,7 +88,7 @@
 					<li>
 						<a
 							href="/devlog/tags/{tag}"
-							class="chip rounded-full border border-border px-3 py-1 text-xs text-gray"
+							class="chip"
 						>
 							{tag}
 						</a>
@@ -151,7 +151,7 @@
 						? 'sm:col-span-2'
 						: ''}"
 				>
-					<span class="flex items-center gap-1 text-xs uppercase tracking-wide text-dim">
+					<span class="meta flex items-center gap-1 uppercase tracking-wide">
 						<ArrowLeft size={12} aria-hidden="true" /> Older
 					</span>
 					<span class="mt-2 block text-base font-semibold text-white group-hover:text-primary">
@@ -166,7 +166,7 @@
 						? 'sm:col-span-2'
 						: ''}"
 				>
-					<span class="flex items-center gap-1 text-xs uppercase tracking-wide text-dim sm:justify-end">
+					<span class="meta flex items-center gap-1 uppercase tracking-wide sm:justify-end">
 						Newer <ArrowRight size={12} aria-hidden="true" />
 					</span>
 					<span class="mt-2 block text-base font-semibold text-white group-hover:text-primary">
@@ -180,7 +180,7 @@
 	{#if data.related.length}
 		<div class="mt-12 {hasToc ? 'lg:grid lg:grid-cols-[1fr_240px] lg:gap-12' : ''}">
 			<div class="lg:mx-auto lg:w-full lg:max-w-2xl">
-				<p class="text-xs font-semibold uppercase tracking-wide text-dim">More like this</p>
+				<p class="label label--strong">More like this</p>
 				<div class="mt-4 grid gap-4">
 					{#each data.related as entry (entry.slug)}
 						<DevlogCard {entry} seriesInfo={data.seriesInfo[entry.slug]} />

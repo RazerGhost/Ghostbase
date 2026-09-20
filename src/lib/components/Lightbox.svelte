@@ -81,7 +81,7 @@
 
 		{#if images.length > 1}
 			<p
-				class="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-border bg-surface px-3 py-1 text-xs text-dim"
+				class="meta absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-border bg-surface px-3 py-1"
 			>
 				{index + 1} / {images.length}
 			</p>

@@ -80,22 +80,22 @@
 		{/if}
 
 		<div class="mt-2 flex items-center gap-3">
-			<h1 class="text-3xl font-extrabold tracking-tight text-white">
+			<h1 class="h-page">
 				{data.project.name}
 			</h1>
 			{#if data.project.status !== 'active'}
-				<span class="chip rounded-full border border-border px-2.5 py-0.5 text-xs capitalize text-dim">
+				<span class="meta chip rounded-full border border-border px-2.5 py-0.5 capitalize">
 					{data.project.status}
 				</span>
 			{/if}
 		</div>
-		<p class="mt-1 text-xs uppercase tracking-wide text-dim">{data.project.readingTime} min read</p>
+		<p class="meta mt-1 uppercase tracking-wide">{data.project.readingTime} min read</p>
 		<p class="mt-2 text-gray">{data.project.description}</p>
 
 		{#if data.project.stack.length}
 			<ul class="mt-4 flex flex-wrap gap-2">
 				{#each data.project.stack as item}
-					<li class="chip rounded-full border border-border px-3 py-1 text-xs text-gray">
+					<li class="chip">
 						{item}
 					</li>
 				{/each}
@@ -108,7 +108,7 @@
 					<li>
 						<a
 							href="/projects/tags/{tag}"
-							class="chip rounded-full border border-border px-3 py-1 text-xs text-gray"
+							class="chip"
 						>
 							#{tag}
 						</a>
@@ -123,7 +123,7 @@
 					href={data.project.live}
 					target="_blank"
 					rel="noopener noreferrer"
-					class="link flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm text-gray transition-colors hover:border-primary hover:text-primary"
+					class="btn link flex items-center gap-1.5"
 				>
 					Live site <ArrowUpRight size={14} aria-hidden="true" />
 				</a>
@@ -133,7 +133,7 @@
 					href={data.project.href}
 					target="_blank"
 					rel="noopener noreferrer"
-					class="link flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm text-gray transition-colors hover:border-primary hover:text-primary"
+					class="btn link flex items-center gap-1.5"
 				>
 					<GithubIcon size={14} aria-hidden="true" /> Source
 				</a>
@@ -193,7 +193,7 @@
 			<div>
 				{#if data.older}
 					<a href="/projects/{data.older.slug}" class="group block">
-						<span class="flex items-center gap-1 text-xs uppercase tracking-wide text-dim">
+						<span class="meta flex items-center gap-1 uppercase tracking-wide">
 							<ArrowLeft size={12} aria-hidden="true" /> Older
 						</span>
 						<span class="mt-1 block text-sm text-gray group-hover:text-primary">
@@ -205,7 +205,7 @@
 			<div class="text-right">
 				{#if data.newer}
 					<a href="/projects/{data.newer.slug}" class="group block">
-						<span class="flex items-center justify-end gap-1 text-xs uppercase tracking-wide text-dim">
+						<span class="meta flex items-center justify-end gap-1 uppercase tracking-wide">
 							Newer <ArrowRight size={12} aria-hidden="true" />
 						</span>
 						<span class="mt-1 block text-sm text-gray group-hover:text-primary">
@@ -220,7 +220,7 @@
 	{#if data.relatedPosts.length}
 		<div class="mt-12 {hasToc ? 'lg:grid lg:grid-cols-[1fr_240px] lg:gap-12' : ''}">
 			<div class="lg:mx-auto lg:w-full lg:max-w-2xl">
-				<p class="text-xs font-semibold uppercase tracking-wide text-dim">From the devlog</p>
+				<p class="label label--strong">From the devlog</p>
 				<ul class="mt-4 grid gap-2">
 					{#each data.relatedPosts as post (post.slug)}
 						<li>
@@ -229,7 +229,7 @@
 								class="link group flex items-baseline justify-between gap-4 rounded-md border border-border px-4 py-2.5 transition-colors hover:border-primary"
 							>
 								<span class="truncate text-sm text-gray group-hover:text-primary">{post.title}</span>
-								<span class="shrink-0 text-xs text-dim">
+								<span class="meta shrink-0">
 									{new Date(post.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
 								</span>
 							</a>
@@ -243,7 +243,7 @@
 	{#if data.related.length}
 		<div class="mt-12 {hasToc ? 'lg:grid lg:grid-cols-[1fr_240px] lg:gap-12' : ''}">
 			<div class="lg:mx-auto lg:w-full lg:max-w-2xl">
-				<p class="text-xs font-semibold uppercase tracking-wide text-dim">More like this</p>
+				<p class="label label--strong">More like this</p>
 				<div class="mt-4 grid gap-4">
 					{#each data.related as project (project.slug)}
 						<ProjectCard {project} />

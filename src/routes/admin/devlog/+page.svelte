@@ -26,12 +26,12 @@
 
 <Seo title="Devlog editor — RazerGhost" description="Private devlog editor." path="/admin/devlog" noindex />
 
-<main class="mx-auto max-w-3xl px-6 py-16">
+<main class="page page--prose">
 	<div class="flex items-center justify-between">
-		<h1 class="text-3xl font-extrabold tracking-tight text-white">Devlog posts</h1>
+		<h1 class="h-page">Devlog posts</h1>
 		<a
 			href="/admin/devlog/new"
-			class="link rounded-full border border-primary px-4 py-2 text-sm text-primary transition-colors hover:bg-primary/10"
+			class="btn btn--accent link"
 		>
 			New post
 		</a>
@@ -46,7 +46,7 @@
 			type="search"
 			bind:value={query}
 			placeholder="Filter by title or series…"
-			class="flex-1 rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-white placeholder:text-dim focus:border-primary focus:outline-none"
+			class="input flex-1 text-sm"
 		/>
 		<label class="flex items-center gap-2 text-sm text-gray">
 			<input type="checkbox" bind:checked={draftsOnly} class="accent-primary" />
@@ -61,7 +61,7 @@
 					<a href="/admin/devlog/{entry.slug}" class="link truncate font-medium text-white hover:text-primary">
 						{entry.title}
 					</a>
-					<div class="mt-0.5 flex items-center gap-2 text-xs text-dim">
+					<div class="meta mt-0.5 flex items-center gap-2">
 						<span>{entry.date}</span>
 						{#if entry.series}<span>· {entry.series}</span>{/if}
 						{#if entry.draft}<span class="rounded-full bg-primary/10 px-2 py-0.5 text-primary">draft</span>{/if}
@@ -73,7 +73,7 @@
 						pendingDelete = { slug: entry.slug, title: entry.title };
 						confirmOpen = true;
 					}}
-					class="link shrink-0 text-xs text-dim hover:text-red-400"
+					class="meta link shrink-0 hover:text-red-400"
 				>
 					Delete
 				</button>

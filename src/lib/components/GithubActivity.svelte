@@ -137,20 +137,20 @@
 							{event.repo.name}
 						</a>
 					</span>
-					<span class="shrink-0 text-xs whitespace-nowrap text-dim">{relativeTime(event.created_at)}</span>
+					<span class="meta shrink-0 whitespace-nowrap">{relativeTime(event.created_at)}</span>
 				</button>
 
 				{#if expandable && expandedId === event.id}
 					{@const commits = commitsByEvent[event.id]}
 					<div class="ml-5 border-l border-border py-1 pl-3">
 						{#if commits === 'loading' || commits === undefined}
-							<p class="text-xs text-dim">Loading commits…</p>
+							<p class="meta">Loading commits…</p>
 						{:else if commits === 'error'}
-							<p class="text-xs text-dim">Couldn't load commits.</p>
+							<p class="meta">Couldn't load commits.</p>
 						{:else}
 							<ul class="grid gap-1">
 								{#each commits as commit (commit.sha)}
-									<li class="truncate text-xs text-dim" title={commit.message}>
+									<li class="meta truncate" title={commit.message}>
 										<a
 											href={`https://github.com/${event.repo.name}/commit/${commit.sha}`}
 											class="link hover:text-primary"

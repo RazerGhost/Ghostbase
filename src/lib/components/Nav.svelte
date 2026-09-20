@@ -49,7 +49,7 @@
 				type="button"
 				onclick={() => (commandPalette.open = true)}
 				aria-label="Open command palette"
-				class="hidden items-center gap-1.5 rounded-md border border-border px-2 py-1 text-xs text-dim transition-colors hover:border-primary hover:text-primary sm:flex"
+				class="meta hidden items-center gap-1.5 rounded-md border border-border px-2 py-1 transition-colors hover:border-primary hover:text-primary sm:flex"
 			>
 				<Search size={13} aria-hidden="true" />
 				<kbd class="font-sans">{isMac ? '⌘K' : 'Ctrl K'}</kbd>
