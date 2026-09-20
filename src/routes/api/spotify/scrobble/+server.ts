@@ -31,11 +31,20 @@ export const GET: RequestHandler = async ({ url, request }) => {
 
 	if (!spotifyConfigured()) error(503, 'Spotify not configured');
 
-	// Spotify has already told us to back off — say so plainly instead of
-	// spending a request to be told again, which is what extends the penalty.
+	// Spotify has already told us to back off. Skip the run rather than spend
+	// a request to be told again — and report it as a success, because it is
+	// one: a skipped run inserts no rows, which is the same outcome as a run
+	// where nothing new was played. Only the run that *discovers* the rate
+	// limit fails (below), so the scheduler reports it once instead of once
+	// per run for as long as the penalty lasts.
 	const cooling = spotifyCooldownMs();
 	if (cooling > 0) {
-		error(429, `Rate limited by Spotify; retry in ${Math.ceil(cooling / 1000)}s`);
+		return json({
+			fetched: 0,
+			inserted: 0,
+			skipped: 'rate_limited',
+			retryInSeconds: Math.ceil(cooling / 1000)
+		});
 	}
 
 	let accessToken: string;
@@ -54,6 +63,9 @@ export const GET: RequestHandler = async ({ url, request }) => {
 	});
 
 	if (res.status === 403) error(403, 'Missing user-read-recently-played scope');
+	// The run that discovers the rate limit is the one that fails, so it shows
+	// up in the scheduler once. Every run until the window closes takes the
+	// skip path above.
 	if (res.status === 429) {
 		const ms = noteSpotifyRateLimit(res);
 		error(429, `Rate limited by Spotify; retry in ${Math.ceil(ms / 1000)}s`);
