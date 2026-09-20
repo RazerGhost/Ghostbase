@@ -13,7 +13,11 @@ export const GET: RequestHandler = async () => {
 
 	try {
 		return json(await getRecentlyPlayed());
-	} catch {
+	} catch (e) {
+		// Still degrades to "nothing to show" for the widget, but no longer
+		// silently: a bare catch here meant a dead token and an idle account
+		// looked identical from the outside and left nothing in the log.
+		console.warn('[spotify] recently-played unavailable:', e instanceof Error ? e.message : e);
 		return json({ available: false, items: [] });
 	}
 };
