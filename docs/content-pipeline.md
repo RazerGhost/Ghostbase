@@ -28,6 +28,24 @@ Devlog/project frontmatter's `cover` and `images` (gallery) fields, and any imag
 
 ## OG images & RSS
 
-[og.ts](../src/lib/server/og.ts) generates per-post/per-project Open Graph preview images (used by `[slug]/og.png/+server.ts` routes) using `satori` + `resvg` — this needs real font bytes rather than system fonts, which is why `src/lib/server/fonts/*.woff` are read from disk at request time and explicitly copied into the Docker runtime image (see [deployment.md](deployment.md)), rather than routed through Vite's asset pipeline like other static assets.
+[og.ts](../src/lib/server/og.ts) generates per-post/per-project Open Graph preview images (used by `[slug]/og.png/+server.ts` routes) using `satori` + `resvg` — this needs real font bytes rather than system fonts, which is why the font files in `src/lib/server/fonts/` are read from disk at request time and explicitly copied into the Docker runtime image (see [deployment.md](deployment.md)), rather than routed through Vite's asset pipeline like other static assets.
+
+Those bytes are the site's own three faces (see [design.md](../design.md) § Typography), cut from the exact `@fontsource` packages `app.css` imports — so a social preview and the page it links to are set in the same type. satori reads `ttf`/`otf`/`woff` but **not** `woff2`, and `@fontsource` ships Archivo and JetBrains Mono as variable `woff2` only, so those two are checked in as static TTFs instanced at weight 400; Instrument Serif ships a plain `.woff` and is copied straight across. To regenerate them after a `@fontsource` bump (needs `pip install fonttools brotli`):
+
+```python
+from fontTools.ttLib import TTFont
+from fontTools.varLib import instancer
+
+for pkg, stem, out in [
+    ("@fontsource-variable/archivo", "archivo-latin-wght-normal", "Archivo-Regular.ttf"),
+    ("@fontsource-variable/jetbrains-mono", "jetbrains-mono-latin-wght-normal", "JetBrainsMono-Regular.ttf"),
+]:
+    f = TTFont(f"node_modules/{pkg}/files/{stem}.woff2")
+    static = instancer.instantiateVariableFont(f, {"wght": 400}, inplace=True, updateFontNames=True)
+    static.flavor = None  # drop the woff2 wrapper satori can't read
+    static.save(f"src/lib/server/fonts/{out}")
+```
+
+`cp node_modules/@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff src/lib/server/fonts/InstrumentSerif-Regular.woff` handles the serif. These are the **latin** subsets, so a title needing latin-ext would render tofu — [og.test.ts](../src/lib/server/og.test.ts) renders a card per shape and asserts a real PNG comes back, which is the only thing that catches a font that stopped loading (satori doesn't throw; it just drops the glyphs).
 
 [xml.ts](../src/lib/server/xml.ts) is a shared helper for the RSS feeds (`devlog/rss.xml`, `projects/rss.xml`) and `sitemap.xml`.
