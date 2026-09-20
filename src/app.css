@@ -61,13 +61,6 @@
 	);
 }
 
-.text-hero {
-	font-size: var(--fs-hero);
-	font-weight: var(--fw-extrabold);
-	line-height: var(--lh-tight);
-	letter-spacing: var(--track-display);
-}
-
 /* Minimal styling for devlog post bodies rendered via {@html} — kept
    hand-rolled rather than pulling in @tailwindcss/typography for a
    handful of element types. */
