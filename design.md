@@ -100,10 +100,12 @@ inside itself is what made the home page read as one grey field.
   counters, dates, durations, play counts, episode counts. This register is ONE
   role — do not spread mono into body copy. It is the instrument-panel signal
   and it is what the `/watchlist` counter already does well.
-- **Use the display end of the scale.** The type scale defined `--fs-hero`,
-  `--fs-display` and `--fs-section` and used none of them; 78% of the site sat
-  at 12–14px. Every page gets one thing that is genuinely large, and on the data
-  pages that thing is a number.
+- **Use the display end of the scale.** 78% of the site sat at 12–14px, and the
+  three display sizes it defined went unconsumed — so they were deleted. A size
+  earns its place back only when a role renders it: `--fs-display` did, via
+  `.num-xl` on the watchlist counter. Every page should get one thing that is
+  genuinely large, and on the data pages that thing is a number — but add the
+  token when the role exists, not in advance.
 - Roles, not sizes: `.h-page` / `.h-section` / `.h-card` / `.label` / `.meta` /
   `.num`. Reach for a role; only reach for a raw size utility when no role fits,
   and when that happens twice, add a role.
@@ -173,9 +175,9 @@ much of the page the primary number takes. The data pages (`/watchlist`,
 
 ## Open — settle these in the browser, not on an artboard
 
-- **Typeface.** Inter is currently loaded from the Google CDN. Candidates worth
-  trying in the running site: keeping Inter, or a sturdier display face over a
-  quieter body face the way RG Digital does. Self-hosting is wanted either way.
+- **Typeface.** Inter is now self-hosted via `@fontsource-variable/inter`.
+  Still worth trying in the running site: a sturdier display face over a quieter
+  body face, the way RG Digital splits Archivo/Geist/Martian Mono.
 - **Accent.** Cyan was chosen as "lime, but not lime". Worth confirming it is
   actually the colour this site wants rather than just the not-RG-Digital one.
 - **How far the instrument register goes** — whether the home page becomes a
