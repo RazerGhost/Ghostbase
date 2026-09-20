@@ -23,13 +23,34 @@ const RULE = '#232322'; // --border
 const SERIF = 'Instrument Serif';
 const MONO = 'JetBrains Mono';
 
+/**
+ * The ghost mark, inlined rather than read from `static/brand/ghost-mark.svg`.
+ *
+ * satori takes images as data URIs, and the file's eyes are punched in a
+ * hardcoded near-black that predates `--bg`; rebuilding the same two paths
+ * here lets them sit on the real ground colour. The viewBox is cropped to
+ * the drawn shape (the file's own is padded), so the mark optically matches
+ * the cap height of the wordmark beside it instead of floating above it.
+ *
+ * design.md § Personality without a face: the mark is the only figure this
+ * site gets, and a shared link is the one place it has to do that work alone.
+ */
+const GHOST_MARK = `data:image/svg+xml;base64,${Buffer.from(
+	`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 10 60 80">` +
+		`<path d="M20 81.688 L20 41.169 C20 24.07 33.542 10 50 10 C66.458 10 80 24.07 80 41.169 L80 81.688 L70 90 L60 81.688 L50 90 L40 81.688 L30 90 Z" fill="${ACCENT}"/>` +
+		`<circle cx="40" cy="43.249" r="4" fill="${GROUND}"/>` +
+		`<circle cx="60" cy="43.249" r="4" fill="${GROUND}"/>` +
+		`</svg>`
+).toString('base64')}`;
+
 // satori's TypeScript signature types its element tree as React's
 // `ReactNode`, but this project doesn't depend on react — cast our own
 // minimal, structurally-equivalent tree at the call site below rather than
 // pull in @types/react just for a type satori never actually needs at runtime.
 interface OgNode {
-	type: 'div';
+	type: 'div' | 'img';
 	props: {
+		src?: string;
 		style?: Record<string, string | number>;
 		children?: OgNode | OgNode[] | string;
 	};
@@ -159,18 +180,13 @@ async function renderOgImageUncached({ title, tags, eyebrow }: OgImageOptions): 
 							{
 								type: 'div',
 								props: {
-									style: { display: 'flex', alignItems: 'center', gap: '14px' },
+									style: { display: 'flex', alignItems: 'center', gap: '15px' },
 									children: [
 										{
-											type: 'div',
+											type: 'img',
 											props: {
-												style: {
-													display: 'flex',
-													width: '11px',
-													height: '11px',
-													borderRadius: '9999px',
-													backgroundColor: ACCENT
-												}
+												src: GHOST_MARK,
+												style: { display: 'flex', width: '21px', height: '28px' }
 											}
 										},
 										label('RazerGhost', INK)
