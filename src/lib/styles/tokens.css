@@ -16,7 +16,7 @@
 
 :root {
 	/* ── Fonts (same family/weights/scale as RG Digital) ── */
-	--font: 'Inter', 'Inter Variable', system-ui, -apple-system, sans-serif;
+	--font: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
 	--font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
 	--fw-regular: 400;
@@ -25,16 +25,12 @@
 	--fw-bold: 700;
 	--fw-extrabold: 800;
 
-	--fs-display: 42px; /* weight 800, --track-display */
 	--fs-heading: 28px; /* weight 800 */
 	--fs-subheading: 18px; /* weight 600 */
 	--fs-body: 16px; /* weight 400 */
 	--fs-body-sm: 14px;
 	--fs-label: 12px; /* weight 500, uppercase, --track-label */
 	--fs-meta: 11px;
-
-	--fs-hero: clamp(44px, 5.5vw, 72px);
-	--fs-section: clamp(36px, 3.5vw, 52px);
 
 	--lh-tight: 1.05;
 	--lh-heading: 1.2;
@@ -76,7 +72,11 @@
 	--border: #2a2a2a;
 	--white: #ffffff;
 	--gray: #a1a1a1;
-	--dim: #6b6b6b;
+	/* Measured in-browser against every surface it lands on: 6.04:1 on --bg
+	   #0a0a0a, 5.76:1 on --surface #111111, 5.09:1 on --surface-2 #1e1e1e.
+	   The ported value (#6b6b6b) was 3.72:1 and 3.54:1 on the first two —
+	   below AA for the dates, meta lines and empty states this token carries. */
+	--dim: #8e8e8e;
 	--black: #000000;
 
 	/* ── Accent — two-tier cyan (replaces single --green) ── */
@@ -160,7 +160,10 @@
 	--border: #e2e2e2;
 	--white: #0a0a0a;
 	--gray: #4b4d52;
-	--dim: #86888c;
+	/* 5.56:1 on --bg #ffffff, 5.14:1 on --surface #f6f6f6, 4.70:1 on
+	   --surface-2 #ececec. The ported value (#86888c) was 3.55:1 on white
+	   and 3.29:1 on --surface. */
+	--dim: #666870;
 	--black: #ffffff;
 
 	--primary-glow: rgba(34, 211, 238, 0.12);
@@ -177,7 +180,7 @@
 		--border: #e2e2e2;
 		--white: #0a0a0a;
 		--gray: #4b4d52;
-		--dim: #86888c;
+		--dim: #666870;
 		--black: #ffffff;
 
 		--primary-glow: rgba(34, 211, 238, 0.12);

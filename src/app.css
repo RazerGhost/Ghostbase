@@ -1,4 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+/* Inter, self-hosted. The Google Fonts @import this replaces was a
+   render-blocking request to a third party on every page load, and sent
+   every visitor's IP there — the same reason RG Digital serves its own
+   faces through Astro's Fonts API instead of the CDN. Vite bundles and
+   fingerprints the woff2 files into the client build, so the Docker image
+   needs no extra copy step. Both axes (opsz 14..32, wght 100..900) plus
+   italic, matching what the CDN URL asked for. */
+@import '@fontsource-variable/inter/opsz.css';
+@import '@fontsource-variable/inter/opsz-italic.css';
 @import 'tailwindcss';
 @import './lib/styles/tokens.css';
 
@@ -59,13 +67,6 @@
 		var(--primary-glow) 0%,
 		transparent 70%
 	);
-}
-
-.text-hero {
-	font-size: var(--fs-hero);
-	font-weight: var(--fw-extrabold);
-	line-height: var(--lh-tight);
-	letter-spacing: var(--track-display);
 }
 
 /* Minimal styling for devlog post bodies rendered via {@html} — kept
