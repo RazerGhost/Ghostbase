@@ -25,7 +25,7 @@
 
 <Seo title={site.name} description={site.description} path="/" />
 
-<main class="page page--wide">
+<main class="page">
 	<div class="grid gap-12 md:grid-cols-[1.5fr_1fr] md:gap-16">
 		<div data-hero-reveal="0">
 			<h1 class="h-hero">{site.name}</h1>

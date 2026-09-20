@@ -76,10 +76,20 @@
 	--space-14: 56px;
 	--space-16: 64px;
 
-	--pad: 88px; /* horizontal page gutter — .page. Editorial wants room. */
+	/* One measurement, used by the nav, the footer and every page, so the
+	   wordmark, the h1 and the footer all start on the same vertical line.
+	   They were on three different widths (1152 / 1280 / 1440) and nothing
+	   lined up. */
+	--pad: 72px; /* horizontal gutter — .shell */
 	--pad-sm: 24px; /* the same gutter below 900px */
-	--max-w: 1280px; /* default .page content width */
-	--nav-h: 72px;
+	--max-w: 1440px; /* default shell width */
+	--nav-h: 76px;
+
+	/* A comfortable line length for body copy. Prose pages keep the full
+	   shell width and set this on the text column itself, rather than
+	   shrinking the whole page and stranding the layout in the middle of a
+	   wide screen. */
+	--measure: 68ch;
 
 	/* ── Radius. Editorial is a ruled system, not a rounded one: radii are
 	   for controls, never for content blocks. ── */

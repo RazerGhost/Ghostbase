@@ -52,17 +52,17 @@
 	noindex={data.project.draft}
 />
 
-<main class="mx-auto max-w-2xl px-6 py-16 {hasToc ? 'lg:max-w-5xl' : ''}">
-	<div class="{hasToc ? 'lg:grid lg:grid-cols-[1fr_240px] lg:gap-12' : ''}">
-		<div class="lg:mx-auto lg:w-full lg:max-w-2xl">
+<main class="page">
+	<div class="{hasToc ? 'lg:grid lg:grid-cols-[minmax(0,1fr)_260px] lg:gap-16' : ''}">
+		<div class="measure">
 			<a href="/projects" class="link flex items-center gap-1 text-sm text-primary hover:opacity-85">
 				<ArrowLeft size={15} aria-hidden="true" /> Projects
 			</a>
 		</div>
 	</div>
 
-	<div class="{hasToc ? 'lg:grid lg:grid-cols-[1fr_240px] lg:items-start lg:gap-12' : ''}">
-	<article class="mt-4 lg:mx-auto lg:w-full {hasToc ? 'lg:max-w-2xl' : ''}">
+	<div class="{hasToc ? 'lg:grid lg:grid-cols-[minmax(0,1fr)_260px] lg:items-start lg:gap-16' : ''}">
+	<article class="measure mt-4">
 		{#if data.project.draft}
 			<p
 				class="mb-4 inline-block rounded-full border border-warn/40 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-warn"
@@ -218,8 +218,8 @@
 	{/if}
 
 	{#if data.relatedPosts.length}
-		<div class="mt-12 {hasToc ? 'lg:grid lg:grid-cols-[1fr_240px] lg:gap-12' : ''}">
-			<div class="lg:mx-auto lg:w-full lg:max-w-2xl">
+		<div class="mt-12 {hasToc ? 'lg:grid lg:grid-cols-[minmax(0,1fr)_260px] lg:gap-16' : ''}">
+			<div class="measure">
 				<p class="label label--strong">From the devlog</p>
 				<ul class="mt-4 grid gap-2">
 					{#each data.relatedPosts as post (post.slug)}
@@ -241,8 +241,8 @@
 	{/if}
 
 	{#if data.related.length}
-		<div class="mt-12 {hasToc ? 'lg:grid lg:grid-cols-[1fr_240px] lg:gap-12' : ''}">
-			<div class="lg:mx-auto lg:w-full lg:max-w-2xl">
+		<div class="mt-12 {hasToc ? 'lg:grid lg:grid-cols-[minmax(0,1fr)_260px] lg:gap-16' : ''}">
+			<div class="measure">
 				<p class="label label--strong">More like this</p>
 				<div class="mt-4 grid gap-4">
 					{#each data.related as project (project.slug)}

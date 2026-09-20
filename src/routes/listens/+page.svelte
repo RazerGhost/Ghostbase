@@ -312,7 +312,7 @@
     path="/listens"
 />
 
-<main class="page page--wide">
+<main class="page">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <h1
@@ -439,7 +439,7 @@
         </div>
 
         <div
-            class="mt-6 rounded-lg border border-border p-5 sm:p-6"
+            class="rule mt-8 pt-8"
         >
             <p class="label">
                 Spent listening
@@ -579,7 +579,7 @@
 
                 {#if data.discoveries.length}
                     <div
-                        class="rounded-lg border border-border p-5 sm:p-6"
+                        class="rule pt-8"
                     >
                         <p
                             class="label"
@@ -607,7 +607,7 @@
 
         {#if hourlyByHour.some((n) => n > 0)}
             <div
-                class="mt-4 rounded-lg border border-border p-5 sm:p-6"
+                class="rule mt-8 pt-8"
             >
                 <p class="label">
                     Listening clock
@@ -634,7 +634,7 @@
 
         {#if monthlyBars.length}
             <div
-                class="mt-4 rounded-lg border border-border p-5 sm:p-6"
+                class="rule mt-8 pt-8"
             >
                 <p class="label">
                     Monthly trend
@@ -664,7 +664,7 @@
 
         {#if heatmapWeeks.length}
             <div
-                class="mt-4 rounded-lg border border-border p-5 sm:p-6"
+                class="rule mt-8 pt-8"
             >
                 <p class="label">
                     {data.selectedYear} activity
@@ -695,7 +695,7 @@
 
         {#if weekdayHourGrid.length}
             <div
-                class="mt-4 rounded-lg border border-border p-5 sm:p-6"
+                class="rule mt-8 pt-8"
             >
                 <p class="label">
                     Listening habits by day &amp; hour
@@ -746,7 +746,7 @@
 
         {#if data.onThisDay.length}
             <div
-                class="mt-4 rounded-lg border border-border p-5 sm:p-6"
+                class="rule mt-8 pt-8"
             >
                 <p class="label">
                     On this day

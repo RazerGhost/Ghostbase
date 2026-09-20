@@ -99,7 +99,7 @@
 
 <Seo title="Projects — RazerGhost" description="Things I've built." path="/projects" />
 
-<main class="page page--wide">
+<main class="page">
 	<div class="flex flex-wrap items-end justify-between gap-6" data-hero-reveal="0">
 		<div>
 			<h1 class="h-page">Projects</h1>
