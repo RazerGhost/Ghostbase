@@ -13,7 +13,7 @@
 	path="/devlog/tags/{data.tag}"
 />
 
-<main class="page page--wide">
+<main class="page">
 	<a href="/devlog" class="ulink">
 		<ArrowLeft size={13} aria-hidden="true" /> Devlog
 	</a>

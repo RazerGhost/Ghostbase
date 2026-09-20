@@ -21,7 +21,7 @@
 	path="/about"
 />
 
-<main class="page page--wide">
+<main class="page">
 	<div data-hero-reveal="0">
 		<p class="label label--icon">
 			<User size={12} aria-hidden="true" /> About

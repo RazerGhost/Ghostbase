@@ -75,7 +75,7 @@
 
 <Seo title="Devlog — RazerGhost" description="Notes on whatever I'm building at the moment." path="/devlog" />
 
-<main class="page page--wide">
+<main class="page">
 	<div class="flex flex-wrap items-end justify-between gap-6" data-hero-reveal="0">
 		<div>
 			<h1 class="h-page">Devlog</h1>

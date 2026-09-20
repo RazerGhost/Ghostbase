@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { navLinks } from '$lib/config';
+	import { navLinks, site } from '$lib/config';
 	import { commandPalette } from '$lib/stores/command-palette.svelte';
-	import Logo from '$lib/components/Logo.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import Search from '@lucide/svelte/icons/search';
 	import Menu from '@lucide/svelte/icons/menu';
@@ -23,68 +22,79 @@
 
 <svelte:window onkeydown={mobileMenuOpen ? onKeydown : undefined} />
 
-<header class="sticky top-0 z-10 border-b border-border bg-bg/80 backdrop-blur-md">
-	<nav class="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-6">
-		<a href="/" class="flex items-center gap-2 transition-opacity hover:opacity-85" onclick={closeMenu}>
-			<Logo variant="outline" size={22} />
-			<span class="text-sm font-bold tracking-tight text-white">RazerGhost</span>
+<!-- Editorial masthead: the wordmark in the display serif, sitting on the same
+     left edge as every page's h1 because both use .shell. The old nav had its
+     own max-width, so it lined up with nothing. -->
+<header class="sticky top-0 z-10 border-b border-border bg-bg/85 backdrop-blur-md">
+	<nav class="shell flex h-[var(--nav-h)] items-center justify-between gap-8">
+		<a
+			href="/"
+			onclick={closeMenu}
+			class="flex shrink-0 items-baseline gap-2.5 transition-opacity hover:opacity-80"
+		>
+			<img src="/brand/ghost-outline.svg" width="17" height="17" alt="" class="translate-y-0.5" />
+			<span class="font-serif text-[19px] tracking-[-0.015em] text-white">{site.name}</span>
 		</a>
-		<div class="flex items-center gap-4">
-			<ul class="hidden items-center gap-5 md:flex">
+
+		<div class="flex items-center gap-7">
+			<ul class="hidden items-center gap-7 md:flex">
 				{#each navLinks as link}
+					{@const active = page.url.pathname.startsWith(link.href)}
 					<li>
 						<a
 							href={link.href}
-							aria-current={page.url.pathname.startsWith(link.href) ? 'page' : undefined}
-							class="text-sm transition-colors {page.url.pathname.startsWith(link.href)
-								? 'text-primary'
-								: 'text-gray hover:text-primary'}"
+							aria-current={active ? 'page' : undefined}
+							class="border-b pb-0.5 text-[13px] transition-colors {active
+								? 'border-primary text-primary'
+								: 'border-transparent text-dim hover:text-white'}"
 						>
 							{link.label}
 						</a>
 					</li>
 				{/each}
 			</ul>
-			<button
-				type="button"
-				onclick={() => (commandPalette.open = true)}
-				aria-label="Open command palette"
-				class="meta hidden items-center gap-1.5 rounded-md border border-border px-2 py-1 transition-colors hover:border-primary hover:text-primary sm:flex"
-			>
-				<Search size={13} aria-hidden="true" />
-				<kbd class="font-sans">{isMac ? '⌘K' : 'Ctrl K'}</kbd>
-			</button>
-			<ThemeToggle />
-			<button
-				type="button"
-				onclick={() => (mobileMenuOpen = !mobileMenuOpen)}
-				aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-				aria-expanded={mobileMenuOpen}
-				class="flex items-center justify-center rounded-md border border-border p-1.5 text-gray transition-colors hover:border-primary hover:text-primary md:hidden"
-			>
-				{#if mobileMenuOpen}
-					<X size={16} aria-hidden="true" />
-				{:else}
-					<Menu size={16} aria-hidden="true" />
-				{/if}
-			</button>
+
+			<div class="flex items-center gap-4">
+				<button
+					type="button"
+					onclick={() => (commandPalette.open = true)}
+					aria-label="Open command palette"
+					class="hidden items-center gap-2 text-dim transition-colors hover:text-primary sm:flex"
+				>
+					<Search size={14} aria-hidden="true" />
+					<kbd class="mono">{isMac ? '⌘K' : 'Ctrl K'}</kbd>
+				</button>
+				<ThemeToggle />
+				<button
+					type="button"
+					onclick={() => (mobileMenuOpen = !mobileMenuOpen)}
+					aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+					aria-expanded={mobileMenuOpen}
+					class="flex items-center text-dim transition-colors hover:text-primary md:hidden"
+				>
+					{#if mobileMenuOpen}
+						<X size={18} aria-hidden="true" />
+					{:else}
+						<Menu size={18} aria-hidden="true" />
+					{/if}
+				</button>
+			</div>
 		</div>
 	</nav>
 
 	{#if mobileMenuOpen}
-		<div class="border-t border-border px-6 py-4 md:hidden">
-			<ul class="flex flex-col gap-1">
+		<div class="shell border-t border-border py-5 md:hidden">
+			<ul class="flex flex-col gap-4">
 				{#each navLinks as link}
+					{@const active = page.url.pathname.startsWith(link.href)}
 					<li>
 						<a
 							href={link.href}
 							onclick={closeMenu}
-							aria-current={page.url.pathname.startsWith(link.href) ? 'page' : undefined}
-							class="block rounded-md px-2 py-2 text-sm transition-colors {page.url.pathname.startsWith(
-								link.href
-							)
+							aria-current={active ? 'page' : undefined}
+							class="font-serif text-[20px] transition-colors {active
 								? 'text-primary'
-								: 'text-gray hover:text-primary'}"
+								: 'text-white'}"
 						>
 							{link.label}
 						</a>

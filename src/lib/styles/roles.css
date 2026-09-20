@@ -20,24 +20,53 @@
    p-6. In the components layer, roles set the default and a utility can still
    override one value without abandoning the role. */
 @layer components {
-	/* ── Page container ──────────────────────────────────────────────────
-	   No page sets its own mx-auto / max-w-* / px-* / py-*. Width is a
-	   modifier, because a reading page wants a measure and a data page
-	   wants room. */
+	/* ── Shell ───────────────────────────────────────────────────────────
+	   The one horizontal container. The nav, the footer and every page use
+	   it, which is what puts the wordmark, each h1 and the footer on the same
+	   line down the left edge. Nothing sets its own mx-auto / max-w / px. */
+	.shell {
+		margin-inline: auto;
+		max-width: var(--max-w);
+		padding-inline: var(--pad);
+	}
+
+	/* A page is the shell plus its vertical rhythm. */
 	.page {
 		margin-inline: auto;
 		max-width: var(--max-w);
 		padding-inline: var(--pad);
-		padding-block: var(--space-10) var(--space-16);
+		padding-block: var(--space-12) var(--space-16);
 	}
+	/* Prose pages do NOT get narrower — they keep the shell and put the
+	   measure on the text column instead. */
 	.page--narrow {
-		max-width: 46rem;
+		max-width: 52rem;
 	}
+	/* Forms and the admin area, where a full shell would strand the controls. */
 	.page--prose {
-		max-width: 54rem;
+		max-width: 60rem;
 	}
-	.page--wide {
-		max-width: 1440px;
+
+	/* Body copy caps its line length wherever it sits. */
+	.measure {
+		max-width: var(--measure);
+	}
+
+	/* ── Spread ──────────────────────────────────────────────────────────
+	   The editorial two-column: a label in the margin, content beside it.
+	   This is how a prose page uses a wide screen without running the text
+	   to 200 characters — the width goes to the margin column, not the
+	   measure. Stacks below 900px. */
+	.spread {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--space-4);
+	}
+	@media (min-width: 900px) {
+		.spread {
+			grid-template-columns: 230px minmax(0, 1fr);
+			gap: var(--space-16);
+		}
 	}
 
 	/* ── Headings ────────────────────────────────────────────────────────
@@ -274,35 +303,27 @@
 	.rank {
 		display: flex;
 		align-items: baseline;
-		gap: var(--space-6);
+		gap: var(--space-5);
+		max-width: 46rem;
 		padding: var(--space-4) 0;
 		border-bottom: 1px solid var(--border);
 	}
+	/* The numeral sat on --surface-2, which measures 1.11:1 against the page
+	   ground — decorative to the point of invisible. It is large text, so AA
+	   wants 3:1; --dim gives 5.4:1 and still reads as quieter than the name
+	   beside it because the name is ink and this is grey. */
 	.rank__n {
 		font-family: var(--font-display);
-		font-size: 40px;
-		line-height: 0.85;
-		color: var(--surface-2);
-		width: 62px;
+		font-size: 34px;
+		line-height: 0.9;
+		color: var(--dim);
+		width: 48px;
 		flex-shrink: 0;
 		letter-spacing: var(--track-display);
 		transition: color var(--dur-fast);
 	}
 	.rank:hover .rank__n {
 		color: var(--accent);
-	}
-
-	/* ── Hanging icon ────────────────────────────────────────────────────
-	   A paragraph with its icon in the left margin — the gear page's prose,
-	   and anywhere else a block wants a marker without a heading. */
-	.hang {
-		display: grid;
-		grid-template-columns: 44px minmax(0, 1fr);
-		gap: 0 var(--space-3);
-	}
-	.hang__icon {
-		color: var(--accent);
-		margin-top: 7px;
 	}
 
 	/* ── Card / panel ────────────────────────────────────────────────────

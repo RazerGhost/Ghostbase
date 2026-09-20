@@ -441,7 +441,7 @@
     path="/watchlist"
 />
 
-<main class="page page--wide">
+<main class="page">
     <h1
         class="h-page"
         data-hero-reveal="0"

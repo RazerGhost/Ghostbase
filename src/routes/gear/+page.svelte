@@ -67,7 +67,7 @@
 	path="/gear"
 />
 
-<main class="page page--prose">
+<main class="page">
 	<div class="flex flex-wrap items-end justify-between gap-6" data-hero-reveal="0">
 		<div>
 			<h1 class="h-page">Gear</h1>
@@ -76,10 +76,12 @@
 		<span class="meta">{items.length} things, written out</span>
 	</div>
 
-	<div class="rule mt-8 flex flex-col gap-7 pt-9" data-hero-reveal="1">
-		<div class="hang">
-			<Code size={16} class="hang__icon" aria-hidden="true" />
-			<p class="text-[17px] leading-[1.8] text-gray">
+	<div class="rule mt-10 flex flex-col gap-12 pt-10" data-hero-reveal="1">
+		<div class="spread">
+			<p class="label label--icon self-start">
+				<Code size={13} aria-hidden="true" /> Editor &amp; stack
+			</p>
+			<p class="measure text-[17px] leading-[1.8] text-gray">
 				I write in <a class="link" href={g('Zed')}>Zed</a> with
 				<a class="link" href={g('Claude Code')}>Claude Code</a> alongside it, and almost everything
 				here ships as <a class="link" href={g('SvelteKit')}>SvelteKit</a> and
@@ -89,9 +91,11 @@
 			</p>
 		</div>
 
-		<div class="hang">
-			<Wrench size={16} class="hang__icon" aria-hidden="true" />
-			<p class="text-[17px] leading-[1.8] text-gray">
+		<div class="spread">
+			<p class="label label--icon self-start">
+				<Wrench size={13} aria-hidden="true" /> Day to day
+			</p>
+			<p class="measure text-[17px] leading-[1.8] text-gray">
 				Day to day that&rsquo;s <a class="link" href={g('Zen Browser')}>Zen Browser</a> on
 				<a class="link" href={g('Windows')}>Windows</a>,
 				<a class="link" href={g('Windows Terminal')}>Windows Terminal</a> and
@@ -109,9 +113,11 @@
 			</p>
 		</div>
 
-		<div class="hang">
-			<Cpu size={16} class="hang__icon" aria-hidden="true" />
-			<p class="text-[17px] leading-[1.8] text-gray">
+		<div class="spread">
+			<p class="label label--icon self-start">
+				<Cpu size={13} aria-hidden="true" /> The machine
+			</p>
+			<p class="measure text-[17px] leading-[1.8] text-gray">
 				It all runs on a <a class="link" href={g('AMD Ryzen 7 7800X3D')}>Ryzen 7 7800X3D</a> and a
 				<a class="link" href={g('Gigabyte RTX 3070 Eagle OC')}>RTX 3070</a>, across an
 				<a class="link" href={g('AOC 24G1WG4 (24")')}>AOC 24G1WG4</a> and an older
@@ -123,9 +129,11 @@
 			</p>
 		</div>
 
-		<div class="hang">
-			<Gamepad2 size={16} class="hang__icon" aria-hidden="true" />
-			<p class="text-[17px] leading-[1.8] text-gray">
+		<div class="spread">
+			<p class="label label--icon self-start">
+				<Gamepad2 size={13} aria-hidden="true" /> Off the clock
+			</p>
+			<p class="measure text-[17px] leading-[1.8] text-gray">
 				And when I&rsquo;m not working: a <a class="link" href={g('MOZA R3 Racing Kit')}>MOZA R3</a>
 				wheel, a <a class="link" href={g('GameSir G7 Pro (Shadow Ember)')}>GameSir G7 Pro</a>, a
 				<a class="link" href={g('Steam Controller')}>Steam Controller</a> that refuses to die, and a
@@ -134,9 +142,9 @@
 		</div>
 
 		{#if unmentioned.length}
-			<div class="hang">
-				<span class="hang__icon"></span>
-				<p class="text-[17px] leading-[1.8] text-gray">
+			<div class="spread">
+				<p class="label self-start">Not yet written in</p>
+				<p class="measure text-[17px] leading-[1.8] text-gray">
 					Also, not yet worked into the copy above:
 					{#each unmentioned as item, i}<a class="link" href={item.href}>{item.name}</a
 						>{i < unmentioned.length - 1 ? ', ' : '.'}{/each}
@@ -145,5 +153,5 @@
 		{/if}
 	</div>
 
-	<p class="meta rule mt-10 pt-5">Every name links out to the thing itself.</p>
+	<p class="meta rule mt-14 pt-6">Every name links out to the thing itself.</p>
 </main>
