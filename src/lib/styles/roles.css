@@ -257,6 +257,16 @@
 	.shelf__item:hover .shelf__art {
 		border-color: var(--border-strong);
 	}
+	.shelf__title {
+		font-family: var(--font-display);
+		font-size: var(--fs-lead);
+		line-height: var(--lh-heading);
+		color: var(--white);
+		transition: color var(--dur-fast);
+	}
+	.shelf__item:hover .shelf__title {
+		color: var(--accent);
+	}
 
 	/* ── Ranking ─────────────────────────────────────────────────────────
 	   The listens top-five (design.md § Lists): a serif numeral, the name,

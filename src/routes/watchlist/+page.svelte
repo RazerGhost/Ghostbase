@@ -344,90 +344,73 @@
     );
 </script>
 
-{#snippet grid(items: LibraryItem[])}
-    <div
-        class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
-    >
-        {#each items as item, i (item.href)}
+{#snippet shelf(items: LibraryItem[])}
+    <div class="shelf mt-5">
+        {#each items as item (item.href)}
             <a
                 href={item.href}
                 target="_blank"
                 rel="noreferrer"
-                class="card group overflow-hidden rounded-lg border border-border bg-surface/50 transition-colors hover:border-primary"
-                style="transition-delay: {Math.min(i, 12) * 60}ms"
+                class="shelf__item group"
             >
-                <div
-                    class="relative aspect-[2/3] w-full overflow-hidden bg-surface-2"
-                >
+                <span class="relative block">
                     {#if item.posterUrl}
                         <img
                             src={item.posterUrl}
                             alt=""
                             loading="lazy"
-                            class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            class="shelf__art"
                         />
                     {:else}
-                        <div class="grid h-full w-full place-items-center">
-                            <Tv size={24} class="text-dim" aria-hidden="true" />
-                        </div>
+                        <span class="shelf__art grid place-items-center">
+                            <Tv size={22} class="text-dim" aria-hidden="true" />
+                        </span>
                     {/if}
+
                     {#if item.overview}
-                        <div
-                            class="absolute inset-0 hidden items-end bg-gradient-to-t from-bg/95 via-bg/60 to-transparent p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:flex"
+                        <span
+                            class="absolute inset-0 hidden items-end bg-gradient-to-t from-bg/95 via-bg/70 to-transparent p-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:flex"
                         >
-                            <p
-                                class="line-clamp-6 text-[11px] leading-snug text-gray"
-                            >
+                            <span class="line-clamp-6 text-[11px] leading-snug text-gray">
                                 {item.overview}
-                            </p>
-                        </div>
+                            </span>
+                        </span>
                     {/if}
+
                     {#if item.rating}
                         <span
-                            class="absolute right-1.5 top-1.5 flex items-center gap-0.5 rounded-full bg-bg/80 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm"
+                            class="absolute top-1.5 right-1.5 flex items-center gap-0.5 rounded-full bg-bg/85 px-1.5 py-0.5 text-[10px] text-white backdrop-blur-sm"
                         >
-                            <Star
-                                size={10}
-                                class="fill-primary text-primary"
-                                aria-hidden="true"
-                            />
+                            <Star size={10} class="fill-primary text-primary" aria-hidden="true" />
                             {item.rating}
                         </span>
                     {/if}
+
                     {#if item.totalEpisodes}
-                        <div
-                            class="absolute inset-x-0 bottom-0 h-1 bg-black/40"
-                        >
-                            <div
-                                class="h-full bg-primary"
-                                style="width: {Math.min(
-                                    100,
-                                    progressRatio(item) * 100,
-                                )}%"
-                            ></div>
-                        </div>
+                        <span class="absolute inset-x-0 bottom-0 block h-1 bg-black/50">
+                            <span
+                                class="block h-full bg-primary"
+                                style="width: {Math.min(100, progressRatio(item) * 100)}%"
+                            ></span>
+                        </span>
                     {/if}
-                </div>
-                <div class="p-3">
-                    <p class="truncate text-sm font-medium text-white">
-                        {item.title}
-                    </p>
-                    <p class="meta mt-0.5">
-                        {item.totalEpisodes
-                            ? `${item.watchedEpisodes}/${item.totalEpisodes} episodes`
-                            : "Movie"}
-                    </p>
-                    {#if item.genres.length}
-                        <p class="mt-0.5 truncate text-[11px] text-dim">
-                            {item.genres.slice(0, 2).join(" · ")}
-                        </p>
-                    {/if}
-                    {#if item.nextToWatch}
-                        <p class="mt-0.5 truncate text-[11px] text-primary">
-                            Up next: {item.nextToWatch}
-                        </p>
-                    {/if}
-                </div>
+                </span>
+
+                <span class="shelf__title mt-3 block truncate">{item.title}</span>
+                <span class="meta mt-1 block truncate">
+                    {item.totalEpisodes
+                        ? `${item.watchedEpisodes}/${item.totalEpisodes} episodes`
+                        : "Movie"}
+                </span>
+                {#if item.nextToWatch}
+                    <span class="mono mono--accent mt-1 block truncate">
+                        up next {item.nextToWatch}
+                    </span>
+                {:else if item.genres.length}
+                    <span class="mono mt-1 block truncate">
+                        {item.genres.slice(0, 2).join(" · ")}
+                    </span>
+                {/if}
             </a>
         {/each}
     </div>
@@ -437,7 +420,7 @@
     {#if items.length === 0}
         <p class="mt-4 text-sm text-dim">{emptyMessage(emptyFallback)}</p>
     {:else}
-        {@render grid(items.slice(0, visibleCounts[key]))}
+        {@render shelf(items.slice(0, visibleCounts[key]))}
         {#if items.length > visibleCounts[key]}
             <div class="mt-6 flex justify-center">
                 <button
@@ -564,37 +547,26 @@
         {/if}
 
         <div
-            class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+            class="rule mt-8 grid grid-cols-1 gap-10 pt-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-16"
         >
-            <div class="rounded-lg border border-border p-5 sm:p-6">
+            <div>
                 <p class="label">
                     Spent watching
                 </p>
-                <p class="mt-2 flex items-baseline gap-1.5 text-white">
-                    <span class="num num-xl sm:text-5xl"
-                        >{watchTime.days}</span
-                    >
-                    <span class="text-sm text-dim">d</span>
-                    <span class="num num-xl sm:text-5xl"
-                        >{watchTime.hours}</span
-                    >
-                    <span class="text-sm text-dim">h</span>
-                    <span class="num num-xl sm:text-5xl"
-                        >{watchTime.minutes}</span
-                    >
-                    <span class="text-sm text-dim">m</span>
+                <p class="num num-xl mt-3 flex items-baseline gap-1">
+                    {watchTime.days}<span class="num-unit">d</span>
+                    <span class="ml-2">{watchTime.hours}</span><span class="num-unit">h</span>
+                    <span class="ml-2">{watchTime.minutes}</span><span class="num-unit">m</span>
                 </p>
-                <div
-                    class="mt-5 grid grid-cols-3 gap-4 border-t border-border pt-5 text-center"
-                >
+                <div class="rule mt-7 grid grid-cols-3 gap-6 pt-6">
                     <div>
-                        <p class="h-section">
+                        <p class="num num-sm">
                             {groupCompleted.length}
                         </p>
                         <p class="meta mt-0.5">Completed</p>
                     </div>
                     <div>
-                        <p class="h-section">
+                        <p class="num num-sm">
                             {totalEpisodesWatchedTvOnly}{#if moviesCompletedCount > 0}<span
                                     class="text-dim"
                                 >
@@ -604,7 +576,7 @@
                         <p class="meta mt-0.5">Episodes watched</p>
                     </div>
                     <div>
-                        <p class="h-section">
+                        <p class="num num-sm">
                             {completedThisYear}
                         </p>
                         <p class="meta mt-0.5">
@@ -617,19 +589,19 @@
                     class="mt-4 grid grid-cols-3 gap-4 border-t border-border pt-4 text-center"
                 >
                     <div>
-                        <p class="h-section">
+                        <p class="num num-sm">
                             {peakYear ?? "—"}
                         </p>
                         <p class="meta mt-0.5">Peak year</p>
                     </div>
                     <div>
-                        <p class="h-section">
+                        <p class="num num-sm">
                             {peakWeekday ?? "—"}
                         </p>
                         <p class="meta mt-0.5">Most active day</p>
                     </div>
                     <div>
-                        <p class="h-section">
+                        <p class="num num-sm">
                             {avgRating ? avgRating.toFixed(1) : "—"}
                         </p>
                         <p class="meta mt-0.5">Avg rating</p>
@@ -640,7 +612,7 @@
                     class="mt-4 grid grid-cols-2 gap-4 border-t border-border pt-4 text-center"
                 >
                     <div>
-                        <p class="h-section">
+                        <p class="num num-sm">
                             {groupPlanToWatch.length}<span class="text-dim">
                                 · {backlogHours}h</span
                             >
@@ -648,7 +620,7 @@
                         <p class="meta mt-0.5">Backlog to clear</p>
                     </div>
                     <div>
-                        <p class="h-section">
+                        <p class="num num-sm">
                             {completionRate}%
                         </p>
                         <p class="meta mt-0.5">Completion rate</p>
@@ -657,26 +629,20 @@
             </div>
 
             {#if topGenres.length}
-                <div class="rounded-lg border border-border p-5 sm:p-6">
-                    <p
-                        class="label"
-                    >
+                <div class="lg:border-l lg:border-border lg:pl-16">
+                    <p class="label">
                         Top genres
                     </p>
-                    <ul class="mt-4 flex flex-col gap-3">
+                    <ul class="mt-5 flex flex-col gap-4">
                         {#each topGenres as { genre, count, pct }}
                             <li>
-                                <div
-                                    class="flex items-center justify-between text-sm"
-                                >
-                                    <span class="text-white">{genre}</span>
-                                    <span class="text-dim">{count}</span>
+                                <div class="flex items-baseline justify-between">
+                                    <span class="text-[15px] text-white">{genre}</span>
+                                    <span class="mono">{count}</span>
                                 </div>
-                                <div
-                                    class="mt-1 h-1.5 overflow-hidden rounded-full bg-surface-2"
-                                >
+                                <div class="mt-2 h-[3px] overflow-hidden bg-surface-2">
                                     <div
-                                        class="h-full rounded-full bg-primary"
+                                        class="h-full bg-primary"
                                         style="width: {pct}%"
                                     ></div>
                                 </div>
