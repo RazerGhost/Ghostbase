@@ -1,9 +1,11 @@
 <script lang="ts">
-	import DevlogCard from '$lib/components/DevlogCard.svelte';
+	import DevlogStream from '$lib/components/DevlogStream.svelte';
 	import Seo from '$lib/components/Seo.svelte';
 	import { replaceState } from '$app/navigation';
 	import { page } from '$app/state';
 	import Rss from '@lucide/svelte/icons/rss';
+	import Terminal from '@lucide/svelte/icons/terminal';
+	import Search from '@lucide/svelte/icons/search';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -49,7 +51,7 @@
 	);
 
 	function formatDate(iso: string): string {
-		return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+		return new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
 	}
 
 	const filtered = $derived.by(() => {
@@ -74,72 +76,90 @@
 <Seo title="Devlog — RazerGhost" description="Notes on whatever I'm building at the moment." path="/devlog" />
 
 <main class="page page--wide">
-	<div class="flex items-baseline justify-between" data-hero-reveal="0">
-		<h1 class="h-page">Devlog</h1>
-		<a
-			href="/devlog/rss.xml"
-			data-sveltekit-reload
-			class="link flex items-center gap-1.5 text-sm text-dim hover:text-primary"
-		>
-			<Rss size={14} aria-hidden="true" /> RSS
-		</a>
-	</div>
-	<p class="mt-2 text-gray" data-hero-reveal="1">Notes on whatever I'm building at the moment.</p>
-
-	<div class="mt-6 grid grid-cols-3 gap-4 rounded-lg border border-border p-4 text-center" data-hero-reveal="2">
+	<div class="flex flex-wrap items-end justify-between gap-6" data-hero-reveal="0">
 		<div>
-			<p class="h-section">{data.entries.length}</p>
-			<p class="meta mt-0.5">Posts</p>
+			<h1 class="h-page">Devlog</h1>
+			<p class="lead mt-3">Notes on whatever I'm building at the moment.</p>
 		</div>
-		<div>
-			<p class="h-section">{tags.length}</p>
-			<p class="meta mt-0.5">Tags</p>
-		</div>
-		<div>
-			<p class="h-section">{latestDate ? formatDate(latestDate) : '—'}</p>
-			<p class="meta mt-0.5">Latest post</p>
+		<div class="flex items-center gap-6">
+			<span class="meta">
+				{data.entries.length}
+				{data.entries.length === 1 ? 'post' : 'posts'} · {tags.length} tags{#if latestDate}
+					· last {formatDate(latestDate)}{/if}
+			</span>
+			<a href="/devlog/rss.xml" data-sveltekit-reload class="ulink">
+				<Rss size={13} aria-hidden="true" /> RSS
+			</a>
 		</div>
 	</div>
 
-	<input
-		type="search"
-		bind:value={query}
-		placeholder="Search posts…"
-		class="mt-6 w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm text-white placeholder:text-dim focus:border-primary focus:outline-none"
-	/>
+	<div class="rule mt-8 flex flex-wrap items-center gap-3 pt-5" data-hero-reveal="1">
+		<div class="relative min-w-0 flex-1">
+			<Search
+				size={14}
+				aria-hidden="true"
+				class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-dim"
+			/>
+			<input
+				type="search"
+				bind:value={query}
+				placeholder="Search posts…"
+				aria-label="Search posts"
+				class="input w-full pl-9"
+			/>
+		</div>
+		{#if selectedTag || query.trim()}
+			<button
+				type="button"
+				class="btn"
+				onclick={() => {
+					selectedTag = null;
+					query = '';
+				}}
+			>
+				Clear
+			</button>
+		{/if}
+	</div>
 
 	{#if tags.length}
-		<ul class="mt-6 flex flex-wrap gap-2">
+		<ul class="mt-4 flex flex-wrap gap-2" data-hero-reveal="2">
 			<li>
 				<button
-					class="chip rounded-full border px-3 py-1 text-xs {selectedTag === null
-						? 'border-primary text-primary'
-						: 'border-border text-gray'}"
+					type="button"
+					class="chip {selectedTag === null ? 'chip--active' : ''}"
 					onclick={() => (selectedTag = null)}
 				>
-					All <span class="text-dim">{data.entries.length}</span>
+					All <span class="chip__count">{data.entries.length}</span>
 				</button>
 			</li>
 			{#each tags as tag}
 				<li>
 					<button
-						class="chip rounded-full border px-3 py-1 text-xs {selectedTag === tag
-							? 'border-primary text-primary'
-							: 'border-border text-gray'}"
+						type="button"
+						class="chip {selectedTag === tag ? 'chip--active' : ''}"
 						onclick={() => toggleTag(tag)}
 					>
-						{tag} <span class="text-dim">{tagCounts.get(tag)}</span>
+						{tag} <span class="chip__count">{tagCounts.get(tag)}</span>
 					</button>
 				</li>
 			{/each}
 		</ul>
 	{/if}
 
-	<div class="mt-8 grid gap-4 sm:grid-cols-2">
-		{#each filtered as entry (entry.slug)}
-			<DevlogCard {entry} seriesInfo={data.seriesInfo[entry.slug]} />
+	<p class="label label--icon mt-10 mb-3">
+		<Terminal size={12} aria-hidden="true" />
+		{#if selectedTag || query.trim()}
+			{filtered.length}
+			{filtered.length === 1 ? 'entry' : 'entries'} matching
 		{:else}
-			<p class="text-sm text-dim">No entries match your search.</p>
-		{/each}
-	</div>
+			Every entry, newest first
+		{/if}
+	</p>
+
+	<DevlogStream
+		entries={filtered}
+		seriesInfo={data.seriesInfo}
+		empty="Nothing matches that search."
+	/>
 </main>
