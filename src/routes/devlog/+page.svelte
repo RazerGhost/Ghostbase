@@ -22,7 +22,17 @@
 		if (query.trim()) params.set('q', query.trim());
 		if (selectedTag) params.set('tag', selectedTag);
 		const qs = params.toString();
-		replaceState(qs ? `?${qs}` : location.pathname, {});
+		const search = qs ? `?${qs}` : '';
+		// Skip when it's already correct (true on mount, since the filters are seeded
+		// from the URL) — calling replaceState this early can throw "router is not
+		// initialized yet" on a hard reload/direct load, which would otherwise permanently
+		// kill this effect since an uncaught error stops it from ever re-running.
+		if (search === location.search) return;
+		try {
+			replaceState(`${location.pathname}${search}`, {});
+		} catch {
+			// router not ready yet — safe to ignore, see above
+		}
 	});
 
 	const tagCounts = $derived.by(() => {
