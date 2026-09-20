@@ -9,36 +9,79 @@ const FONT_DIR = path.resolve(process.cwd(), 'src/lib/server/fonts');
 const WIDTH = 1200;
 const HEIGHT = 630;
 
+/* The card is the site's register at poster scale (design.md § Typography):
+   Instrument Serif for the title, JetBrains Mono for the label row, hairline
+   rules as the structure, and no glow behind any of it. Colours are the
+   tokens from tokens.css, written out because satori has no stylesheet —
+   keep them in step by hand if a token moves. */
+const INK = '#f3f1ed'; // --white
+const DIM = '#8d8a85'; // --dim
+const ACCENT = '#22d3ee'; // --accent
+const GROUND = '#0c0c0d'; // --bg
+const RULE = '#232322'; // --border
+
+const SERIF = 'Instrument Serif';
+const MONO = 'JetBrains Mono';
+
+/**
+ * The ghost mark, inlined rather than read from `static/brand/ghost-mark.svg`.
+ *
+ * satori takes images as data URIs, and the file's eyes are punched in a
+ * hardcoded near-black that predates `--bg`; rebuilding the same two paths
+ * here lets them sit on the real ground colour. The viewBox is cropped to
+ * the drawn shape (the file's own is padded), so the mark optically matches
+ * the cap height of the wordmark beside it instead of floating above it.
+ *
+ * design.md § Personality without a face: the mark is the only figure this
+ * site gets, and a shared link is the one place it has to do that work alone.
+ */
+const GHOST_MARK = `data:image/svg+xml;base64,${Buffer.from(
+	`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 10 60 80">` +
+		`<path d="M20 81.688 L20 41.169 C20 24.07 33.542 10 50 10 C66.458 10 80 24.07 80 41.169 L80 81.688 L70 90 L60 81.688 L50 90 L40 81.688 L30 90 Z" fill="${ACCENT}"/>` +
+		`<circle cx="40" cy="43.249" r="4" fill="${GROUND}"/>` +
+		`<circle cx="60" cy="43.249" r="4" fill="${GROUND}"/>` +
+		`</svg>`
+).toString('base64')}`;
+
 // satori's TypeScript signature types its element tree as React's
 // `ReactNode`, but this project doesn't depend on react — cast our own
 // minimal, structurally-equivalent tree at the call site below rather than
 // pull in @types/react just for a type satori never actually needs at runtime.
 interface OgNode {
-	type: 'div';
+	type: 'div' | 'img';
 	props: {
+		src?: string;
 		style?: Record<string, string | number>;
 		children?: OgNode | OgNode[] | string;
 	};
 }
 
-let fontsCache: { name: string; data: Buffer; weight: 400 | 700; style: 'normal' }[] | null = null;
+type LoadedFont = { name: string; data: Buffer; weight: 400; style: 'normal' };
 
-function loadFonts() {
+let fontsCache: LoadedFont[] | null = null;
+
+/**
+ * The three faces, at weight 400 only — display type is never bolded here.
+ *
+ * satori reads ttf/otf/woff but not woff2, and @fontsource ships Archivo and
+ * JetBrains Mono as variable woff2 alone, so those two are checked in as
+ * static ttf instanced at wght 400 from those exact files. Instrument Serif
+ * ships a plain .woff, which is copied as-is.
+ */
+function loadFonts(): LoadedFont[] {
 	if (!fontsCache) {
-		fontsCache = [
-			{
-				name: 'Inter',
-				data: fs.readFileSync(path.join(FONT_DIR, 'Inter-Regular.woff')),
-				weight: 400,
-				style: 'normal'
-			},
-			{
-				name: 'Inter',
-				data: fs.readFileSync(path.join(FONT_DIR, 'Inter-Bold.woff')),
-				weight: 700,
-				style: 'normal'
-			}
-		];
+		fontsCache = (
+			[
+				[SERIF, 'InstrumentSerif-Regular.woff'],
+				['Archivo', 'Archivo-Regular.ttf'],
+				[MONO, 'JetBrainsMono-Regular.ttf']
+			] as const
+		).map(([name, file]) => ({
+			name,
+			data: fs.readFileSync(path.join(FONT_DIR, file)),
+			weight: 400 as const,
+			style: 'normal' as const
+		}));
 	}
 	return fontsCache;
 }
@@ -72,6 +115,43 @@ export async function renderOgImage(options: OgImageOptions): Promise<Buffer> {
 	return png;
 }
 
+/** A mono label: uppercase and tracked, the one label register the site has. */
+function label(text: string, color: string): OgNode {
+	return {
+		type: 'div',
+		props: {
+			style: {
+				display: 'flex',
+				fontFamily: MONO,
+				fontSize: '20px',
+				letterSpacing: '3.2px', // 0.16em, --track-label
+				textTransform: 'uppercase',
+				color
+			},
+			children: text
+		}
+	};
+}
+
+/** One hairline. Rules are the structure here, at exactly one weight. */
+function rule(): OgNode {
+	return {
+		type: 'div',
+		props: { style: { display: 'flex', height: '1px', backgroundColor: RULE } }
+	};
+}
+
+/**
+ * Instrument Serif carries far more presence per pixel than a grotesque, so
+ * the steps below are gentler than a sans would need — a 90-character title
+ * still wants to read as one held breath, not as a paragraph.
+ */
+function titleSize(title: string): string {
+	if (title.length > 78) return '52px';
+	if (title.length > 44) return '64px';
+	return '76px';
+}
+
 async function renderOgImageUncached({ title, tags, eyebrow }: OgImageOptions): Promise<Buffer> {
 	const tree: OgNode = {
 		type: 'div',
@@ -79,97 +159,98 @@ async function renderOgImageUncached({ title, tags, eyebrow }: OgImageOptions): 
 			style: {
 				display: 'flex',
 				flexDirection: 'column',
-				justifyContent: 'space-between',
 				width: `${WIDTH}px`,
 				height: `${HEIGHT}px`,
-				padding: '64px',
-				backgroundColor: '#0a0a0a',
-				backgroundImage:
-					'radial-gradient(circle at 50% -10%, rgba(34,211,238,0.16), rgba(10,10,10,0) 60%)',
-				fontFamily: 'Inter'
+				padding: '60px 64px',
+				backgroundColor: GROUND,
+				fontFamily: 'Archivo'
 			},
 			children: [
-				{
-					type: 'div',
-					props: {
-						style: { display: 'flex', alignItems: 'center', gap: '12px' },
-						children: [
-							{
-								type: 'div',
-								props: {
-									style: {
-										display: 'flex',
-										width: '16px',
-										height: '16px',
-										borderRadius: '9999px',
-										backgroundColor: '#22d3ee'
-									}
-								}
-							},
-							{
-								type: 'div',
-								props: {
-									style: {
-										display: 'flex',
-										fontSize: '28px',
-										fontWeight: 700,
-										color: '#ffffff',
-										letterSpacing: '-1px'
-									},
-									children: eyebrow ? `RazerGhost · ${eyebrow}` : 'RazerGhost'
-								}
-							}
-						]
-					}
-				},
+				// Masthead: the mark, the wordmark, and which part of the site.
 				{
 					type: 'div',
 					props: {
 						style: {
 							display: 'flex',
-							fontSize: title.length > 60 ? '52px' : '64px',
-							// 700 is the heaviest face actually loaded (loadFonts above)
-							// — asking for more makes satori silently fall back anyway.
-							fontWeight: 700,
-							color: '#ffffff',
-							lineHeight: 1.15,
-							letterSpacing: '-1.5px'
+							alignItems: 'center',
+							justifyContent: 'space-between',
+							paddingBottom: '26px'
 						},
-						children: title
-					}
-				},
-				{
-					type: 'div',
-					props: {
-						style: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' },
 						children: [
 							{
 								type: 'div',
 								props: {
-									style: { display: 'flex', gap: '12px', flexWrap: 'wrap' },
-									children: tags.slice(0, 4).map((tag) => ({
-										type: 'div',
-										props: {
-											style: {
-												display: 'flex',
-												fontSize: '22px',
-												color: '#22d3ee',
-												border: '2px solid rgba(34,211,238,0.4)',
-												borderRadius: '9999px',
-												padding: '6px 20px'
-											},
-											children: tag
-										}
-									}))
+									style: { display: 'flex', alignItems: 'center', gap: '15px' },
+									children: [
+										{
+											type: 'img',
+											props: {
+												src: GHOST_MARK,
+												style: { display: 'flex', width: '21px', height: '28px' }
+											}
+										},
+										label('RazerGhost', INK)
+									]
 								}
 							},
+							...(eyebrow ? [label(eyebrow, ACCENT)] : [])
+						]
+					}
+				},
+				rule(),
+
+				/* The title hangs off the bottom rule rather than centring, so a
+				   two-word post and a nine-word one both land on the same line
+				   and the quiet field above reads as deliberate either way. */
+				{
+					type: 'div',
+					props: {
+						style: {
+							display: 'flex',
+							flexGrow: 1,
+							alignItems: 'flex-end',
+							paddingTop: '40px',
+							paddingBottom: '38px'
+						},
+						children: [
 							{
 								type: 'div',
 								props: {
-									style: { display: 'flex', fontSize: '22px', color: '#6b6b6b' },
-									children: new URL(site.url).host
+									style: {
+										display: 'flex',
+										fontFamily: SERIF,
+										fontSize: titleSize(title),
+										fontWeight: 400,
+										color: INK,
+										lineHeight: 1.12,
+										letterSpacing: '-0.9px' // --track-display
+									},
+									children: title
 								}
 							}
+						]
+					}
+				},
+
+				rule(),
+				{
+					type: 'div',
+					props: {
+						style: {
+							display: 'flex',
+							justifyContent: 'space-between',
+							alignItems: 'center',
+							paddingTop: '26px'
+						},
+						children: [
+							{
+								type: 'div',
+								props: {
+									style: { display: 'flex', gap: '20px' },
+									children: tags.slice(0, 4).map((tag) => label(tag, DIM))
+								}
+							},
+							label(new URL(site.url).host, DIM)
 						]
 					}
 				}

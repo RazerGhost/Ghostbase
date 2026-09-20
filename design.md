@@ -122,6 +122,11 @@ Three faces, three roles, all self-hosted. No third-party font CDN.
   everywhere else, against 108px in the first draft. Nothing shouts.
 - Roles, not sizes: `.h-hero` / `.h-page` / `.h-section` / `.h-card-lg` /
   `.h-card` / `.lead` / `.label` / `.mono` / `.meta` / `.num`.
+- **OG images carry the same three faces.** satori has no stylesheet and reads
+  ttf/otf/woff but not woff2, so `src/lib/server/fonts/` holds static copies cut
+  from the exact `@fontsource` files the site serves — Instrument Serif's own
+  `.woff`, and Archivo + JetBrains Mono instanced at wght 400. A face that
+  fails to load there renders tofu silently; `og.test.ts` is what catches it.
 
 ## Icons
 
@@ -205,10 +210,6 @@ reading pages.
 
 ## Open
 
-- **OG images** still render in Inter (`src/lib/server/og.ts` reads .woff files
-  from `src/lib/server/fonts/`). satori cannot use the woff2 that `@fontsource`
-  ships, so moving them onto Instrument Serif + Archivo needs .ttf/.woff copies
-  added to that directory. Until then the social previews are off-register.
 - **The accent itself.** Cyan was originally chosen as "lime, but not lime". It
   now has a readable light-mode counterpart, but whether cyan is the colour this
   site wants — rather than the not-RG-Digital one — is still unsettled.
