@@ -58,20 +58,12 @@ export const watchProfiles = [
 
 export type GearItem = { name: string; note?: string; href?: string };
 
-type GearIcon =
-  | "code"
-  | "layers"
-  | "wrench"
-  | "cpu"
-  | "keyboard"
-  | "headphones"
-  | "gamepad"
-  | "video";
-
-export const gearGroups: { label: string; icon: GearIcon; items: GearItem[] }[] = [
+// Grouping is kept as the editing shape — it is how this list is easiest to
+// maintain — but /gear renders it as prose, so the labels are not shown and
+// the groups carry no icon of their own.
+export const gearGroups: { label: string; items: GearItem[] }[] = [
   {
     label: "Editor",
-    icon: "code",
     items: [
       { name: "Zed", href: "https://zed.dev" },
       { name: "Claude Code", href: "https://claude.com/product/claude-code" },
@@ -79,7 +71,6 @@ export const gearGroups: { label: string; icon: GearIcon; items: GearItem[] }[] 
   },
   {
     label: "Stack",
-    icon: "layers",
     items: [
       { name: "SvelteKit", href: "https://svelte.dev/docs/kit" },
       { name: "TypeScript", href: "https://www.typescriptlang.org" },
@@ -89,7 +80,6 @@ export const gearGroups: { label: string; icon: GearIcon; items: GearItem[] }[] 
   },
   {
     label: "Daily Tools",
-    icon: "wrench",
     items: [
       { name: "Zen Browser", href: "https://zen-browser.app" },
       { name: "Windows", href: "https://www.microsoft.com/windows" },
@@ -112,7 +102,6 @@ export const gearGroups: { label: string; icon: GearIcon; items: GearItem[] }[] 
   },
   {
     label: "Desktop",
-    icon: "cpu",
     items: [
       {
         name: "AMD Ryzen 7 7800X3D",
@@ -134,7 +123,6 @@ export const gearGroups: { label: string; icon: GearIcon; items: GearItem[] }[] 
   },
   {
     label: "Peripherals",
-    icon: "keyboard",
     items: [
       {
         name: "Keychron K10 HE Wireless",
@@ -145,7 +133,6 @@ export const gearGroups: { label: string; icon: GearIcon; items: GearItem[] }[] 
   },
   {
     label: "Audio",
-    icon: "headphones",
     items: [
       { name: "Elgato Wave:3 MK.2", href: "https://www.elgato.com/us/en/p/wave-3" },
       { name: "Simgot EW300 DSP", href: "https://www.linsoul.com/products/simgot-ew300?variant=45798828277977" },
@@ -153,7 +140,6 @@ export const gearGroups: { label: string; icon: GearIcon; items: GearItem[] }[] 
   },
   {
     label: "Sim & Gaming",
-    icon: "gamepad",
     items: [
       { name: "MOZA R3 Racing Kit", href: "https://mozaracing.com/pages/r3-racing-bundle" },
       {
@@ -165,7 +151,6 @@ export const gearGroups: { label: string; icon: GearIcon; items: GearItem[] }[] 
   },
   {
     label: "Streaming",
-    icon: "video",
     items: [{ name: "Elgato Stream Deck MK.1", href: "https://www.elgato.com/us/en/p/stream-deck" }],
   },
 ];

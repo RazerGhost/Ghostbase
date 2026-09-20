@@ -1,223 +1,149 @@
 <script lang="ts">
-	import { replaceState } from '$app/navigation';
-	import { page } from '$app/state';
+	/**
+	 * Gear, written out rather than listed (design.md § Lists).
+	 *
+	 * The names and links still come from `gearGroups` in config.ts — that
+	 * stays the single source of truth — but the page is prose, so adding an
+	 * item to config no longer makes it appear here on its own. `unmentioned`
+	 * below catches exactly that: anything in config the copy hasn't picked up
+	 * gets listed at the end instead of silently vanishing.
+	 */
 	import Seo from '$lib/components/Seo.svelte';
 	import { gearGroups } from '$lib/config';
-	import Code2 from '@lucide/svelte/icons/code-2';
-	import Layers from '@lucide/svelte/icons/layers';
+	import Code from '@lucide/svelte/icons/code';
 	import Wrench from '@lucide/svelte/icons/wrench';
 	import Cpu from '@lucide/svelte/icons/cpu';
-	import Keyboard from '@lucide/svelte/icons/keyboard';
-	import Headphones from '@lucide/svelte/icons/headphones';
 	import Gamepad2 from '@lucide/svelte/icons/gamepad-2';
-	import Video from '@lucide/svelte/icons/video';
-	import Search from '@lucide/svelte/icons/search';
-	import ExternalLink from '@lucide/svelte/icons/external-link';
 
-	const icons = {
-		code: Code2,
-		layers: Layers,
-		wrench: Wrench,
-		cpu: Cpu,
-		keyboard: Keyboard,
-		headphones: Headphones,
-		gamepad: Gamepad2,
-		video: Video
-	};
+	const items = gearGroups.flatMap((g) => g.items);
+	const byName = new Map(items.map((i) => [i.name, i]));
 
-	const initialParams = page.url.searchParams;
-	const initialLabel = initialParams.get('category');
-
-	let query = $state('');
-	let activeLabel = $state<string | null>(
-		initialLabel && gearGroups.some((g) => g.label === initialLabel) ? initialLabel : null
-	);
-	let expanded = $state<string | null>(null);
-	let searchInputEl = $state<HTMLInputElement>();
-
-	const visibleGroups = $derived.by(() => {
-		const q = query.trim().toLowerCase();
-		return gearGroups
-			.map((group) => ({
-				...group,
-				items: group.items.filter((item) => {
-					if (q) return item.name.toLowerCase().includes(q);
-					if (activeLabel) return group.label === activeLabel;
-					return true;
-				})
-			}))
-			.filter((group) => group.items.length > 0);
-	});
-
-	// Keep the URL in sync with the category filter so it's reload-safe and
-	// shareable — replaceState only, since the filter is applied client-side
-	// over already-loaded data and shouldn't trigger a server round-trip.
-	$effect(() => {
-		const search = activeLabel ? `?category=${encodeURIComponent(activeLabel)}` : '';
-		// Skip when it's already correct (true on mount, since activeLabel is seeded
-		// from the URL) — calling replaceState this early can throw "router is not
-		// initialized yet" on a hard reload/direct load, which would otherwise permanently
-		// kill this effect since an uncaught error stops it from ever re-running.
-		if (search === location.search) return;
-		try {
-			replaceState(`${location.pathname}${search}`, {});
-		} catch {
-			// router not ready yet — safe to ignore, see above
-		}
-	});
-
-	function toggleExpanded(key: string) {
-		expanded = expanded === key ? null : key;
+	/** The href for a config item, by its exact name in config.ts. */
+	function g(name: string): string | undefined {
+		return byName.get(name)?.href;
 	}
 
-	function highlightParts(name: string, q: string): { text: string; match: boolean }[] {
-		if (!q) return [{ text: name, match: false }];
-		const i = name.toLowerCase().indexOf(q);
-		if (i === -1) return [{ text: name, match: false }];
-		return [
-			{ text: name.slice(0, i), match: false },
-			{ text: name.slice(i, i + q.length), match: true },
-			{ text: name.slice(i + q.length), match: false }
-		].filter((part) => part.text.length > 0);
-	}
-
-	function onWindowKeydown(e: KeyboardEvent) {
-		if (e.key !== '/') return;
-		const target = e.target as HTMLElement | null;
-		if (target && ['INPUT', 'TEXTAREA'].includes(target.tagName)) return;
-		e.preventDefault();
-		searchInputEl?.focus();
-	}
+	// Every config name the copy below links. Keep in step with the prose.
+	const mentioned = [
+		'Zed',
+		'Claude Code',
+		'SvelteKit',
+		'TypeScript',
+		'Tailwind CSS',
+		'Node.js',
+		'Zen Browser',
+		'Windows',
+		'Windows Terminal',
+		'Tabby',
+		'PowerShell',
+		'Figma',
+		'Affinity',
+		'DaVinci Resolve',
+		'Proton Mail',
+		'Proton Pass',
+		'Proton Drive',
+		'Proton VPN',
+		'Discord',
+		'WhatsApp',
+		'AMD Ryzen 7 7800X3D',
+		'Gigabyte RTX 3070 Eagle OC',
+		'AOC 24G1WG4 (24")',
+		'Dell P2414H (24")',
+		'Keychron K10 HE Wireless',
+		'Keychron M6 8K',
+		'Simgot EW300 DSP',
+		'Elgato Wave:3 MK.2',
+		'MOZA R3 Racing Kit',
+		'GameSir G7 Pro (Shadow Ember)',
+		'Steam Controller',
+		'Elgato Stream Deck MK.1'
+	];
+	const unmentioned = items.filter((i) => !mentioned.includes(i.name));
 </script>
 
-<Seo title="Gear — RazerGhost" description="Tools and gear in regular rotation." path="/gear" />
+<Seo
+	title="Gear — RazerGhost"
+	description="The tools, hardware and software in regular rotation."
+	path="/gear"
+/>
 
-<svelte:window onkeydown={onWindowKeydown} />
-
-<main class="page page--wide">
-	<h1 class="h-page" data-hero-reveal="0">Gear</h1>
-	<p class="mt-2 text-gray" data-hero-reveal="1">Tools and gear in regular rotation.</p>
-
-	<div class="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center" data-hero-reveal="2">
-		<div class="relative w-full sm:max-w-xs">
-			<Search
-				size={14}
-				class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-dim"
-				aria-hidden="true"
-			/>
-			<input
-				bind:this={searchInputEl}
-				type="search"
-				bind:value={query}
-				placeholder="Search gear… (press /)"
-				class="w-full rounded-lg border border-border bg-transparent py-2 pl-8 pr-3 text-sm text-white placeholder:text-dim focus:border-primary focus:outline-none"
-			/>
+<main class="page page--prose">
+	<div class="flex flex-wrap items-end justify-between gap-6" data-hero-reveal="0">
+		<div>
+			<h1 class="h-page">Gear</h1>
+			<p class="lead mt-3">Tools and gear in regular rotation.</p>
 		</div>
-		<ul class="flex flex-wrap gap-2 text-xs">
-			<li>
-				<button
-					type="button"
-					disabled={!!query}
-					onclick={() => (activeLabel = null)}
-					class="chip rounded-full border px-3 py-1 disabled:opacity-40 {activeLabel === null
-						? 'border-primary text-primary'
-						: 'border-border text-gray'}"
-				>
-					All
-				</button>
-			</li>
-			{#each gearGroups as group}
-				<li>
-					<button
-						type="button"
-						disabled={!!query}
-						onclick={() => (activeLabel = activeLabel === group.label ? null : group.label)}
-						class="chip rounded-full border px-3 py-1 disabled:opacity-40 {activeLabel ===
-						group.label
-							? 'border-primary text-primary'
-							: 'border-border text-gray'}"
-					>
-						{group.label}
-					</button>
-				</li>
-			{/each}
-		</ul>
+		<span class="meta">{items.length} things, written out</span>
 	</div>
 
-	{#if visibleGroups.length === 0}
-		<p class="mt-10 text-sm text-dim">
-			No gear matches "{query}".
-			<button type="button" class="text-primary underline underline-offset-2" onclick={() => (query = '')}>
-				Clear search
-			</button>
-		</p>
-	{/if}
+	<div class="rule mt-8 flex flex-col gap-7 pt-9" data-hero-reveal="1">
+		<div class="hang">
+			<Code size={16} class="hang__icon" aria-hidden="true" />
+			<p class="text-[17px] leading-[1.8] text-gray">
+				I write in <a class="link" href={g('Zed')}>Zed</a> with
+				<a class="link" href={g('Claude Code')}>Claude Code</a> alongside it, and almost everything
+				here ships as <a class="link" href={g('SvelteKit')}>SvelteKit</a> and
+				<a class="link" href={g('TypeScript')}>TypeScript</a>
+				with <a class="link" href={g('Tailwind CSS')}>Tailwind CSS</a> on
+				<a class="link" href={g('Node.js')}>Node.js</a>.
+			</p>
+		</div>
 
-	{#snippet itemName(name: string)}
-		{#each highlightParts(name, query.trim().toLowerCase()) as part}
-			{#if part.match}
-				<mark class="rounded-sm bg-primary/20 text-primary">{part.text}</mark>
-			{:else}
-				{part.text}
-			{/if}
-		{/each}
-	{/snippet}
+		<div class="hang">
+			<Wrench size={16} class="hang__icon" aria-hidden="true" />
+			<p class="text-[17px] leading-[1.8] text-gray">
+				Day to day that&rsquo;s <a class="link" href={g('Zen Browser')}>Zen Browser</a> on
+				<a class="link" href={g('Windows')}>Windows</a>,
+				<a class="link" href={g('Windows Terminal')}>Windows Terminal</a> and
+				<a class="link" href={g('Tabby')}>Tabby</a> over
+				<a class="link" href={g('PowerShell')}>PowerShell</a>,
+				<a class="link" href={g('Figma')}>Figma</a> and
+				<a class="link" href={g('Affinity')}>Affinity</a> when something needs drawing,
+				<a class="link" href={g('DaVinci Resolve')}>DaVinci Resolve</a> when it needs cutting, and
+				Proton for <a class="link" href={g('Proton Mail')}>mail</a>,
+				<a class="link" href={g('Proton Pass')}>passwords</a>,
+				<a class="link" href={g('Proton Drive')}>files</a> and
+				<a class="link" href={g('Proton VPN')}>VPN</a>.
+				<a class="link" href={g('Discord')}>Discord</a> and
+				<a class="link" href={g('WhatsApp')}>WhatsApp</a> handle everyone else.
+			</p>
+		</div>
 
-	<div class="mt-10 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-		{#each visibleGroups as group, i}
-			{@const Icon = icons[group.icon]}
-			<section style="transition-delay: {i * 60}ms">
-				<h2 class="label label--icon">
-					<Icon size={13} aria-hidden="true" />
-					{group.label}
-					<span class="text-dim/60">({group.items.length})</span>
-				</h2>
-				<ul class="mt-3 flex flex-wrap gap-2">
-					{#each group.items as item}
-						{@const key = `${group.label}:${item.name}`}
-						<li>
-							{#if item.href}
-								<a
-									href={item.href}
-									target="_blank"
-									rel="noopener noreferrer"
-									class="chip inline-flex w-fit items-center gap-1.5 rounded-full border border-border px-3 py-1 text-sm text-gray"
-								>
-									<Icon size={13} class="text-dim" aria-hidden="true" />
-									{@render itemName(item.name)}
-									<ExternalLink size={11} class="text-dim" aria-hidden="true" />
-								</a>
-							{:else if item.note}
-								<button
-									type="button"
-									aria-expanded={expanded === key}
-									onclick={() => toggleExpanded(key)}
-									class="chip inline-flex w-fit items-center gap-1.5 rounded-full border px-3 py-1 text-sm {expanded ===
-									key
-										? 'border-primary text-primary'
-										: 'border-border text-gray'}"
-								>
-									<Icon size={13} class="text-dim" aria-hidden="true" />
-									{@render itemName(item.name)}
-								</button>
-							{:else}
-								<span
-									class="chip inline-flex w-fit items-center gap-1.5 rounded-full border border-border px-3 py-1 text-sm text-gray"
-								>
-									<Icon size={13} class="text-dim" aria-hidden="true" />
-									{@render itemName(item.name)}
-								</span>
-							{/if}
-						</li>
-					{/each}
-				</ul>
-				{#each group.items as item}
-					{@const key = `${group.label}:${item.name}`}
-					{#if item.note && expanded === key}
-						<p class="meta mt-2">{item.note}</p>
-					{/if}
-				{/each}
-			</section>
-		{/each}
+		<div class="hang">
+			<Cpu size={16} class="hang__icon" aria-hidden="true" />
+			<p class="text-[17px] leading-[1.8] text-gray">
+				It all runs on a <a class="link" href={g('AMD Ryzen 7 7800X3D')}>Ryzen 7 7800X3D</a> and a
+				<a class="link" href={g('Gigabyte RTX 3070 Eagle OC')}>RTX 3070</a>, across an
+				<a class="link" href={g('AOC 24G1WG4 (24")')}>AOC 24G1WG4</a> and an older
+				<a class="link" href={g('Dell P2414H (24")')}>Dell P2414H</a>. Hands on a
+				<a class="link" href={g('Keychron K10 HE Wireless')}>Keychron K10 HE</a> and an
+				<a class="link" href={g('Keychron M6 8K')}>M6 8K</a>; ears on
+				<a class="link" href={g('Simgot EW300 DSP')}>Simgot EW300</a>; voice through an
+				<a class="link" href={g('Elgato Wave:3 MK.2')}>Elgato Wave:3</a>.
+			</p>
+		</div>
+
+		<div class="hang">
+			<Gamepad2 size={16} class="hang__icon" aria-hidden="true" />
+			<p class="text-[17px] leading-[1.8] text-gray">
+				And when I&rsquo;m not working: a <a class="link" href={g('MOZA R3 Racing Kit')}>MOZA R3</a>
+				wheel, a <a class="link" href={g('GameSir G7 Pro (Shadow Ember)')}>GameSir G7 Pro</a>, a
+				<a class="link" href={g('Steam Controller')}>Steam Controller</a> that refuses to die, and a
+				<a class="link" href={g('Elgato Stream Deck MK.1')}>Stream Deck</a> doing far less than it could.
+			</p>
+		</div>
+
+		{#if unmentioned.length}
+			<div class="hang">
+				<span class="hang__icon"></span>
+				<p class="text-[17px] leading-[1.8] text-gray">
+					Also, not yet worked into the copy above:
+					{#each unmentioned as item, i}<a class="link" href={item.href}>{item.name}</a
+						>{i < unmentioned.length - 1 ? ', ' : '.'}{/each}
+				</p>
+			</div>
+		{/if}
 	</div>
+
+	<p class="meta rule mt-10 pt-5">Every name links out to the thing itself.</p>
 </main>
