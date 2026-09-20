@@ -16,7 +16,7 @@
 
 :root {
 	/* ── Fonts (same family/weights/scale as RG Digital) ── */
-	--font: 'Inter', 'Inter Variable', system-ui, -apple-system, sans-serif;
+	--font: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
 	--font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
 	--fw-regular: 400;
