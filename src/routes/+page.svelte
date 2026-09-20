@@ -238,4 +238,18 @@
 		{/if}
 	</div>
 
+	<!-- The one RG Digital pointer. Placement is main's call — after the
+	     projects and the devlog, not in the first 200 pixels next to the name.
+	     The styling is the charter's: a line of text, not a glowing CTA band. -->
+	<p class="mt-16 text-center text-sm text-dim">
+		Client work lives elsewhere —
+		<a
+			href="https://rg-digital.dev/about"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="link inline-flex items-center gap-1 text-primary hover:opacity-85"
+		>
+			see it at RG Digital <ArrowRight size={14} aria-hidden="true" />
+		</a>
+	</p>
 </main>
