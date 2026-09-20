@@ -10,8 +10,10 @@
 	let { data, children }: LayoutProps = $props();
 </script>
 
+<!-- No ambient glow behind the page: Editorial's ground is flat paper-dark,
+     and a radial gradient under everything is the one piece of marketing
+     furniture that survived the first pass (design.md § Divergence). -->
 <div class="relative flex min-h-screen flex-col bg-bg text-white">
-	<div class="bg-glow" aria-hidden="true"></div>
 	<Nav />
 	<div class="relative flex-1">
 		{@render children()}
