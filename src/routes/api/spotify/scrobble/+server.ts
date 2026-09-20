@@ -1,7 +1,13 @@
 import { timingSafeEqual } from 'node:crypto';
 import { json, error } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
-import { getSpotifyAccessToken, spotifyConfigured } from '$lib/server/spotify';
+import {
+	getSpotifyAccessToken,
+	noteSpotifyRateLimit,
+	spotifyConfigured,
+	spotifyCooldownMs,
+	SpotifyAuthError
+} from '$lib/server/spotify';
 import { insertPlays } from '$lib/server/spotify-history-db';
 import type { PlayRecord } from '$lib/server/spotify-history-db';
 import type { RequestHandler } from './$types';
@@ -25,14 +31,34 @@ export const GET: RequestHandler = async ({ url, request }) => {
 
 	if (!spotifyConfigured()) error(503, 'Spotify not configured');
 
-	const accessToken = await getSpotifyAccessToken();
+	// Spotify has already told us to back off — say so plainly instead of
+	// spending a request to be told again, which is what extends the penalty.
+	const cooling = spotifyCooldownMs();
+	if (cooling > 0) {
+		error(429, `Rate limited by Spotify; retry in ${Math.ceil(cooling / 1000)}s`);
+	}
+
+	let accessToken: string;
+	try {
+		accessToken = await getSpotifyAccessToken();
+	} catch (e) {
+		// A refresh failure used to surface as an unhandled 500 with the reason
+		// only in the container log. The scheduled task sees this body.
+		if (e instanceof SpotifyAuthError) error(502, e.message);
+		throw e;
+	}
+
 	const res = await fetch('https://api.spotify.com/v1/me/player/recently-played?limit=50', {
 		headers: { Authorization: `Bearer ${accessToken}` },
 		signal: AbortSignal.timeout(10_000)
 	});
 
 	if (res.status === 403) error(403, 'Missing user-read-recently-played scope');
-	if (!res.ok) error(res.status, 'Spotify API request failed');
+	if (res.status === 429) {
+		const ms = noteSpotifyRateLimit(res);
+		error(429, `Rate limited by Spotify; retry in ${Math.ceil(ms / 1000)}s`);
+	}
+	if (!res.ok) error(res.status, `Spotify API request failed (${res.status})`);
 
 	const data = await res.json();
 	const records: PlayRecord[] = (data.items ?? [])
