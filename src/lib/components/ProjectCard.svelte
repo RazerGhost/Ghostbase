@@ -1,4 +1,12 @@
 <script lang="ts">
+	/**
+	 * A project as an editorial entry row (design.md § Lists — projects follow
+	 * the devlog): mono status line, serif name, description, stack. Separated
+	 * by a hairline rather than boxed.
+	 *
+	 * `featured` marks the one project that leads the page — it gets the accent
+	 * rule rather than a different shape.
+	 */
 	import type { ProjectMeta } from '$lib/server/projects';
 	import GithubIcon from '@icons-pack/svelte-simple-icons/icons/SiGithub';
 	import ArrowUpRight from '@lucide/svelte/icons/arrow-up-right';
@@ -10,45 +18,28 @@
 
 <a
 	href={`/projects/${project.slug}`}
-	class="link group block rounded-lg border p-5 transition-colors hover:border-primary {featured
-		? 'border-primary/50'
-		: 'border-border'}"
+	class="entry -mx-3 block px-3 py-5"
+	class:border-primary={featured}
 >
-	{#if project.cover}
-		<img src={project.cover} alt="" class="mb-4 aspect-video w-full rounded-md object-cover" />
-	{/if}
-
-	<div class="flex items-center justify-between gap-2">
-		<h2 class="font-semibold text-white">{project.name}</h2>
-		<div class="flex shrink-0 items-center gap-2">
-			{#if project.status !== 'active'}
-				<span class="chip rounded-full border border-border px-2 py-0.5 text-[11px] capitalize text-dim">
-					{project.status}
-				</span>
-			{/if}
-			<ArrowUpRight
-				size={16}
-				class="text-dim transition-colors group-hover:text-primary"
-				aria-hidden="true"
-			/>
-		</div>
+	<div class="flex items-baseline justify-between gap-4">
+		<p class="mono">
+			{#if featured}<span class="mono--accent">Featured · </span>{/if}{project.status}
+		</p>
+		<ArrowUpRight size={14} class="shrink-0 text-dim" aria-hidden="true" />
 	</div>
-	<p class="mt-1.5 text-sm text-gray">{project.description}</p>
 
-	{#if badges.length}
-		<ul class="mt-3 flex flex-wrap gap-2">
-			{#each badges as badge}
-				<li class="chip">
-					{badge}
-				</li>
-			{/each}
-		</ul>
-	{/if}
+	<h2 class="h-card-lg entry__title mt-2">{project.name}</h2>
+	<p class="mt-2 max-w-[62ch] text-[15px] leading-relaxed text-gray">{project.description}</p>
 
-	{#if project.href}
-		<div class="meta mt-3 flex items-center gap-1.5">
-			<GithubIcon size={13} aria-hidden="true" />
-			<span>{project.href.replace('https://github.com/', '')}</span>
-		</div>
-	{/if}
+	<div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+		{#if badges.length}
+			<p class="mono">{badges.join(' · ')}</p>
+		{/if}
+		{#if project.href}
+			<p class="mono inline-flex items-center gap-1.5">
+				<GithubIcon size={12} aria-hidden="true" />
+				{project.href.replace('https://github.com/', '')}
+			</p>
+		{/if}
+	</div>
 </a>

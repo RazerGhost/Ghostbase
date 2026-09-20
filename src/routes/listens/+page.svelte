@@ -2,6 +2,8 @@
     import Seo from "$lib/components/Seo.svelte";
     import ListeningNowCard from "$lib/components/ListeningNowCard.svelte";
     import Music from "@lucide/svelte/icons/music";
+    import Disc from "@lucide/svelte/icons/disc-3";
+    import Ranking, { type RankItem } from "$lib/components/Ranking.svelte";
     import Search from "@lucide/svelte/icons/search";
     import X from "@lucide/svelte/icons/x";
     import { goto } from "$app/navigation";
@@ -44,14 +46,45 @@
         return id ? `https://open.spotify.com/track/${id}` : null;
     }
 
-    const maxArtistMs = $derived(
-        Math.max(1, ...data.stats.topArtists.map((a) => a.msPlayed)),
+    /** "4h 22m" / "38m" — a ranked artist's or album's listening time. */
+    function listened(ms: number): string {
+        const minutes = Math.round(ms / 60000);
+        const hours = Math.floor(minutes / 60);
+        return hours ? `${hours}h ${minutes % 60}m` : `${minutes}m`;
+    }
+
+    // The three top-fives, shaped for Ranking. They are set as type rather than
+    // as bars (design.md § Lists), so the magnitude lives in the count and the
+    // context line, not in a track width.
+    const artistRanking = $derived(
+        data.stats.topArtists.map((a) => ({
+            key: a.artist,
+            title: a.artist,
+            sub: `${a.plays.toLocaleString()} plays`,
+            value: listened(a.msPlayed),
+            valueLabel: "listened",
+            onpick: () => toggleArtist(a.artist),
+            expanded: expandedArtist === a.artist,
+        })),
     );
-    const maxTrackPlays = $derived(
-        Math.max(1, ...data.stats.topTracks.map((t) => t.plays)),
+    const trackRanking = $derived(
+        data.stats.topTracks.map((t) => ({
+            key: `${t.track}-${t.artist}`,
+            title: t.track,
+            sub: t.artist,
+            value: t.plays.toLocaleString(),
+            valueLabel: "plays",
+            href: trackHref(t.spotifyUri),
+        })),
     );
-    const maxAlbumMs = $derived(
-        Math.max(1, ...data.topAlbums.map((a) => a.msPlayed)),
+    const albumRanking = $derived(
+        data.topAlbums.map((a) => ({
+            key: `${a.album}-${a.artist}`,
+            title: a.album,
+            sub: `${a.artist} · ${a.plays.toLocaleString()} plays`,
+            value: listened(a.msPlayed),
+            valueLabel: "listened",
+        })),
     );
 
     function selectYear(e: Event) {
@@ -250,6 +283,28 @@
         }
     }
 </script>
+
+<!-- Rendered under an expanded artist row by Ranking. The row's own click
+     handler fetches the tracks, so this only has to show them. -->
+{#snippet artistTrackList(item: RankItem)}
+    {#if artistTracks.length}
+        <ul class="flex flex-col gap-2 border-l border-border pl-4">
+            {#each artistTracks as t}
+                {@const href = trackHref(t.spotifyUri)}
+                <li class="flex items-baseline justify-between gap-4 text-[13px]">
+                    {#if href}
+                        <a {href} target="_blank" rel="noreferrer" class="link truncate">{t.track}</a>
+                    {:else}
+                        <span class="truncate text-gray">{t.track}</span>
+                    {/if}
+                    <span class="mono shrink-0">{t.plays}</span>
+                </li>
+            {/each}
+        </ul>
+    {:else}
+        <p class="meta">Loading {item.title}&rsquo;s tracks&hellip;</p>
+    {/if}
+{/snippet}
 
 <Seo
     title="Listens — RazerGhost"
@@ -485,185 +540,23 @@
             class="mt-4 grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
         >
                 {#if data.stats.topArtists.length}
-                    <div
-                        class="rounded-lg border border-border p-5 sm:p-6"
-                    >
-                        <p
-                            class="label"
-                        >
-                            Top artists
+                    <div>
+                        <p class="label label--icon">
+                            <Music size={12} aria-hidden="true" /> Top artists
                         </p>
-                        <ul class="mt-4 flex flex-col gap-3">
-                            {#each data.stats.topArtists as artist}
-                                {@const art = albumArt(artist.spotifyUri)}
-                                <li>
-                                    <button
-                                        type="button"
-                                        class="flex w-full items-center gap-3 text-left"
-                                        onclick={() =>
-                                            toggleArtist(artist.artist)}
-                                    >
-                                        <div
-                                            class="h-9 w-9 shrink-0 overflow-hidden rounded-md bg-surface-2"
-                                        >
-                                            {#if art}
-                                                <img
-                                                    src={art}
-                                                    alt=""
-                                                    class="h-full w-full object-cover"
-                                                />
-                                            {:else}
-                                                <div
-                                                    class="flex h-full w-full items-center justify-center"
-                                                >
-                                                    <Music
-                                                        size={14}
-                                                        class="text-dim"
-                                                        aria-hidden="true"
-                                                    />
-                                                </div>
-                                            {/if}
-                                        </div>
-                                        <div class="min-w-0 flex-1">
-                                            <div
-                                                class="flex items-center justify-between text-sm"
-                                            >
-                                                <span
-                                                    class="truncate text-white hover:text-primary"
-                                                    >{artist.artist}</span
-                                                >
-                                                <span
-                                                    class="ml-3 shrink-0 text-dim"
-                                                    >{artist.plays} plays</span
-                                                >
-                                            </div>
-                                            <div
-                                                class="mt-1 h-1.5 overflow-hidden rounded-full bg-surface-2"
-                                            >
-                                                <div
-                                                    class="h-full rounded-full bg-primary"
-                                                    style="width: {(artist.msPlayed /
-                                                        maxArtistMs) *
-                                                        100}%"
-                                                ></div>
-                                            </div>
-                                        </div>
-                                    </button>
-                                    {#if expandedArtist === artist.artist}
-                                        <ul
-                                            class="mt-2 ml-3 flex flex-col gap-1.5 border-l border-border pl-3"
-                                        >
-                                            {#each artistTracks as t}
-                                                {@const href = trackHref(
-                                                    t.spotifyUri,
-                                                )}
-                                                <li
-                                                    class="flex items-center justify-between text-xs"
-                                                >
-                                                    {#if href}
-                                                        <a
-                                                            {href}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                            class="link truncate text-gray hover:text-primary"
-                                                            >{t.track}</a
-                                                        >
-                                                    {:else}
-                                                        <span
-                                                            class="truncate text-gray"
-                                                            >{t.track}</span
-                                                        >
-                                                    {/if}
-                                                    <span
-                                                        class="shrink-0 text-dim"
-                                                        >{t.plays}</span
-                                                    >
-                                                </li>
-                                            {/each}
-                                        </ul>
-                                    {/if}
-                                </li>
-                            {/each}
-                        </ul>
+                        <div class="mt-3">
+                            <Ranking items={artistRanking} expandedContent={artistTrackList} />
+                        </div>
                     </div>
                 {/if}
-
                 {#if data.stats.topTracks.length}
-                    <div
-                        class="rounded-lg border border-border p-5 sm:p-6"
-                    >
-                        <p
-                            class="label"
-                        >
-                            Top tracks
+                    <div>
+                        <p class="label label--icon">
+                            <Music size={12} aria-hidden="true" /> Top tracks
                         </p>
-                        <ul class="mt-4 flex flex-col gap-3">
-                            {#each data.stats.topTracks as track}
-                                {@const href = trackHref(track.spotifyUri)}
-                                {@const art = albumArt(track.spotifyUri)}
-                                <li class="flex items-center gap-3">
-                                    <div
-                                        class="h-9 w-9 shrink-0 overflow-hidden rounded-md bg-surface-2"
-                                    >
-                                        {#if art}
-                                            <img
-                                                src={art}
-                                                alt=""
-                                                class="h-full w-full object-cover"
-                                            />
-                                        {:else}
-                                            <div
-                                                class="flex h-full w-full items-center justify-center"
-                                            >
-                                                <Music
-                                                    size={14}
-                                                    class="text-dim"
-                                                    aria-hidden="true"
-                                                />
-                                            </div>
-                                        {/if}
-                                    </div>
-                                    <div class="min-w-0 flex-1">
-                                        <div
-                                            class="flex items-center justify-between text-sm"
-                                        >
-                                            <span
-                                                class="min-w-0 flex-1 truncate text-white"
-                                            >
-                                                {#if href}
-                                                    <a
-                                                        {href}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        class="link hover:text-primary"
-                                                        >{track.track}</a
-                                                    >
-                                                {:else}
-                                                    {track.track}
-                                                {/if}
-                                                <span class="text-dim">
-                                                    — {track.artist}</span
-                                                >
-                                            </span>
-                                            <span
-                                                class="ml-3 shrink-0 text-dim"
-                                                >{track.plays}</span
-                                            >
-                                        </div>
-                                        <div
-                                            class="mt-1 h-1.5 overflow-hidden rounded-full bg-surface-2"
-                                        >
-                                            <div
-                                                class="h-full rounded-full bg-primary"
-                                                style="width: {(track.plays /
-                                                    maxTrackPlays) *
-                                                    100}%"
-                                            ></div>
-                                        </div>
-                                    </div>
-                                </li>
-                            {/each}
-                        </ul>
+                        <div class="mt-3">
+                            <Ranking items={trackRanking} />
+                        </div>
                     </div>
                 {/if}
         </div>
@@ -674,70 +567,13 @@
                 class:md:grid-cols-2={data.topAlbums.length && data.discoveries.length}
             >
                 {#if data.topAlbums.length}
-                    <div
-                        class="rounded-lg border border-border p-5 sm:p-6"
-                    >
-                        <p
-                            class="label"
-                        >
-                            Top albums
+                    <div>
+                        <p class="label label--icon">
+                            <Disc size={12} aria-hidden="true" /> Top albums
                         </p>
-                        <ul class="mt-4 flex flex-col gap-3">
-                            {#each data.topAlbums as album}
-                                {@const art = albumArt(album.spotifyUri)}
-                                <li class="flex items-center gap-3">
-                                    <div
-                                        class="h-9 w-9 shrink-0 overflow-hidden rounded-md bg-surface-2"
-                                    >
-                                        {#if art}
-                                            <img
-                                                src={art}
-                                                alt=""
-                                                class="h-full w-full object-cover"
-                                            />
-                                        {:else}
-                                            <div
-                                                class="flex h-full w-full items-center justify-center"
-                                            >
-                                                <Music
-                                                    size={14}
-                                                    class="text-dim"
-                                                    aria-hidden="true"
-                                                />
-                                            </div>
-                                        {/if}
-                                    </div>
-                                    <div class="min-w-0 flex-1">
-                                        <div
-                                            class="flex items-center justify-between text-sm"
-                                        >
-                                            <span
-                                                class="min-w-0 flex-1 truncate text-white"
-                                            >
-                                                {album.album}
-                                                <span class="text-dim">
-                                                    — {album.artist}</span
-                                                >
-                                            </span>
-                                            <span
-                                                class="ml-3 shrink-0 text-dim"
-                                                >{album.plays} plays</span
-                                            >
-                                        </div>
-                                        <div
-                                            class="mt-1 h-1.5 overflow-hidden rounded-full bg-surface-2"
-                                        >
-                                            <div
-                                                class="h-full rounded-full bg-primary"
-                                                style="width: {(album.msPlayed /
-                                                    maxAlbumMs) *
-                                                    100}%"
-                                            ></div>
-                                        </div>
-                                    </div>
-                                </li>
-                            {/each}
-                        </ul>
+                        <div class="mt-3">
+                            <Ranking items={albumRanking} />
+                        </div>
                     </div>
                 {/if}
 

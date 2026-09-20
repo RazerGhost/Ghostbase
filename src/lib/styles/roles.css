@@ -20,111 +20,294 @@
    p-6. In the components layer, roles set the default and a utility can still
    override one value without abandoning the role. */
 @layer components {
-
 	/* ── Page container ──────────────────────────────────────────────────
 	   No page sets its own mx-auto / max-w-* / px-* / py-*. Width is a
-	   modifier, because the data pages want more room than the prose ones. */
+	   modifier, because a reading page wants a measure and a data page
+	   wants room. */
 	.page {
 		margin-inline: auto;
 		max-width: var(--max-w);
 		padding-inline: var(--pad);
-		padding-block: var(--space-16);
+		padding-block: var(--space-10) var(--space-16);
 	}
 	.page--narrow {
-		max-width: 42rem;
+		max-width: 46rem;
 	}
 	.page--prose {
-		max-width: 48rem;
+		max-width: 54rem;
 	}
 	.page--wide {
-		max-width: 72rem;
+		max-width: 1440px;
 	}
 
 	/* ── Headings ────────────────────────────────────────────────────────
-	   Roles, not sizes. .h-page is the one h1 per page; .h-section titles a
-	   block of UI; .h-card titles a card, in two sizes (small = a compact card
-	   in a dense list, large = a card in a 2- or 3-column grid). */
+	   All display type is Instrument Serif at weight 400 — the face carries
+	   the hierarchy, so nothing here is bolded. Roles, not sizes. */
+	.h-hero,
+	.h-page,
+	.h-section,
+	.h-card,
+	.h-card-lg {
+		font-family: var(--font-display);
+		font-weight: var(--fw-regular);
+		color: var(--white);
+		letter-spacing: var(--track-display);
+	}
+	.h-hero {
+		font-size: var(--fs-hero);
+		line-height: var(--lh-display);
+	}
 	.h-page {
 		font-size: var(--fs-title);
-		font-weight: var(--fw-extrabold);
-		line-height: var(--lh-heading);
-		letter-spacing: var(--track-tight);
-		color: var(--white);
+		line-height: var(--lh-tight);
 	}
 	.h-section {
 		font-size: var(--fs-section-head);
-		font-weight: var(--fw-bold);
-		line-height: 1.4;
-		color: var(--white);
-	}
-	.h-card {
-		font-size: var(--fs-body);
-		font-weight: var(--fw-semibold);
-		color: var(--white);
+		line-height: var(--lh-heading);
 	}
 	.h-card-lg {
-		font-size: var(--fs-subheading);
-		font-weight: var(--fw-semibold);
+		font-size: var(--fs-entry);
 		line-height: var(--lh-heading);
-		color: var(--white);
+	}
+	.h-card {
+		font-size: var(--fs-subheading);
+		line-height: var(--lh-heading);
 	}
 
-	/* Subtitle under an .h-page */
+	/* The italic line under an h1. Serif italic, never the body face. */
 	.lead {
-		font-size: var(--fs-body);
-		line-height: var(--lh-body);
-		color: var(--gray);
+		font-family: var(--font-display);
+		font-style: italic;
+		font-size: var(--fs-lead);
+		line-height: 1.4;
+		color: var(--dim);
 	}
 
 	/* ── Label register ──────────────────────────────────────────────────
-	   Small uppercase section markers ("CURRENTLY", "TOP GENRES", "NOW
-	   PLAYING"). --label-icon is the same label with a leading icon. */
+	   Small uppercase mono markers ("RIGHT NOW", "NOW PLAYING", "CONTENTS").
+	   .label--icon is the same label with a leading icon. */
 	.label {
+		font-family: var(--font-mono);
 		font-size: var(--fs-label);
-		font-weight: var(--fw-medium);
+		font-weight: var(--fw-regular);
 		text-transform: uppercase;
-		letter-spacing: 0.025em;
+		letter-spacing: var(--track-label);
 		color: var(--dim);
-	}
-	.label--strong {
-		font-weight: var(--fw-semibold);
 	}
 	.label--icon {
 		display: inline-flex;
 		align-items: center;
-		gap: 6px;
+		gap: var(--space-2);
+	}
+	.label--accent {
+		color: var(--accent);
 	}
 
-	/* Secondary line: dates, counts, "3 min read", byline fragments. */
-	.meta {
+	/* ── Mono register ───────────────────────────────────────────────────
+	   Dates, commit-ish hashes, tag lists, read times. One role; never body
+	   copy. Sits next to .label, but sentence-cased and untracked. */
+	.mono {
+		font-family: var(--font-mono);
 		font-size: var(--fs-label);
+		color: var(--dim);
+	}
+	.mono--accent {
+		color: var(--accent);
+	}
+
+	/* Secondary sans line: excerpts' bylines, counts, empty states. */
+	.meta {
+		font-size: var(--fs-small);
 		color: var(--dim);
 	}
 
 	/* ── Numeral register ────────────────────────────────────────────────
-	   Mono + tabular figures, for stat values, counters, durations, play and
-	   episode counts. ONE role — do not spread mono into body copy. This is
-	   the instrument-panel signal: on the data pages, the number is meant to
-	   be the biggest thing on the screen. */
+	   Display serif with tabular figures, for stat values and counters.
+	   Editorial sets its numbers as type, not as instrument read-outs — the
+	   mono register stays on labels and dates. */
 	.num {
-		font-family: var(--font-mono);
+		font-family: var(--font-display);
+		font-weight: var(--fw-regular);
 		font-variant-numeric: tabular-nums;
-		font-weight: var(--fw-bold);
 		color: var(--white);
 		letter-spacing: var(--track-display);
+		line-height: 1;
+	}
+	.num-sm {
+		font-size: var(--fs-section-head);
 	}
 	.num-lg {
-		font-size: var(--fs-section-head);
-		line-height: var(--lh-heading);
+		font-size: 34px;
 	}
 	.num-xl {
 		font-size: var(--fs-display);
-		font-weight: var(--fw-extrabold);
-		line-height: var(--lh-tight);
+	}
+	/* The unit that trails a number — "days", "d", "plays". */
+	.num-unit {
+		font-size: 0.42em;
+		color: var(--dim);
+		letter-spacing: 0;
+	}
+
+	/* ── Rules ───────────────────────────────────────────────────────────
+	   Editorial separates with hairlines, not with filled blocks. One weight,
+	   one colour (design.md § Rules). */
+	.rule {
+		border: 0;
+		border-top: 1px solid var(--border);
+	}
+	/* The heavy rule that opens a contents list — ink, not grey. */
+	.rule--ink {
+		border-top: 2px solid var(--white);
+	}
+
+	/* ── Entry list ──────────────────────────────────────────────────────
+	   The shared shape behind the devlog stream, the listens rankings and
+	   any other row list: a hairline between items, a hover that only moves
+	   the title's colour (one hover signal). */
+	.entry {
+		display: block;
+		border-top: 1px solid var(--border);
+		transition: background var(--dur-fast);
+	}
+	.entry:hover {
+		background: var(--surface);
+	}
+	.entry:hover .entry__title,
+	.entry:hover .h-card-lg,
+	.entry:hover .h-card {
+		color: var(--accent);
+	}
+	.entry__title {
+		transition: color var(--dur-fast);
+	}
+
+	/* ── Log stream ──────────────────────────────────────────────────────
+	   The devlog index (design.md § Lists): date, length, title, tags on one
+	   line. Collapses to two lines once the columns stop fitting. */
+	.stream-row {
+		display: grid;
+		grid-template-columns: 116px 62px minmax(0, 1fr) 220px;
+		gap: var(--space-4);
+		align-items: baseline;
+		padding: var(--space-4) var(--space-3);
+		margin-inline: calc(-1 * var(--space-3));
+	}
+	.stream-row__title {
+		font-family: var(--font-display);
+		font-size: var(--fs-entry);
+		line-height: var(--lh-heading);
+		color: var(--white);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		transition: color var(--dur-fast);
+	}
+	@media (max-width: 1100px) {
+		.stream-row {
+			grid-template-columns: 116px minmax(0, 1fr);
+			row-gap: var(--space-2);
+		}
+		.stream-row__len,
+		.stream-row__tags {
+			display: none;
+		}
+		.stream-row__title {
+			white-space: normal;
+		}
+	}
+
+	/* ── Shelf ───────────────────────────────────────────────────────────
+	   The watchlist (design.md § Lists): a horizontal row of posters per
+	   status, scrolling sideways rather than wrapping. */
+	.shelf {
+		display: flex;
+		gap: var(--space-6);
+		overflow-x: auto;
+		scroll-snap-type: x proximity;
+		padding-bottom: var(--space-3);
+		scrollbar-width: thin;
+		scrollbar-color: var(--border-strong) transparent;
+	}
+	.shelf::-webkit-scrollbar {
+		height: 6px;
+	}
+	.shelf::-webkit-scrollbar-thumb {
+		background: var(--border-strong);
+		border-radius: var(--radius-full);
+	}
+	.shelf__item {
+		width: 152px;
+		flex-shrink: 0;
+		scroll-snap-align: start;
+		transition: transform var(--dur-base) var(--ease-out);
+	}
+	.shelf__item:hover {
+		transform: translateY(-5px);
+	}
+	.shelf__art {
+		display: block;
+		width: 100%;
+		aspect-ratio: 2 / 3;
+		object-fit: cover;
+		background: var(--surface);
+		border: 1px solid var(--border);
+		transition: border-color var(--dur-base);
+	}
+	.shelf__item:hover .shelf__art {
+		border-color: var(--border-strong);
+	}
+	.shelf__title {
+		font-family: var(--font-display);
+		font-size: var(--fs-lead);
+		line-height: var(--lh-heading);
+		color: var(--white);
+		transition: color var(--dur-fast);
+	}
+	.shelf__item:hover .shelf__title {
+		color: var(--accent);
+	}
+
+	/* ── Ranking ─────────────────────────────────────────────────────────
+	   The listens top-five (design.md § Lists): a serif numeral, the name,
+	   a written line of context, the count. */
+	.rank {
+		display: flex;
+		align-items: baseline;
+		gap: var(--space-6);
+		padding: var(--space-4) 0;
+		border-bottom: 1px solid var(--border);
+	}
+	.rank__n {
+		font-family: var(--font-display);
+		font-size: 40px;
+		line-height: 0.85;
+		color: var(--surface-2);
+		width: 62px;
+		flex-shrink: 0;
+		letter-spacing: var(--track-display);
+		transition: color var(--dur-fast);
+	}
+	.rank:hover .rank__n {
+		color: var(--accent);
+	}
+
+	/* ── Hanging icon ────────────────────────────────────────────────────
+	   A paragraph with its icon in the left margin — the gear page's prose,
+	   and anywhere else a block wants a marker without a heading. */
+	.hang {
+		display: grid;
+		grid-template-columns: 44px minmax(0, 1fr);
+		gap: 0 var(--space-3);
+	}
+	.hang__icon {
+		color: var(--accent);
+		margin-top: 7px;
 	}
 
 	/* ── Card / panel ────────────────────────────────────────────────────
-	   Elevation level 1. The default block. */
+	   Elevation level 1. Editorial uses rules for content, so cards are for
+	   controls and chrome: dialogs, the admin area, the floating widget. */
 	.card {
 		background: var(--surface);
 		border: 1px solid var(--border);
@@ -136,9 +319,10 @@
 	}
 
 	/* A card never contains another card (design.md § Elevation). Nesting the
-	   same surface inside itself is what made the home page read as one flat
-	   grey field, so a nested .card silently gives up its fill and border and
-	   keeps only its spacing — the mistake cannot reach the screen. */
+	   same surface inside itself is what made the old home page read as one
+	   flat grey field, so a nested .card silently gives up its fill and
+	   border and keeps only its spacing — the mistake cannot reach the
+	   screen. */
 	.card .card {
 		background: none;
 		border: 0;
@@ -151,7 +335,7 @@
 		background: none;
 	}
 
-	/* No padding — for cards whose child manages its own insets (media, tables). */
+	/* No padding — for cards whose child manages its own insets. */
 	.card--flush {
 		padding: 0;
 	}
@@ -170,36 +354,34 @@
 	.btn {
 		display: inline-flex;
 		align-items: center;
-		gap: 6px;
-		border: 1px solid var(--border);
+		gap: var(--space-2);
+		border: 1px solid var(--border-strong);
 		border-radius: var(--radius-full);
 		padding: var(--space-2) var(--space-4);
-		font-size: var(--fs-body-sm);
-		color: var(--gray);
+		font-size: var(--fs-small);
+		color: var(--dim);
 		transition:
 			color var(--dur-fast),
 			border-color var(--dur-fast),
 			background-color var(--dur-fast);
 	}
 	.btn:hover {
-		color: var(--color-primary);
-		border-color: var(--color-primary);
+		color: var(--accent);
+		border-color: var(--accent);
 	}
 
 	/* Accent variant — the affirmative action in a pair (import, refresh, save). */
 	.btn--accent {
-		border-color: var(--color-primary);
-		color: var(--color-primary);
+		border-color: var(--accent);
+		color: var(--accent);
 	}
 	.btn--accent:hover {
 		background: var(--primary-glow);
-		border-color: var(--color-primary);
-		color: var(--color-primary);
 	}
 
 	/* Square variant — sits next to an .input in a row. */
 	.btn--sq {
-		border-radius: var(--radius-lg);
+		border-radius: var(--radius-md);
 		padding: var(--space-2) var(--space-3);
 	}
 
@@ -209,28 +391,50 @@
 		opacity: 0.5;
 	}
 
+	/* Underlined text link — the editorial alternative to a pill. */
+	.ulink {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		border-bottom: 1px solid var(--border-strong);
+		padding-bottom: 3px;
+		font-size: var(--fs-small);
+		color: var(--white);
+		transition:
+			color var(--dur-fast),
+			border-color var(--dur-fast);
+	}
+	.ulink:hover {
+		color: var(--accent);
+		border-color: var(--accent);
+	}
+
 	/* ── Chip ────────────────────────────────────────────────────────────
 	   Tags, filters, stack badges. */
 	.chip {
 		display: inline-flex;
 		align-items: center;
-		gap: var(--space-1);
-		border: 1px solid var(--border);
+		gap: var(--space-2);
+		border: 1px solid var(--border-strong);
 		border-radius: var(--radius-full);
-		padding: var(--space-1) var(--space-3);
-		font-size: var(--fs-label);
-		color: var(--gray);
+		padding: var(--space-2) var(--space-4);
+		font-size: var(--fs-small);
+		color: var(--dim);
 		transition:
 			color var(--dur-fast),
 			border-color var(--dur-fast);
 	}
 	.chip:hover {
-		color: var(--color-primary);
-		border-color: var(--color-primary);
+		color: var(--accent);
+		border-color: var(--accent);
 	}
 	.chip--active {
-		border-color: var(--color-primary);
-		color: var(--color-primary);
+		border-color: var(--accent);
+		color: var(--accent);
+	}
+	/* The count that trails a filter chip. */
+	.chip__count {
+		color: var(--border-strong);
 	}
 
 	/* ── Form controls ───────────────────────────────────────────────────
@@ -238,13 +442,13 @@
 	   drift apart. */
 	.input,
 	.textarea {
-		border: 1px solid var(--border);
-		border-radius: var(--radius-lg);
+		border: 1px solid var(--border-strong);
+		border-radius: var(--radius-md);
 		background: transparent;
 		padding: var(--space-2) var(--space-4);
 		color: var(--white);
 		font-family: inherit;
-		font-size: inherit;
+		font-size: var(--fs-body-sm);
 	}
 	.input::placeholder,
 	.textarea::placeholder {
@@ -252,13 +456,22 @@
 	}
 	.input:focus,
 	.textarea:focus {
-		border-color: var(--color-primary);
+		border-color: var(--accent);
 		outline: none;
 	}
 	.textarea {
 		font-family: var(--font-mono);
-		font-size: var(--fs-body-sm);
+		font-size: var(--fs-small);
 		line-height: var(--lh-body);
+	}
+
+	/* ── Leader dots ─────────────────────────────────────────────────────
+	   Between a title and its trailing value, index-style. */
+	.dots {
+		flex-grow: 1;
+		border-bottom: 1px dotted var(--border-strong);
+		margin: 0 var(--space-4) 7px;
+		min-width: 24px;
 	}
 
 	/* ── Live-event flash ────────────────────────────────────────────────
@@ -273,25 +486,16 @@
 			box-shadow: var(--ring-action);
 		}
 		100% {
-			box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-action) 0%, transparent);
+			box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-action) 0%, transparent);
 		}
-	}
-
-	/* ── Page chrome ─────────────────────────────────────────────────────
-	   Faint ambient glow behind the page, anchored top-centre — gives the dark
-	   surface some depth without turning into a marketing gradient. */
-	.bg-glow {
-		position: fixed;
-		inset: 0;
-		z-index: -1;
-		pointer-events: none;
-		background: radial-gradient(ellipse 60% 40% at 50% 0%, var(--primary-glow) 0%, transparent 70%);
 	}
 
 	@media (prefers-reduced-motion: reduce) {
 		.flash-in {
 			animation: none;
 		}
+		.shelf__item:hover {
+			transform: none;
+		}
 	}
-
 }

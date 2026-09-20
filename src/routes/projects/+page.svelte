@@ -100,32 +100,23 @@
 <Seo title="Projects — RazerGhost" description="Things I've built." path="/projects" />
 
 <main class="page page--wide">
-	<div class="flex items-baseline justify-between" data-hero-reveal="0">
-		<h1 class="h-page">Projects</h1>
-		<a
-			href="/projects/rss.xml"
-			data-sveltekit-reload
-			class="link flex items-center gap-1.5 text-sm text-dim hover:text-primary"
-		>
-			<Rss size={14} aria-hidden="true" /> RSS
-		</a>
+	<div class="flex flex-wrap items-end justify-between gap-6" data-hero-reveal="0">
+		<div>
+			<h1 class="h-page">Projects</h1>
+			<p class="lead mt-3">Things I've built, in progress or otherwise.</p>
+		</div>
+		<div class="flex items-center gap-6">
+			<span class="meta">
+				{data.projects.length}
+				{data.projects.length === 1 ? 'project' : 'projects'} · {tags.length} tags{#if latestDate}
+					· last {formatDate(latestDate)}{/if}
+			</span>
+			<a href="/projects/rss.xml" data-sveltekit-reload class="ulink">
+				<Rss size={13} aria-hidden="true" /> RSS
+			</a>
+		</div>
 	</div>
-	<p class="mt-2 text-gray" data-hero-reveal="1">Things I've built, in progress or otherwise.</p>
 
-	<div class="mt-6 grid grid-cols-3 gap-4 rounded-lg border border-border p-4 text-center" data-hero-reveal="2">
-		<div>
-			<p class="h-section">{data.projects.length}</p>
-			<p class="meta mt-0.5">Projects</p>
-		</div>
-		<div>
-			<p class="h-section">{tags.length}</p>
-			<p class="meta mt-0.5">Tags</p>
-		</div>
-		<div>
-			<p class="h-section">{latestDate ? formatDate(latestDate) : '—'}</p>
-			<p class="meta mt-0.5">Latest build</p>
-		</div>
-	</div>
 
 	{#if featuredProject}
 		<div class="mt-6">
@@ -141,11 +132,13 @@
 			type="search"
 			bind:value={query}
 			placeholder="Search projects…"
-			class="flex-1 rounded-lg border border-border bg-transparent px-3 py-2 text-sm text-white placeholder:text-dim focus:border-primary focus:outline-none"
+			aria-label="Search projects"
+			class="input flex-1"
 		/>
 		<select
 			bind:value={sort}
-			class="rounded-lg border border-border bg-transparent px-3 py-2 text-sm text-white focus:border-primary focus:outline-none"
+			aria-label="Sort projects"
+			class="input"
 		>
 			<option value="newest">Newest first</option>
 			<option value="oldest">Oldest first</option>
@@ -157,23 +150,21 @@
 		<ul class="mt-6 flex flex-wrap gap-2">
 			<li>
 				<button
-					class="chip rounded-full border px-3 py-1 text-xs {selectedTag === null
-						? 'border-primary text-primary'
-						: 'border-border text-gray'}"
+					type="button"
+					class="chip {selectedTag === null ? 'chip--active' : ''}"
 					onclick={() => (selectedTag = null)}
 				>
-					All <span class="text-dim">{data.projects.length}</span>
+					All <span class="chip__count">{data.projects.length}</span>
 				</button>
 			</li>
 			{#each tags as tag}
 				<li>
 					<button
-						class="chip rounded-full border px-3 py-1 text-xs {selectedTag === tag
-							? 'border-primary text-primary'
-							: 'border-border text-gray'}"
+						type="button"
+						class="chip {selectedTag === tag ? 'chip--active' : ''}"
 						onclick={() => toggleTag(tag)}
 					>
-						{tag} <span class="text-dim">{tagCounts.get(tag)}</span>
+						{tag} <span class="chip__count">{tagCounts.get(tag)}</span>
 					</button>
 				</li>
 			{/each}
@@ -186,12 +177,11 @@
 				{#if statusCounts.get(status)}
 					<li>
 						<button
-							class="chip rounded-full border px-3 py-1 text-xs capitalize {selectedStatus === status
-								? 'border-primary text-primary'
-								: 'border-border text-gray'}"
+							type="button"
+							class="chip capitalize {selectedStatus === status ? 'chip--active' : ''}"
 							onclick={() => toggleStatus(status)}
 						>
-							{status} <span class="text-dim">{statusCounts.get(status)}</span>
+							{status} <span class="chip__count">{statusCounts.get(status)}</span>
 						</button>
 					</li>
 				{/if}
@@ -200,16 +190,14 @@
 	{/if}
 
 	{#if data.projects.length - (featuredProject ? 1 : 0) > 0}
-		<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-			{#each filtered as project, i}
-				<div style="transition-delay: {i * 60}ms">
-					<ProjectCard {project} />
-				</div>
+		<div class="rule mt-10">
+			{#each filtered as project (project.slug)}
+				<ProjectCard {project} />
 			{:else}
-				<p class="text-sm text-dim">Nothing matches your search.</p>
+				<p class="meta py-6">Nothing matches your search.</p>
 			{/each}
 		</div>
 	{/if}
 
-	<p class="mt-10 text-sm text-dim">More coming as I build things worth sharing.</p>
+	<p class="meta rule mt-12 pt-6">More coming as I build things worth sharing.</p>
 </main>

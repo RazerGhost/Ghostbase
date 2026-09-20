@@ -1,4 +1,13 @@
 <script lang="ts">
+	/**
+	 * A single devlog post as an editorial entry row — mono meta line, serif
+	 * title, excerpt, tags, separated from its neighbours by a hairline rather
+	 * than boxed in a card (design.md § Rules).
+	 *
+	 * The index and the tag pages use DevlogStream instead; this is for the
+	 * places that show a handful of posts in a column, like "related" at the
+	 * foot of a post.
+	 */
 	import type { DevlogMeta } from '$lib/server/devlog';
 
 	let {
@@ -7,44 +16,25 @@
 	}: { entry: DevlogMeta; seriesInfo?: { part: number; total: number } } = $props();
 
 	const formattedDate = $derived(
-		new Date(entry.date).toLocaleDateString('en-US', {
-			year: 'numeric',
+		new Date(entry.date).toLocaleDateString('en-GB', {
+			day: '2-digit',
 			month: 'short',
-			day: 'numeric'
+			year: 'numeric'
 		})
 	);
 </script>
 
-<a
-	href={`/devlog/${entry.slug}`}
-	class="card card--interactive group block"
->
-	{#if entry.cover}
-		<img src={entry.cover} alt="" class="mb-4 aspect-video w-full rounded-md object-cover" />
-	{/if}
-
-	<p class="meta uppercase tracking-wide">
-		{formattedDate} · {entry.readingTime} min read
-	</p>
+<a href={`/devlog/${entry.slug}`} class="entry block px-3 py-5 -mx-3">
+	<p class="mono">{formattedDate} · {entry.readingTime} min</p>
 	{#if entry.series && seriesInfo}
-		<p class="mt-1 text-xs font-medium text-primary">
-			{entry.series} · Part {seriesInfo.part} of {seriesInfo.total}
+		<p class="mono mono--accent mt-1">
+			{entry.series} · part {seriesInfo.part} of {seriesInfo.total}
 		</p>
 	{/if}
-	<h3 class="mt-2 text-lg font-semibold text-white group-hover:text-primary">
-		{entry.title}
-	</h3>
-	<p class="mt-2 text-sm leading-relaxed text-gray">{entry.excerpt}</p>
+	<h3 class="h-card-lg entry__title mt-2">{entry.title}</h3>
+	<p class="mt-2 text-[15px] leading-relaxed text-gray">{entry.excerpt}</p>
 
 	{#if entry.tags.length}
-		<ul class="mt-4 flex flex-wrap gap-2">
-			{#each entry.tags as tag}
-				<li
-					class="chip"
-				>
-					{tag}
-				</li>
-			{/each}
-		</ul>
+		<p class="mono mt-3">{entry.tags.join('  ')}</p>
 	{/if}
 </a>

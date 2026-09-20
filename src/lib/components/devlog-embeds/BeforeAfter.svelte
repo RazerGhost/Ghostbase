@@ -30,7 +30,7 @@
 			min="0"
 			max="100"
 			bind:value={position}
-			class="mt-3 w-full accent-[var(--color-primary)]"
+			class="mt-3 w-full accent-[var(--accent)]"
 			aria-label="Before/after comparison slider"
 		/>
 	{:else}

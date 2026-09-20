@@ -7,8 +7,8 @@
 
    ACCENT SYSTEM — two tiers:
 
-     --color-primary  (#22D3EE)  = at rest. Anything on screen when nothing
-       is happening: links, borders, focus rings, general UI chrome.
+     --color-primary  = at rest. Anything on screen when nothing is
+       happening: links, borders, focus rings, general UI chrome.
 
      --color-action   (#00E5FF)  = something just fired. Tied to a real live
        event — a track change, a presence flip, a scrobble landing. Applied
@@ -16,11 +16,18 @@
    ──────────────────────────────────────────────────────────────────── */
 
 :root {
-	/* ── Fonts — self-hosted, see the @font-face imports in app.css. The
-	   "Inter Variable" family name comes from @fontsource-variable and has to
-	   lead, since that is what the bundled faces actually register as. ── */
-	--font: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
-	--font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	/* ── Fonts — three roles, three faces, all self-hosted (see the
+	   @fontsource imports in app.css; no third-party CDN).
+
+	     --font-display  Instrument Serif. Page titles, section headings,
+	                     entry titles, stat values. The voice of the site.
+	     --font          Archivo. Body copy and UI. Stays quiet underneath.
+	     --font-mono     JetBrains Mono. The label/meta register only —
+	                     uppercase markers, dates, hashes, tag lists.
+	                     One role; never body copy. ── */
+	--font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+	--font: 'Archivo Variable', system-ui, -apple-system, sans-serif;
+	--font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
 	--fw-regular: 400;
 	--fw-medium: 500;
@@ -28,28 +35,32 @@
 	--fw-bold: 700;
 	--fw-extrabold: 800;
 
-	/* Type scale. The display end was deleted here for going unconsumed — 78%
-	   of the site sat at 12–14px. Only the size a role actually renders earns
-	   its way back: --fs-display, via .num-xl on the watchlist counter. Add
-	   the rest when something uses them, not before. */
-	--fs-display: 42px; /* .num-xl */
-	--fs-title: 30px; /* page h1 — .h-page */
-	--fs-heading: 28px; /* section heading in prose */
-	--fs-section-head: 20px; /* section heading in UI — .h-section */
-	--fs-subheading: 18px;
+	/* Type scale. Instrument Serif carries the hierarchy at modest sizes —
+	   it has far more presence per pixel than a grotesque, so the display
+	   end sits lower here than the first draft of this system used. */
+	--fs-hero: 58px; /* home h1 only — .h-hero */
+	--fs-display: 48px; /* the one big number on a data page — .num-xl */
+	--fs-title: 38px; /* every other page's h1 — .h-page */
+	--fs-heading: 26px; /* h2 inside a rendered post */
+	--fs-section-head: 23px; /* section heading in UI — .h-section */
+	--fs-entry: 20px; /* list entry / card title — .h-card-lg */
+	--fs-subheading: 19px; /* h3 inside a post — .h-card */
+	--fs-lead: 17px; /* the italic line under an h1 — .lead */
 	--fs-body: 16px;
-	--fs-body-sm: 14px;
-	--fs-label: 12px;
+	--fs-body-sm: 15px;
+	--fs-small: 13px;
+	--fs-label: 11px; /* mono, uppercase, tracked — .label */
 	--fs-meta: 11px;
 
-	--lh-tight: 1.05;
-	--lh-heading: 1.2;
+	--lh-display: 1.05;
+	--lh-tight: 1.15;
+	--lh-heading: 1.25;
 	--lh-body: 1.6;
 	--lh-relaxed: 1.75;
 
-	--track-tight: -0.025em; /* matches what the site renders today (Tailwind tracking-tight) */
-	--track-display: -0.02em;
-	--track-label: 0.06em;
+	--track-tight: -0.02em;
+	--track-display: -0.015em; /* Instrument Serif wants only a hair of negative */
+	--track-label: 0.16em; /* JetBrains Mono, uppercase */
 	--track-loose: 0.1em;
 
 	/* ── Spacing (4px scale) ── */
@@ -65,52 +76,57 @@
 	--space-14: 56px;
 	--space-16: 64px;
 
-	--pad: 24px; /* horizontal page gutter — .page */
-	--max-w: 1024px; /* default .page content width */
+	--pad: 88px; /* horizontal page gutter — .page. Editorial wants room. */
+	--pad-sm: 24px; /* the same gutter below 900px */
+	--max-w: 1280px; /* default .page content width */
 	--nav-h: 72px;
 
-	/* ── Radius ── */
-	--radius-sm: 6px;
-	--radius-md: 8px;
-	--radius-lg: 12px;
+	/* ── Radius. Editorial is a ruled system, not a rounded one: radii are
+	   for controls, never for content blocks. ── */
+	--radius-sm: 4px;
+	--radius-md: 6px;
+	--radius-lg: 8px;
 	--radius-full: 9999px;
 
 	/* ── Surfaces — three elevation levels (see design.md § Elevation).
-	   Level 0 = the page, 1 = cards/panels, 2 = something lifted out of a
-	   level-1 block. A card never contains another card; roles.css flattens
-	   .card .card so that cannot happen by accident. ── */
-	--bg: #0a0a0a; /* level 0 */
-	--surface: #111111; /* level 1 */
-	--surface-2: #1e1e1e; /* level 2 */
-	--border: #2a2a2a;
-	--white: #ffffff;
-	--gray: #a1a1a1;
-	/* Measured in-browser against every surface it lands on: 6.04:1 on --bg
-	   #0a0a0a, 5.76:1 on --surface #111111, 5.09:1 on --surface-2 #1e1e1e.
-	   The ported value (#6b6b6b) was 3.72:1 and 3.54:1 on the first two —
-	   below AA for the dates, meta lines and empty states this token carries. */
-	--dim: #8e8e8e;
-	--black: #000000;
+	   Every neutral carries a slight warm tint (hue ~50°) so the page reads
+	   as paper-in-the-dark rather than as a screen. Never zero-chroma grey,
+	   never pure #fff text. ── */
+	--bg: #0c0c0d; /* level 0 */
+	--surface: #131312; /* level 1 */
+	--surface-2: #1c1c1b; /* level 2 */
+	--border: #232322;
+	--border-strong: #333331;
+	--white: #f3f1ed; /* primary ink */
+	--gray: #c9c6c1; /* body copy */
+	/* Measured in-browser against every surface it lands on: 5.69:1 on --bg,
+	   5.41:1 on --surface, 4.96:1 on --surface-2. This token carries dates,
+	   meta lines and empty states, so it has to clear AA on all three. */
+	--dim: #8d8a85;
+	--black: #0c0c0d; /* ink-on-accent, e.g. ::selection */
 
-	/* ── Accent — two tiers, see header ── */
-	--color-primary: #22d3ee;
-	--color-action: #00e5ff;
+	/* ── Accent — two tiers, see header.
+	   Cyan is readable on the dark ground but fails badly on the light one
+	   (#22d3ee on near-white is 1.8:1), so light mode gets a deepened
+	   version of the same hue rather than the same hex. ── */
+	--accent: #22d3ee;
+	--accent-action: #00e5ff;
 
 	--primary-glow: rgba(34, 211, 238, 0.08);
 	--primary-glow-border: rgba(34, 211, 238, 0.25);
 	/* Derived from --color-action so the token is the single source; changing
 	   the action colour changes the flash. */
-	--action-glow: color-mix(in srgb, var(--color-action) 35%, transparent);
+	--action-glow: color-mix(in srgb, var(--accent-action) 35%, transparent);
 
 	/* ── Semantic feedback ── */
 	--danger: #ff5050;
 	--danger-text: #ff6464;
 	--warn: #ffa03c;
 
-	--focus-ring: var(--color-primary);
+	--focus-ring: var(--accent);
 
 	/* ── Shadows / rings ── */
-	--shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.3);
+	--shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.35);
 	--ring-action: 0 0 0 3px var(--action-glow); /* live event — .flash-in */
 
 	/* ── Motion ── */
@@ -125,45 +141,62 @@
 }
 
 /* ── Light mode ──────────────────────────────────────────────────────
-   Overrides the neutral surface/text tokens only — accent, spacing, radii
-   and motion stay identical across themes. Applied when the OS prefers
+   Overrides the neutral surfaces, the ink and the accent — spacing, radii,
+   type and motion stay identical across themes. Applied when the OS prefers
    light AND there's no explicit override, or when the user has explicitly
    picked "light" via the theme toggle (which stamps data-theme on <html>
    and persists to localStorage). */
 :root[data-theme='light'] {
 	color-scheme: light;
 
-	--bg: #ffffff;
-	--surface: #f6f6f6;
-	--surface-2: #ececec;
-	--border: #e2e2e2;
-	--white: #0a0a0a;
-	--gray: #4b4d52;
-	/* 5.56:1 on --bg #ffffff, 5.14:1 on --surface #f6f6f6, 4.70:1 on
-	   --surface-2 #ececec. The ported value (#86888c) was 3.55:1 on white
-	   and 3.29:1 on --surface. */
-	--dim: #666870;
-	--black: #ffffff;
+	--bg: #faf9f6;
+	--surface: #f2f0ec;
+	--surface-2: #e8e5df;
+	--border: #e0ddd6;
+	--border-strong: #c9c5bc;
+	--white: #14130f;
+	--gray: #4a4843;
+	/* 5.79:1 on --bg, 5.36:1 on --surface, 4.85:1 on --surface-2. The first
+	   value tried here, #6b6862, measured 4.42:1 on --surface-2 — under AA,
+	   which the arithmetic it was picked by had not caught. */
+	--dim: #656259;
+	--black: #faf9f6;
 
-	--primary-glow: rgba(34, 211, 238, 0.12);
-	--primary-glow-border: rgba(34, 211, 238, 0.35);
+	/* Same hue, deepened until it is readable as text: 5.09:1 on --bg,
+	   against 1.83:1 for the dark-mode cyan. */
+	--accent: #0e7490;
+	--accent-action: #0891b2;
+
+	--primary-glow: rgba(14, 116, 144, 0.07);
+	--primary-glow-border: rgba(14, 116, 144, 0.3);
 }
 
 @media (prefers-color-scheme: light) {
 	:root:not([data-theme='dark']):not([data-theme='light']) {
 		color-scheme: light;
 
-		--bg: #ffffff;
-		--surface: #f6f6f6;
-		--surface-2: #ececec;
-		--border: #e2e2e2;
-		--white: #0a0a0a;
-		--gray: #4b4d52;
-		--dim: #666870;
-		--black: #ffffff;
+		--bg: #faf9f6;
+		--surface: #f2f0ec;
+		--surface-2: #e8e5df;
+		--border: #e0ddd6;
+		--border-strong: #c9c5bc;
+		--white: #14130f;
+		--gray: #4a4843;
+		--dim: #656259;
+		--black: #faf9f6;
 
-		--primary-glow: rgba(34, 211, 238, 0.12);
-		--primary-glow-border: rgba(34, 211, 238, 0.35);
+		--accent: #0e7490;
+		--accent-action: #0891b2;
+
+		--primary-glow: rgba(14, 116, 144, 0.07);
+		--primary-glow-border: rgba(14, 116, 144, 0.3);
+	}
+}
+
+/* Narrow screens: the editorial gutter collapses to something usable. */
+@media (max-width: 900px) {
+	:root {
+		--pad: var(--pad-sm);
 	}
 }
 
@@ -197,6 +230,7 @@
 
 	body {
 		font-family: var(--font);
+		font-size: var(--fs-body);
 		background: var(--bg);
 		color: var(--white);
 		-webkit-font-smoothing: antialiased;
@@ -214,7 +248,7 @@
 		text-decoration: none;
 	}
 	a.link {
-		color: var(--color-primary);
+		color: var(--accent);
 	}
 	a.link:hover {
 		opacity: 0.85;
@@ -232,7 +266,7 @@
 	}
 
 	::selection {
-		background: var(--color-primary);
+		background: var(--accent);
 		color: var(--black);
 	}
 }
