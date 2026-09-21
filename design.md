@@ -31,8 +31,10 @@ come back:
   link — never the same sentence twice on one page, never a closing sales band.
 - **No borrowed motion.** RG Digital's scroll-reveal was ported here and left
   half the home page invisible on load. Gone (see *Motion*).
-- **No dead vocabulary.** 36 of 83 tokens and 7 named classes were once never
-  referenced outside the file defining them. Orphaned aliases and imported
+- **No dead vocabulary.** 30 of the 82 tokens declared before the role layer
+  were never referenced through `var()` anywhere in the codebase — a whole
+  weight scale, a line-height scale, an easing and a nav blur, all declared
+  and none used. Orphaned aliases and imported
   component classes get deleted, not kept "for later". The exception is a
   member of a complete scale (a weight, an easing, a tracking step).
 
