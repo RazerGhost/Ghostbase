@@ -499,6 +499,129 @@
 		color: var(--accent);
 	}
 
+	/* ── Ledger ──────────────────────────────────────────────────────────
+	   A name and a figure on one hairline — the shape the listens page's two
+	   short side lists ("discovered in", "on this day") want. They are not
+	   rankings: nothing is ordered by size, so they get no numeral. They were
+	   bare <li>s in raw utilities, which is why they read as a different site
+	   from the ranking sitting next to them. Matches .rank's 46rem measure so
+	   a ledger and a ranking in the same grid line up. */
+	.ledger {
+		max-width: 46rem;
+	}
+	.ledger__row {
+		display: flex;
+		align-items: baseline;
+		gap: var(--space-4);
+		padding: var(--space-3) 0;
+		border-bottom: 1px solid var(--border);
+	}
+	.ledger__lead {
+		flex-shrink: 0;
+		width: 3.5rem;
+	}
+	.ledger__name {
+		min-width: 0;
+		flex: 1;
+		color: var(--white);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.ledger__val {
+		flex-shrink: 0;
+		text-align: right;
+	}
+
+	/* ── Plots ───────────────────────────────────────────────────────────
+	   The four small charts on the listens page. They were filled, rounded
+	   blocks of --accent, which breaks two rules at once: rules are the
+	   structure here rather than filled blocks (§ Rules), and the accent
+	   belongs to links and to the one thing that just fired (§ Theme) — not
+	   to a 7x24 field of itself, which made the heatmaps the loudest element
+	   on a page whose own numbers are set as quiet type.
+
+	   So the plots are drawn in ink, and the accent is spent on the single
+	   peak. That is a colour doing a job: the chart now names its own maximum
+	   instead of just signalling "chart". */
+	/* A plot's width follows how many points it holds, because one fixed
+	   measure is wrong at both ends: twelve months across the full 1247px page
+	   draws 100px slabs, and the all-time series — 139 months — squeezed into
+	   a fixed 46rem draws 3px slivers. --plot-cols is set per chart, and the
+	   width is that many bars wide or the full column, whichever is smaller. */
+	.plot-figure {
+		--plot-col: 46px;
+		width: min(100%, calc(var(--plot-cols) * var(--plot-col)));
+	}
+	/* Twelve months at the default column lands at 552px, which leaves half a
+	   page of nothing beside it. 62px puts a twelve-point series on the same
+	   46rem measure as the rankings above, and a 139-point one still fills the
+	   column. */
+	.plot-figure--wide {
+		--plot-col: 62px;
+	}
+	.plot {
+		display: flex;
+		align-items: flex-end;
+		gap: 2px;
+		width: 100%;
+		border-bottom: 1px solid var(--border);
+	}
+	/* 46% rather than a quieter tint because a bar is a graphical object you
+	   need in order to read the chart, so WCAG 1.4.11 wants 3:1 against the
+	   ground. Measured with transitions frozen: 22% gave 1.83:1 on the dark
+	   theme. 46% clears 3:1 in both. */
+	.plot__col {
+		flex: 1 1 0;
+		min-width: 2px;
+		background: color-mix(in srgb, var(--white) 46%, transparent);
+		transition: background var(--dur-fast);
+	}
+	.plot__col--peak {
+		background: var(--accent);
+	}
+	.plot:hover .plot__col {
+		background: color-mix(in srgb, var(--white) 62%, transparent);
+	}
+	.plot:hover .plot__col--peak {
+		background: var(--accent);
+	}
+	/* Min / mid / max under a plot, in the mono register the rest of the
+	   page's dates and labels already use. */
+	.plot__scale {
+		display: flex;
+		justify-content: space-between;
+		width: 100%;
+		margin-top: var(--space-2);
+	}
+
+	/* One cell of a heatmap. data-lvl is 0-4. Level 0 is a day with no plays
+	   and gets --border rather than --surface-2, which measures 1.11:1
+	   against the page ground — the same invisible-on-purpose mistake
+	   .rank__n had. The ramp starts at 20% rather than 14% so that an empty
+	   day and the quietest day are actually told apart; at 14% they landed
+	   within a few units of --border in both themes. */
+	.plot-cell {
+		aspect-ratio: 1;
+		width: 100%;
+		background: var(--border);
+	}
+	.plot-cell[data-lvl='1'] {
+		background: color-mix(in srgb, var(--white) 20%, transparent);
+	}
+	.plot-cell[data-lvl='2'] {
+		background: color-mix(in srgb, var(--white) 32%, transparent);
+	}
+	.plot-cell[data-lvl='3'] {
+		background: color-mix(in srgb, var(--white) 46%, transparent);
+	}
+	.plot-cell[data-lvl='4'] {
+		background: color-mix(in srgb, var(--white) 62%, transparent);
+	}
+	.plot-cell.plot-cell--peak {
+		background: var(--accent);
+	}
+
 	/* ── Card / panel ────────────────────────────────────────────────────
 	   Elevation level 1. Editorial uses rules for content, so cards are for
 	   controls and chrome: dialogs, the admin area, the floating widget. */

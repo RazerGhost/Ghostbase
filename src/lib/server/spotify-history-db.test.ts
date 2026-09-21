@@ -306,6 +306,33 @@ describe('getDiscoveries', () => {
 		const discoveries = getDiscoveries(2025);
 		expect(discoveries.map((d) => d.artist)).toEqual(['Artist Late', 'Artist Early']);
 	});
+
+	// The all-time filter used to get an empty array, which left the page a
+	// column short. It asks the other end of the same ordering: what the
+	// history opens with, oldest first.
+	it('returns the earliest artists, oldest first, for the all-time filter', () => {
+		insertPlays([
+			play({ artist: 'Artist Middle', spotifyUri: 'a', playedAt: '2020-06-01T00:00:00.000Z' }),
+			play({ artist: 'Artist First', spotifyUri: 'b', playedAt: '2015-01-01T00:00:00.000Z' }),
+			play({ artist: 'Artist Last', spotifyUri: 'c', playedAt: '2025-09-01T00:00:00.000Z' })
+		]);
+		const discoveries = getDiscoveries(null);
+		expect(discoveries.map((d) => d.artist)).toEqual([
+			'Artist First',
+			'Artist Middle',
+			'Artist Last'
+		]);
+	});
+
+	it('counts an artist from their first play, not from the filter window', () => {
+		insertPlays([
+			play({ artist: 'Artist A', spotifyUri: 'a', playedAt: '2015-01-01T00:00:00.000Z' }),
+			play({ artist: 'Artist A', spotifyUri: 'b', playedAt: '2024-01-01T00:00:00.000Z' })
+		]);
+		const [first] = getDiscoveries(null);
+		expect(first.firstPlayedAt).toBe('2015-01-01T00:00:00.000Z');
+		expect(first.plays).toBe(2);
+	});
 });
 
 describe('getActiveDates', () => {

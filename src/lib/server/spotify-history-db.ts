@@ -468,13 +468,25 @@ export type Discovery = { artist: string; firstPlayedAt: string; plays: number }
 // filtered year) falls within `year` — "discovered this year". Deliberately
 // not year-filtered in WHERE: needs every row to compute each artist's real
 // MIN(played_at), then filters on that in HAVING.
-export function getDiscoveries(year: number, limit = 10): Discovery[] {
-	return memoized(`discoveries:${year}:${limit}`, () => {
+//
+// `year: null` is the all-time filter, and it asks the opposite question: the
+// artists the history *opens* with, oldest first. It used to return nothing
+// there, which left the page with one lone column and 500px of empty grid
+// beside it — and there is a real answer for all-time, it is just the other
+// end of the same ordering.
+export function getDiscoveries(year: number | null, limit = 10): Discovery[] {
+	return memoized(`discoveries:${year ?? 'all'}:${limit}`, () => {
+		const select = `SELECT artist, MIN(played_at) as firstPlayedAt, COUNT(*) as plays
+				 FROM plays GROUP BY artist`;
+		if (year == null) {
+			return getDb()
+				.prepare(`${select} ORDER BY firstPlayedAt ASC LIMIT @limit`)
+				.all({ limit }) as Discovery[];
+		}
 		const { yearStart, yearEnd } = yearRange(year);
 		return getDb()
 			.prepare(
-				`SELECT artist, MIN(played_at) as firstPlayedAt, COUNT(*) as plays
-				 FROM plays GROUP BY artist
+				`${select}
 				 HAVING firstPlayedAt >= @yearStart AND firstPlayedAt < @yearEnd
 				 ORDER BY firstPlayedAt DESC LIMIT @limit`
 			)
