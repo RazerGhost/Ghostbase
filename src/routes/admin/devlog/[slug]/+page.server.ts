@@ -3,15 +3,27 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { getRawEntry, writeEntry, renameEntry, deleteEntry } from '$lib/server/content-editor';
 import { slugifyHeading } from '$lib/server/content';
 import { toDateString } from '$lib/server/content';
+import { getContentGitState, fileGitState } from '$lib/server/content-git';
 import type { Actions, PageServerLoad } from './$types';
 
 const CONTENT_DIR = path.resolve(process.cwd(), 'src/content/devlog');
 
-export const load: PageServerLoad = ({ params }) => {
+export const load: PageServerLoad = async ({ params }) => {
 	const entry = getRawEntry(CONTENT_DIR, params.slug);
 	if (!entry) error(404, 'Post not found');
 
+	// Where this file has got to on the way to being published, and the trail
+	// leaf for the running head (see AdminChrome).
+	const git = await getContentGitState();
+	const state = fileGitState(git, `src/content/devlog/${entry.slug}.md`);
+
 	return {
+		adminCrumb: String(entry.meta.title ?? entry.slug),
+		git: {
+			tracked: git !== null,
+			changed: state === 'changed',
+			ahead: git?.ahead ?? null
+		},
 		slug: entry.slug,
 		title: String(entry.meta.title ?? entry.slug),
 		date: toDateString(entry.meta.date),
