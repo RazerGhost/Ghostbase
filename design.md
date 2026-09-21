@@ -201,11 +201,16 @@ floating above the document. A paper register does not have one.
   label register; the live line at the far right. Type on the ground — no
   fill, no border, no rule beneath it. It scrolls away with the page, and
   that is what earns it the room to say more than a status dot would.
-- **Dock.** The only fixed element on the site. Six destinations, a rule,
-  then search and the theme toggle — nothing else earns a cell. A right-edge
-  rail above 900px, a bottom bar below it: the same cells either way, always
-  under the reader's thumb. Icon-only at rest, each name revealed on hover
-  and on focus.
+- **Dock.** The only fixed element on the site. The ghost mark first, as
+  home; six destinations; a rule; then search, the theme toggle, and "back to
+  top" once you have scrolled — nothing else earns a cell. A right-edge rail
+  above 900px, a bottom bar below it, always under the reader's thumb.
+  Icon-only at rest, each name revealed on hover and on focus.
+
+  **Nothing else floats.** A second fixed object in the opposite corner is
+  the exact furniture this design removes, so the old back-to-top button was
+  folded in rather than left beside the dock. The bar cannot hold it — nine
+  cells already divide a 375px phone into 40px each — so it is rail-only.
 - **Footer.** One line. Copyright and the outbound links on the left, the
   last deploy date on the right. It stays this short only because the dock
   carries the navigation.

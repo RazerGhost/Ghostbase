@@ -91,9 +91,10 @@
 	.dock__cell {
 		position: relative;
 		display: grid;
+		flex: 1 1 0;
 		place-items: center;
+		min-width: 0;
 		height: var(--dock-cell);
-		min-width: var(--dock-cell);
 		color: var(--dim);
 		background: none;
 		border: 0;
@@ -125,7 +126,10 @@
 		padding-bottom: calc(var(--dock-cell) + 1px);
 	}
 	.dock__rule,
-	.dock__label {
+	.dock__label,
+	/* A tenth cell would leave each one too narrow to hit on a phone, and
+	   "back to top" is the most optional thing in here. */
+	.dock__cell--top {
 		display: none;
 	}
 
@@ -145,6 +149,13 @@
 		}
 		.dock-clear {
 			padding-bottom: 0;
+		}
+		.dock__cell {
+			flex: 0 0 auto;
+			min-width: var(--dock-cell);
+		}
+		.dock__cell--top {
+			display: grid;
 		}
 		.dock__cell[aria-current='page']::before {
 			top: 50%;

@@ -3,7 +3,6 @@
 	import RunningHead from '$lib/components/RunningHead.svelte';
 	import Dock from '$lib/components/Dock.svelte';
 	import Footer from '$lib/components/Footer.svelte';
-	import BackToTop from '$lib/components/BackToTop.svelte';
 	import CommandPalette from '$lib/components/CommandPalette.svelte';
 	import type { LayoutProps } from './$types';
 
@@ -25,6 +24,5 @@
 	</div>
 	<Footer />
 	<Dock />
-	<BackToTop />
 	<CommandPalette entries={data.commandPaletteEntries} />
 </div>
