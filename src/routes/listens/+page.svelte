@@ -291,7 +291,7 @@
         <ul class="flex flex-col gap-2 border-l border-border pl-4">
             {#each artistTracks as t}
                 {@const href = trackHref(t.spotifyUri)}
-                <li class="flex items-baseline justify-between gap-4 text-[13px]">
+                <li class="flex items-baseline justify-between gap-4 text-[14px]">
                     {#if href}
                         <a {href} target="_blank" rel="noreferrer" class="link truncate">{t.track}</a>
                     {:else}
@@ -624,7 +624,7 @@
                         ></div>
                     {/each}
                 </div>
-                <div class="mt-1 flex justify-between text-[10px] text-dim">
+                <div class="mt-1 flex justify-between text-[11px] text-dim">
                     <span>12am</span>
                     <span>12pm</span>
                     <span>11pm</span>
@@ -651,7 +651,7 @@
                         ></div>
                     {/each}
                 </div>
-                <div class="mt-1 flex justify-between text-[10px] text-dim">
+                <div class="mt-1 flex justify-between text-[11px] text-dim">
                     <span>{formatMonth(monthlyBars[0].month)}</span>
                     <span
                         >{formatMonth(
@@ -704,7 +704,7 @@
                     <div class="flex flex-col gap-[3px]">
                         {#each weekdayHourGrid as row}
                             <div class="flex items-center gap-2">
-                                <span class="w-8 shrink-0 text-[10px] text-dim">
+                                <span class="w-8 shrink-0 text-[11px] text-dim">
                                     {WEEKDAY_NAMES[row.weekday].slice(0, 3)}
                                 </span>
                                 <div class="flex flex-1 gap-[3px]">
@@ -724,12 +724,12 @@
                         {/each}
                     </div>
                 </div>
-                <div class="mt-1 ml-10 flex justify-between text-[10px] text-dim">
+                <div class="mt-1 ml-10 flex justify-between text-[11px] text-dim">
                     <span>12am</span>
                     <span>12pm</span>
                     <span>11pm</span>
                 </div>
-                <div class="mt-3 flex items-center justify-end gap-1.5 text-[10px] text-dim">
+                <div class="mt-3 flex items-center justify-end gap-1.5 text-[11px] text-dim">
                     <span>Less</span>
                     {#each [0, 1, 2, 3, 4] as level}
                         <div

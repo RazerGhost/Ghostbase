@@ -46,7 +46,7 @@
 						class="link">RG Digital</a
 					>, building web apps and sites for clients. This site is everything that
 					<em class="font-serif text-[19px] italic text-white">isn&rsquo;t</em> client
-					work — a link hub instead of a dozen separate profiles, plus a running devlog of whatever
+					work — one place instead of a dozen separate profiles, plus a running devlog of whatever
 					random thing I&rsquo;m building at the moment.
 				</p>
 			</div>

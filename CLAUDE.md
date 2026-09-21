@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-RazerGhost's personal site: a link hub + devlog built with SvelteKit (Svelte 5), Tailwind CSS 4, and mdsvex. Deployed via Docker (adapter-node) behind Coolify/Traefik. Licensed under [PolyForm Noncommercial 1.0.0](LICENSE) — forkable/self-hostable, not resellable as a paid hosted service.
+RazerGhost's personal site: a devlog plus pages for projects, gear, watchlist and listening history, built with SvelteKit (Svelte 5), Tailwind CSS 4, and mdsvex. Deployed via Docker (adapter-node) behind Coolify/Traefik. Licensed under [PolyForm Noncommercial 1.0.0](LICENSE) — forkable/self-hostable, not resellable as a paid hosted service.
 
 This file is a high-level orientation. For implementation-level detail on any one subsystem (auth, watchlist, listens, backups, deployment, every env var), see [docs/](docs/README.md) — those docs go deeper than what's summarized below. [README.md](README.md) is the human-facing overview.
 

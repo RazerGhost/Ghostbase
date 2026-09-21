@@ -371,7 +371,7 @@
                         <span
                             class="absolute inset-0 hidden items-end bg-gradient-to-t from-bg/95 via-bg/70 to-transparent p-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:flex"
                         >
-                            <span class="line-clamp-6 text-[11px] leading-snug text-gray">
+                            <span class="line-clamp-6 text-[12px] leading-snug text-gray">
                                 {item.overview}
                             </span>
                         </span>

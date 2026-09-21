@@ -1,6 +1,6 @@
 ---
 name: RazerGhost
-description: A personal link hub and devlog — the site you're looking at right now.
+description: A personal site and devlog — the one you're looking at right now.
 href: 'https://github.com/RazerGhost/ghostbase'
 live: 'https://razerghost.xyz'
 tags:
