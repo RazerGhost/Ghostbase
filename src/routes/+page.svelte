@@ -82,7 +82,7 @@
 		<div>
 			<Music size={15} aria-hidden="true" class="text-dim" />
 			<p class="num num-lg mt-3">
-				{data.currentStreak ?? 0}<span class="num-unit"> days</span>
+				{data.currentStreak ?? 0}<span class="num-unit">days</span>
 			</p>
 			<p class="meta mt-2 leading-relaxed">
 				listening streak, on {data.totalPlays.toLocaleString()} plays logged
@@ -91,14 +91,14 @@
 		<div>
 			<Clapperboard size={15} aria-hidden="true" class="text-dim" />
 			<p class="num num-lg mt-3">
-				{data.daysWatched}<span class="num-unit"> days</span>
+				{data.daysWatched}<span class="num-unit">days</span>
 			</p>
 			<p class="meta mt-2 leading-relaxed">spent watching, across everything tracked</p>
 		</div>
 		<div>
 			<PenLine size={15} aria-hidden="true" class="text-dim" />
 			<p class="num num-lg mt-3">
-				{data.postCount}<span class="num-unit"> posts</span>
+				{data.postCount}<span class="num-unit">posts</span>
 			</p>
 			<p class="meta mt-2 leading-relaxed">written here since the rebuild began</p>
 		</div>
