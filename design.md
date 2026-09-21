@@ -188,7 +188,13 @@ decision, not a default:
 
 No sales CTA. Links are links: underlined text (`.ulink`, `.link`) or a
 bordered pill (`.btn`, with `.btn--accent` for the affirmative one in a pair).
-The RG Digital pointer reads as a footnote — one per page, never repeated.
+**The RG Digital pointer lives on About, and nowhere else.** At most one per
+page and never repeated — but no page is obliged to carry one, and after
+trying it the home page carries none. It closed that page as a line under a
+rule, which is a CTA band however quietly it is written; centred it was
+obvious, and left-aligned it was still the last thing you read on a personal
+site, pointing at the business. This site is not the funnel for that one.
+Someone who wants the client work reaches About, and About has the link.
 
 ## Chrome
 

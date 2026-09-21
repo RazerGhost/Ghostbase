@@ -170,24 +170,4 @@
 			{/if}
 		</div>
 	</div>
-
-	<!-- The one RG Digital pointer. Placement is deliberate — after the projects
-	     and the devlog, not in the first 200 pixels next to the name — and the
-	     styling is a line of text, not a CTA band (design.md § CTA voice).
-
-	     Left-aligned, because it was the only centred text on the site: on a
-	     ruled, left-hung register, a centred line under a rule reads as a
-	     closing band whatever its words say. The gear page's closing line is
-	     the same role and has always been left-aligned; this now matches it. -->
-	<p class="meta rule mt-16 pt-6">
-		Client work lives elsewhere —
-		<a
-			href="https://rg-digital.dev/about"
-			target="_blank"
-			rel="noopener noreferrer"
-			class="link inline-flex items-center gap-1"
-		>
-			see it at RG Digital <ArrowRight size={13} aria-hidden="true" />
-		</a>
-	</p>
 </main>
