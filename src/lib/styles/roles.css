@@ -1,12 +1,22 @@
 /* ── Role layer — Ghostbase ──────────────────────────────────────────
    This is the file to edit when a design decision changes.
 
-   Before this existed, the design lived inline: the string
-   "rounded-lg border border-border bg-surface p-6" appeared 32 times across
-   18 files, "text-xl font-bold text-white" 30 times, the input recipe 38
-   times. A design change meant rewriting thousands of utility strings, which
+   Before this existed, the design lived inline. Counted on the commit before
+   this file — 55 components, 1,040 class attributes:
+
+     card surface   rounded-lg border-border bg-surface        29 uses / 15 files
+     heading        text-xl font-bold text-white               31 uses /  6 files
+     form control   rounded-lg border border-border            48 uses / 13 files
+                    bg-transparent py-2
+     any panel      rounded-lg border-border                  111 uses / 32 files
+
+   A design change meant rewriting hundreds of utility strings by hand, which
    is why the site could not be redesigned. Now a role is declared once here
    and markup asks for it by name.
+
+   (An earlier version of this comment claimed 32/18, 30 and 38. Those
+   numbers could not be reproduced against the commit they describe; the
+   table above can be, with the patterns it names.)
 
    Rule: reach for a role. Only reach for a raw utility when no role fits —
    and when that happens twice, add a role here.
