@@ -136,8 +136,8 @@
 			<p class="measure text-[17px] leading-[1.8] text-gray">
 				And when I&rsquo;m not working: a <a class="link" href={g('MOZA R3 Racing Kit')}>MOZA R3</a>
 				wheel, a <a class="link" href={g('GameSir G7 Pro (Shadow Ember)')}>GameSir G7 Pro</a>, a
-				<a class="link" href={g('Steam Controller')}>Steam Controller</a> Valve finally started
-				making again, and an <a class="link" href={g('Elgato Stream Deck MK.1')}>Elgato Stream Deck</a>.
+				<a class="link" href={g('Steam Controller')}>Steam Controller</a>, and an
+				<a class="link" href={g('Elgato Stream Deck MK.1')}>Elgato Stream Deck</a>.
 			</p>
 		</div>
 
