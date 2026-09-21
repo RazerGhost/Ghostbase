@@ -163,3 +163,26 @@ export const navLinks = [
   { label: "Watchlist", href: "/watchlist" },
   { label: "Listens", href: "/listens" },
 ];
+
+// The private tools, in one list. The admin dashboard and the admin dock both
+// read it, so a new tool is added in one place — the same reason navLinks
+// exists for the public side. Icons are presentation and live with the
+// components that draw them, not here.
+export const adminLinks = [
+  { label: "Devlog", href: "/admin/devlog" },
+  { label: "Projects", href: "/admin/projects" },
+  { label: "Right now", href: "/admin/status" },
+  { label: "Media", href: "/admin/media" },
+  { label: "Spotify import", href: "/spotify-import" },
+  { label: "Watchlist cache", href: "/admin/watchlist-cache" },
+  { label: "Backups", href: "/admin/backups" },
+];
+
+// Everything behind the GitHub login, which is also everything that wears the
+// admin chrome instead of the site's. Kept beside navLinks so the two sets are
+// read together; the auth gate itself is in hooks.server.ts.
+const ADMIN_PREFIXES = ["/admin", "/spotify-import"];
+
+export function isAdminPath(pathname: string): boolean {
+  return ADMIN_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+}

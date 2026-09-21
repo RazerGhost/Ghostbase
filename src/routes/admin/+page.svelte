@@ -1,90 +1,179 @@
 <script lang="ts">
 	import Seo from '$lib/components/Seo.svelte';
-	import FileText from '@lucide/svelte/icons/file-text';
-	import FolderKanban from '@lucide/svelte/icons/folder-kanban';
-	import Activity from '@lucide/svelte/icons/activity';
-	import Music from '@lucide/svelte/icons/music';
-	import Database from '@lucide/svelte/icons/database';
-	import ArchiveRestore from '@lucide/svelte/icons/archive-restore';
-	import Image from '@lucide/svelte/icons/image';
-	import ArrowUpRight from '@lucide/svelte/icons/arrow-up-right';
+	import { adminLinks } from '$lib/config';
+	import type { PageProps } from './$types';
 
-	const tools = [
-		{
-			label: 'Devlog editor',
-			href: '/admin/devlog',
-			icon: FileText,
-			description: 'Write and edit posts in src/content/devlog. Commit + push to publish.'
-		},
-		{
-			label: 'Projects editor',
-			href: '/admin/projects',
-			icon: FolderKanban,
-			description: 'Write and edit entries in src/content/projects. Commit + push to publish.'
-		},
-		{
-			label: 'Status editor',
-			href: '/admin/status',
-			icon: Activity,
-			description: 'Edit the "Right now" card shown on the homepage.'
-		},
-		{
-			label: 'Spotify import',
-			href: '/spotify-import',
-			icon: Music,
-			description: 'Upload an extended streaming history export to backfill listening data.'
-		},
-		{
-			label: 'Watchlist cache',
-			href: '/admin/watchlist-cache',
-			icon: Database,
-			description: 'Inspect and force-refresh cached Simkl genre/synopsis/runtime rows.'
-		},
-		{
-			label: 'Backups',
-			href: '/admin/backups',
-			icon: ArchiveRestore,
-			description: 'Check when the data volume last backed up, or trigger one manually.'
-		},
-		{
-			label: 'Media library',
-			href: '/admin/media',
-			icon: Image,
-			description: 'Upload and browse images for devlog/project covers, galleries, and posts.'
+	let { data }: PageProps = $props();
+
+	const s = $derived(data.state);
+
+	function ago(iso: string | null): string | null {
+		if (!iso) return null;
+		const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
+		if (days <= 0) return 'today';
+		if (days === 1) return 'yesterday';
+		if (days < 30) return `${days} days ago`;
+		const months = Math.round(days / 30);
+		return months === 1 ? 'a month ago' : `${months} months ago`;
+	}
+
+	const nf = new Intl.NumberFormat('en-GB');
+
+	// The right-hand note on each tool row: what that tool would tell you if
+	// you opened it. `tone` is what earns the warn colour — "you have work
+	// sitting here", never just "this number is large".
+	const notes = $derived<Record<string, { note: string; tone?: 'warn' }>>({
+		'/admin/devlog': s.devlog.changed
+			? { note: `${s.devlog.changed} uncommitted`, tone: 'warn' }
+			: { note: `${s.devlog.total} posts` },
+		'/admin/projects': s.projects.changed
+			? { note: `${s.projects.changed} uncommitted`, tone: 'warn' }
+			: { note: `${s.projects.total} ${s.projects.total === 1 ? 'entry' : 'entries'}` },
+		'/admin/status': { note: 'home page' },
+		'/admin/media': { note: `${s.media.files} files` },
+		'/spotify-import': { note: s.listens.plays ? `${nf.format(s.listens.plays)} plays` : 'nothing yet' },
+		'/admin/watchlist-cache': s.cache.missingRuntime
+			? { note: `${s.cache.missingRuntime} incomplete`, tone: 'warn' }
+			: { note: `${s.cache.rows} rows` },
+		'/admin/backups': !s.backup.configured
+			? { note: 'not configured', tone: 'warn' }
+			: s.backup.last
+				? { note: ago(s.backup.last.timestamp) ?? '—' }
+				: { note: 'never run', tone: 'warn' }
+	});
+
+	const descriptions: Record<string, string> = {
+		'/admin/devlog': 'Posts in src/content/devlog',
+		'/admin/projects': 'Entries in src/content/projects',
+		'/admin/status': 'The "Right now" card on the home page',
+		'/admin/media': 'Covers, galleries and body images',
+		'/spotify-import': 'Backfill from an extended history export',
+		'/admin/watchlist-cache': 'Simkl genres, synopses and runtimes',
+		'/admin/backups': 'Three databases and the media folder'
+	};
+
+	// Written, not badged (design.md § Microinteractions — empty states are
+	// written). Only things you could act on today get a sentence.
+	const attention = $derived.by(() => {
+		const items: string[] = [];
+		const changed = s.devlog.changed + s.projects.changed;
+		if (changed) {
+			items.push(
+				changed === 1
+					? 'one file is written but not committed'
+					: `${changed} files are written but not committed`
+			);
 		}
-	];
+		if (s.git && s.git.ahead) {
+			items.push(`${s.git.ahead} ${s.git.ahead === 1 ? 'commit' : 'commits'} have not been pushed`);
+		}
+		if (s.backup.configured && !s.backup.last) items.push('no backup has ever run');
+		else if (s.backup.last) {
+			const days = Math.floor((Date.now() - new Date(s.backup.last.timestamp).getTime()) / 86_400_000);
+			if (days >= 2) items.push(`the last backup ran ${ago(s.backup.last.timestamp)}`);
+		}
+		if (s.cache.missingRuntime) {
+			items.push(
+				`${s.cache.missingRuntime} cached ${s.cache.missingRuntime === 1 ? 'title has' : 'titles have'} no runtime`
+			);
+		}
+		return items;
+	});
+
+	function sentence(items: string[]): string {
+		if (items.length === 1) return `${items[0]}.`;
+		return `${items.slice(0, -1).join(', ')} and ${items.at(-1)}.`;
+	}
 </script>
 
 <Seo title="Admin — RazerGhost" description="Private admin dashboard." path="/admin" noindex />
 
-<main class="page page--prose">
+<main class="page">
 	<h1 class="h-page">Admin</h1>
-	<p class="mt-2 text-sm text-dim">Every private tool for editing this site, in one place.</p>
+	<p class="lead mt-2">Everything private, and what state it is all in.</p>
 
-	<ul class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-		{#each tools as tool (tool.href)}
-			<li>
-				<a
-					href={tool.href}
-					class="link group flex h-full flex-col gap-3 rounded-lg border border-border bg-surface/40 p-5 transition-colors hover:border-primary"
+	<!-- The numbers, in the register the home page uses for its own. -->
+	<div class="rule mt-9 grid grid-cols-2 gap-8 border-b border-border py-7 lg:grid-cols-4">
+		<div>
+			<p class="num num-lg">
+				{s.devlog.total}<span class="num-unit">{s.devlog.total === 1 ? 'post' : 'posts'}</span>
+			</p>
+			<p class="meta mt-2 leading-relaxed">
+				{#if s.devlog.drafts}
+					{s.devlog.drafts} still {s.devlog.drafts === 1 ? 'a draft' : 'drafts'}
+				{:else}
+					nothing left in draft
+				{/if}
+			</p>
+		</div>
+		<div>
+			<p class="num num-lg">
+				{s.projects.total}<span class="num-unit"
+					>{s.projects.total === 1 ? 'project' : 'projects'}</span
 				>
-					<div class="flex items-center justify-between">
-						<span
-							class="flex h-9 w-9 items-center justify-center rounded-full border border-border text-primary group-hover:border-primary"
-						>
-							<tool.icon size={18} />
-						</span>
-						<ArrowUpRight
-							size={16}
-							class="text-dim opacity-0 transition-opacity group-hover:opacity-100"
-						/>
-					</div>
-					<div>
-						<h2 class="font-medium text-white group-hover:text-primary">{tool.label}</h2>
-						<p class="meta mt-1">{tool.description}</p>
-					</div>
-				</a>
-			</li>
+			</p>
+			<p class="meta mt-2 leading-relaxed">
+				{s.media.files}
+				{s.media.files === 1 ? 'image' : 'images'} in the library
+			</p>
+		</div>
+		<div>
+			<p class="num num-lg">
+				{nf.format(s.listens.plays)}<span class="num-unit">plays</span>
+			</p>
+			<p class="meta mt-2 leading-relaxed">
+				{#if s.listens.lastPlayedAt}
+					last scrobble {ago(s.listens.lastPlayedAt)}
+				{:else}
+					nothing imported yet
+				{/if}
+			</p>
+		</div>
+		<div>
+			<p class="num num-lg">
+				{s.cache.rows}<span class="num-unit">cached</span>
+			</p>
+			<p class="meta mt-2 leading-relaxed">
+				Simkl rows behind the watchlist
+			</p>
+		</div>
+	</div>
+
+	{#if attention.length}
+		<p class="mt-6 flex items-start gap-3.5 text-[15px] leading-relaxed text-gray">
+			<span class="mt-[7px] block size-[7px] shrink-0 rounded-full bg-warn" aria-hidden="true"
+			></span>
+			<span class="measure">{sentence(attention)}</span>
+		</p>
+	{:else}
+		<p class="mt-6 flex items-start gap-3.5 text-[15px] leading-relaxed text-gray">
+			<span class="mt-[7px] block size-[7px] shrink-0 rounded-full bg-primary" aria-hidden="true"
+			></span>
+			<span class="measure">Nothing wants you. Everything is committed, pushed and backed up.</span>
+		</p>
+	{/if}
+
+	<p class="label mt-10">Tools</p>
+	<div class="mt-1 grid grid-cols-1 gap-x-14 md:grid-cols-2">
+		{#each adminLinks as link (link.href)}
+			{@const note = notes[link.href]}
+			<a href={link.href} class="entry flex items-baseline gap-5 py-4">
+				<span class="min-w-0 flex-1">
+					<span class="h-card-lg entry__title block">{link.label}</span>
+					<span class="meta mt-1.5 block">{descriptions[link.href]}</span>
+				</span>
+				<span class="label shrink-0" class:text-warn={note?.tone === 'warn'}>{note?.note}</span>
+			</a>
 		{/each}
-	</ul>
+	</div>
+
+	<p class="meta mt-8">
+		{#if s.git}
+			On <span class="mono">{s.git.branch}</span>. Content is baked into the image at build time, so
+			a post is live once it is pushed — about a minute later.
+		{:else}
+			This build is not a git checkout, so nothing here can tell you what is committed. The editors
+			are meant for <span class="mono">pnpm dev</span> on your own machine.
+		{/if}
+	</p>
 </main>

@@ -12,6 +12,11 @@
 	 *
 	 * Icons are presentation, so they are mapped here rather than added to
 	 * `navLinks` in config.ts, which stays a list of destinations.
+	 *
+	 * The admin area wears the same dock with a different set of cells: one
+	 * fixed element is the whole rule (design.md § Chrome), so admin gets
+	 * these cells pointed somewhere else rather than a second bar of its own.
+	 * `links`, `home` and `exit` are what differ; everything below is shared.
 	 */
 	import { page } from '$app/state';
 	import { navLinks } from '$lib/config';
@@ -27,7 +32,25 @@
 	import AudioLines from '@lucide/svelte/icons/audio-lines';
 	import type { Component } from 'svelte';
 
-	const icons: Record<string, Component> = {
+	type DockLink = { label: string; href: string };
+
+	let {
+		links = navLinks,
+		home = { href: '/', label: 'Home' },
+		icons: iconOverrides,
+		exit,
+		showSearch = true,
+		ariaLabel = 'Pages'
+	}: {
+		links?: DockLink[];
+		home?: DockLink;
+		icons?: Record<string, Component>;
+		exit?: { href: string; label: string; icon: Component };
+		showSearch?: boolean;
+		ariaLabel?: string;
+	} = $props();
+
+	const defaultIcons: Record<string, Component> = {
 		'/about': User,
 		'/projects': FolderGit2,
 		'/devlog': NotebookText,
@@ -35,12 +58,14 @@
 		'/watchlist': Tv,
 		'/listens': AudioLines
 	};
+	const icons = $derived(iconOverrides ?? defaultIcons);
 
 	const isMac = typeof navigator !== 'undefined' && /Mac/.test(navigator.platform);
 
-	// Home is matched exactly: every path starts with "/", so the prefix test
-	// the other cells use would mark it current everywhere.
-	const atHome = $derived(page.url.pathname === '/');
+	// The home cell is matched exactly: every path starts with "/", so the
+	// prefix test the other cells use would mark "/" current everywhere. The
+	// admin dashboard has the same problem against its own children.
+	const atHome = $derived(page.url.pathname === home.href);
 
 	let scrolled = $state(false);
 
@@ -66,11 +91,16 @@
 	});
 </script>
 
-<nav class="dock" aria-label="Pages">
+<nav class="dock" aria-label={ariaLabel}>
 	<!-- Home is the mark itself, first. Drawn inline rather than loaded from
 	     static/brand/ so it takes currentColor and behaves like every other
 	     cell — dim at rest, accent when current or hovered. -->
-	<a href="/" class="dock__cell" aria-label="Home" aria-current={atHome ? 'page' : undefined}>
+	<a
+		href={home.href}
+		class="dock__cell"
+		aria-label={home.label}
+		aria-current={atHome ? 'page' : undefined}
+	>
 		<svg
 			width="14"
 			height="18"
@@ -87,10 +117,10 @@
 			<circle cx="40" cy="43.249" r="4" fill="currentColor" stroke="none" />
 			<circle cx="60" cy="43.249" r="4" fill="currentColor" stroke="none" />
 		</svg>
-		<span class="dock__label label" aria-hidden="true">Home</span>
+		<span class="dock__label label" aria-hidden="true">{home.label}</span>
 	</a>
 
-	{#each navLinks as link}
+	{#each links as link}
 		{@const Icon = icons[link.href]}
 		{@const active = page.url.pathname.startsWith(link.href)}
 		<a
@@ -106,15 +136,24 @@
 
 	<span class="dock__rule" aria-hidden="true"></span>
 
-	<button
-		type="button"
-		class="dock__cell"
-		onclick={() => (commandPalette.open = true)}
-		aria-label="Search"
-	>
-		<Search size={16} aria-hidden="true" />
-		<span class="dock__label label" aria-hidden="true">{isMac ? '⌘K' : 'Ctrl K'}</span>
-	</button>
+	{#if exit}
+		<a href={exit.href} class="dock__cell" aria-label={exit.label}>
+			<exit.icon size={16} aria-hidden="true" />
+			<span class="dock__label label" aria-hidden="true">{exit.label}</span>
+		</a>
+	{/if}
+
+	{#if showSearch}
+		<button
+			type="button"
+			class="dock__cell"
+			onclick={() => (commandPalette.open = true)}
+			aria-label="Search"
+		>
+			<Search size={16} aria-hidden="true" />
+			<span class="dock__label label" aria-hidden="true">{isMac ? '⌘K' : 'Ctrl K'}</span>
+		</button>
+	{/if}
 
 	<ThemeToggle />
 
