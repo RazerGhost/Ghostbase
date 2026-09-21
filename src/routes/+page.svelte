@@ -35,10 +35,9 @@
 			     photograph anywhere, the voice has to do this work, so the first
 			     screen says who is typing rather than leaving a gap. -->
 			<p class="measure mt-6 leading-[1.8] text-gray">
-				I&rsquo;m Dimitri de Jong. I run
-				<a href="https://rg-digital.dev" class="link">RG Digital</a> by day; this is where
-				everything else ends up &mdash; what I&rsquo;m building, what I&rsquo;m watching, and what
-				I have had on repeat since 2015.
+				I&rsquo;m Dimitri de Jong. I run RG Digital by day; this is where everything else
+				ends up &mdash; what I&rsquo;m building, what I&rsquo;m watching, and what I have had
+				on repeat since 2015.
 			</p>
 			<ul class="mt-7 flex flex-wrap items-center gap-5">
 				{#each socialLinks as link}
@@ -171,19 +170,4 @@
 			{/if}
 		</div>
 	</div>
-
-	<!-- The one RG Digital pointer. Placement is deliberate — after the projects
-	     and the devlog, not in the first 200 pixels next to the name — and the
-	     styling is a line of text, not a CTA band (design.md § CTA voice). -->
-	<p class="meta rule mt-16 pt-6 text-center">
-		Client work lives elsewhere —
-		<a
-			href="https://rg-digital.dev/about"
-			target="_blank"
-			rel="noopener noreferrer"
-			class="link inline-flex items-center gap-1"
-		>
-			see it at RG Digital <ArrowRight size={13} aria-hidden="true" />
-		</a>
-	</p>
 </main>
