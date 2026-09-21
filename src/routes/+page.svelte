@@ -109,7 +109,7 @@
 		<div>
 			<div class="flex items-baseline justify-between">
 				<h2 class="h-section">Latest</h2>
-				<a href="/devlog" class="link inline-flex items-center gap-1.5 text-[13px]">
+				<a href="/devlog" class="link inline-flex items-center gap-1.5 text-[14px]">
 					View all <ArrowRight size={13} aria-hidden="true" />
 				</a>
 			</div>

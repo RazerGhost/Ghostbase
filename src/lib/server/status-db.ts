@@ -20,7 +20,7 @@ const SCHEMA = `
 const DEFAULT_STATUS: Status = {
 	updated: 'July 16, 2026',
 	items: [
-		'Rebuilding razerghost.xyz as a link hub + devlog (this site).',
+		'Rebuilding razerghost.xyz as a personal site + devlog (this site).',
 		"Poking at whatever random project comes up next — check the devlog for specifics."
 	]
 };
