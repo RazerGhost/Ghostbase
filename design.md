@@ -192,8 +192,33 @@ decision, not a default:
 | Devlog | **log stream** — hash, date, length, title, tags on one line | `.stream-row` |
 | Watchlist | **shelves** — a horizontal row of posters per status | `.shelf` |
 | Listens | **ranking as type** — serif numeral, name, a written line, the count | `.rank` |
+| (side lists) | **ledger** — a name and a figure on one hairline, no numeral | `.ledger` |
 | Gear | **written** — prose paragraphs where every tool is a link | `.hang` |
 | Projects | follows the devlog | `.entry` |
+
+## Plots — ink, with the accent spent on the peak
+
+The listens page carries four small charts. They were filled, rounded blocks of
+`--accent`, which breaks two rules at once: rules are the structure here rather
+than filled blocks, and the accent belongs to links and to the thing that just
+fired. A 7x24 field of it made the heatmaps the loudest element on a page whose
+own numbers are set as quiet type.
+
+- **Bars and cells are ink** (`--white` at a fixed alpha), never the accent.
+  A bar is a graphical object you need in order to read the chart, so it is
+  held to WCAG 1.4.11's 3:1 — 46% clears it in both themes; 22% measured
+  1.83:1 on dark.
+- **The accent marks the single maximum**, and only that. The chart then names
+  its own peak instead of signalling "chart".
+- **A heatmap's empty cell is `--border`**, and the ramp starts far enough
+  above it (20%) that "no plays" and "the quietest day" are told apart. The
+  middle steps of a five-level ramp cannot all clear 3:1 — that is inherent —
+  so every cell carries a `title` and the ramp carries a Less/More legend.
+- **A plot is as wide as its series**, via `--plot-cols`: twelve months across
+  the full page draws 100px slabs, and 139 months in a fixed measure draws 3px
+  slivers. Neither is a chart.
+- No rounded corners, and a hairline baseline so a zero sits flat on the rule
+  instead of drawing a stub.
 
 ## Motion
 

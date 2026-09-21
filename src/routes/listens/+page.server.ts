@@ -35,7 +35,7 @@ export const load: PageServerLoad = ({ url }) => {
 	const topAlbums = getTopAlbums(yearOpts);
 	const skipShuffle = getSkipShuffleStats(yearOpts);
 	const monthlyTrend = getMonthlyTrend(yearOpts);
-	const discoveries = year != null ? getDiscoveries(year) : [];
+	const discoveries = getDiscoveries(year);
 	const streaks = computeStreaks(getActiveDates());
 
 	const today = new Date();
