@@ -152,6 +152,4 @@
 			</div>
 		{/if}
 	</div>
-
-	<p class="meta rule mt-14 pt-6">Every name links out to the thing itself.</p>
 </main>
