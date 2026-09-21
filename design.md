@@ -78,10 +78,35 @@ do not hardcode colours in components.
   three surfaces in both themes).
 - Accent, two tiers:
   - `--accent` — **at rest.** Links, focus rings, chrome, rules that matter.
-    #22d3ee on dark, **#0e7490 on light**: the same hue deepened, because the
+    #22d3ee on dark, **#0d6d87 on light**: the same hue deepened, because the
     dark-mode cyan is 1.8:1 on a near-white ground and unreadable as text.
   - `--accent-action` — **something just fired.** A track changed, presence
     flipped, a scrobble landed. Live-data moments only, via `.flash-in`.
+
+**Cyan is settled.** Not because it was chosen well — it was picked as "lime,
+but not lime", which is a derivation and not a decision — but because
+everything since has converged on it:
+
+- **The semantic palette forces a cool accent.** `--danger` and `--warn` are
+  red and amber. Measured as RGB distance, an amber accent lands 15 units from
+  `--warn` and an oxblood one 34 from `--danger` — indistinguishable in use, so
+  a link would read as a warning. Cyan sits 302 and 288 away. That rules out
+  the entire warm half of the wheel, which is where the most tempting
+  alternatives were.
+- **It is the mark's colour, in eight files.** `ghost-mark`, `ghost-mark-light`,
+  `ghost-outline`, `logo-icon`, both wordmark lockups, `favicon.svg` and
+  `apple-touch-icon.svg` all carry #22d3ee, as does `og.ts`. Changing the
+  accent is a rebrand, not a token edit.
+- **The runner-up was indigo**, the only other cool hue that stays clear of the
+  semantic colours. It holds its hue across themes better (69% of its luminance
+  against cyan's 53%) but is markedly weaker on the dark ground — 6.48:1
+  against cyan's 10.82:1 — and would cost that rebrand to gain little.
+
+The cost is real and worth naming: cyan is intrinsically light at full chroma,
+so it loses nearly half its luminance going to the light theme. That is why the
+light value is a much deeper teal than the dark one, and why it had to be
+re-picked twice to clear AA on every surface. **A new colour is checked against
+`--danger` and `--warn` as well as against the three surfaces.**
 
 The accent is named `--accent`, not `--color-primary`, so that `app.css` can map
 it into Tailwind's theme with `var()`. Under the colliding name the mapping had
@@ -283,11 +308,5 @@ Firefox 120, and below that the page loses its colours rather than degrading.
 
 ## Open
 
-- **The accent itself.** Cyan was originally chosen as "lime, but not lime". It
-  now has a readable light-mode counterpart, but whether cyan is the colour this
-  site wants — rather than the not-RG-Digital one — is still unsettled.
-- **The light accent, as a choice rather than a derivation.** Light mode now
-  has its own values (below), but they were reached by taking the dark hues
-  down until they measured, not by asking what this design wants to look like
-  on paper. That question is still open, and it is the same question as the
-  cyan one above.
+Nothing outstanding. The accent was the last entry here; see *Theme* for why
+it is settled and *Light mode* for what the second theme costs.
