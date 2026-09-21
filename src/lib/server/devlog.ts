@@ -60,8 +60,9 @@ function toMeta(slug: string, meta: Record<string, unknown>, body: string): Devl
 // backs the list page, RSS, sitemap, tag pages, and prev/next/related
 // computations, so leaving them out of this function keeps them unpublished
 // everywhere at once. getDevlogEntry() below deliberately does NOT filter,
-// so a draft is still viewable by anyone who has its direct URL — useful
-// for previewing a post before it goes live.
+// so a draft is still readable by slug — but only in dev: devlog/[slug]'s
+// load (and its og.png) 404 a draft in production, so previewing a post
+// before it goes live stays a local-only affordance.
 // Parsed results are cached per server process and invalidated by file
 // mtimes (see contentDirSignature) — editing a post on disk (by hand or via
 // /admin/devlog) still takes effect on the next request, but unchanged

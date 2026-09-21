@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 import { getDevlogEntry } from '$lib/server/devlog';
 import { renderOgImage } from '$lib/server/og';
 import type { RequestHandler } from './$types';
@@ -6,6 +7,8 @@ import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ params }) => {
 	const entry = getDevlogEntry(params.slug);
 	if (!entry) error(404, 'Devlog entry not found');
+	// Drafts are 404 in production, same as the post page.
+	if (entry.draft && !dev) error(404, 'Devlog entry not found');
 
 	const png = await renderOgImage({ title: entry.title, tags: entry.tags, eyebrow: 'Devlog' });
 

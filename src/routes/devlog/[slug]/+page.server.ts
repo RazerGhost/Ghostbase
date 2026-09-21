@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 import { getAllDevlogEntries, getDevlogEntry, getSeriesInfoMap } from '$lib/server/devlog';
 import type { PageServerLoad } from './$types';
 
@@ -6,6 +7,14 @@ export const load: PageServerLoad = ({ params }) => {
 	const entry = getDevlogEntry(params.slug);
 
 	if (!entry) {
+		error(404, 'Devlog entry not found');
+	}
+
+	// A draft is previewable at its direct URL in dev, but not in production:
+	// getAllDevlogEntries() already keeps it out of the list, RSS, sitemap and
+	// tag pages, so serving it here would be the one way a link could leak an
+	// unpublished post. Same guard in og.png/+server.ts.
+	if (entry.draft && !dev) {
 		error(404, 'Devlog entry not found');
 	}
 
