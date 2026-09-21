@@ -30,6 +30,16 @@
 		<div data-hero-reveal="0">
 			<h1 class="h-hero">{site.name}</h1>
 			<p class="lead mt-4">{site.tagline}</p>
+			<!-- The masthead column was a name, a tagline and then dead space to
+			     the rule. design.md § Personality without a face: with no
+			     photograph anywhere, the voice has to do this work, so the first
+			     screen says who is typing rather than leaving a gap. -->
+			<p class="measure mt-6 leading-[1.8] text-gray">
+				I&rsquo;m Dimitri de Jong. I run
+				<a href="https://rg-digital.dev" class="link">RG Digital</a> by day; this is where
+				everything else ends up &mdash; what I&rsquo;m building, what I&rsquo;m watching, and what
+				I have had on repeat since 2015.
+			</p>
 			<ul class="mt-7 flex flex-wrap items-center gap-5">
 				{#each socialLinks as link}
 					{@const Icon = icons[link.icon]}

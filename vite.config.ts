@@ -4,6 +4,12 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
+	// Stamped into the bundle so the footer can print when this build was
+	// made (src/lib/deployed.ts). Evaluated once, when the build starts —
+	// in `pnpm dev` that is when the dev server started.
+	define: {
+		__BUILD_TIME__: JSON.stringify(new Date().toISOString())
+	},
 	ssr: {
 		// These ship raw, uncompiled .svelte files as their icon components —
 		// SSR needs Vite to run them through vite-plugin-svelte rather than

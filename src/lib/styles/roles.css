@@ -30,6 +30,169 @@
 		padding-inline: var(--pad);
 	}
 
+	/* ── Chrome ──────────────────────────────────────────────────────────
+	   design.md § Chrome: the page is printed and scrolls away; the dock is
+	   the only fixed thing on the site. Everything here is the mono label
+	   register — the serif belongs to the page, so chrome never competes
+	   with an h1. */
+
+	/* The running head. Sits inside .shell, so the wordmark starts on the
+	   same vertical line as every h1 and the footer. No border under it:
+	   a rule here would rebuild the bar this design removed. */
+	.runhead {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-8);
+		padding-block: var(--space-8) 0;
+	}
+	/* The one live dot on the site: cyan, static, and only on something that
+	   is genuinely changing. It does not pulse — chrome does not animate on a
+	   loop (design.md § Motion). */
+	.live-dot {
+		display: block;
+		width: 6px;
+		height: 6px;
+		border-radius: var(--radius-full);
+		background: var(--accent);
+	}
+
+	/* The footer's single line. Wraps rather than crushes on a phone. */
+	.footline {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-4) var(--space-6);
+		padding-block: var(--space-5);
+	}
+
+	/* The dock. Fixed, and the only element that is.
+
+	   The bottom bar is the DEFAULT and the right-edge rail is the
+	   enhancement, because the rail needs room in two directions: 900px of
+	   width to sit beside the text, and enough height that a 380px column
+	   centred on the viewport does not run off both ends of a short window.
+	   Written the other way round, a laptop with a short browser window got
+	   a rail whose top cells were unreachable. */
+	.dock {
+		position: fixed;
+		z-index: 20;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		display: flex;
+		justify-content: space-around;
+		padding-inline: var(--space-2);
+		background: var(--surface);
+		border-top: 1px solid var(--border);
+	}
+	.dock__cell {
+		position: relative;
+		display: grid;
+		flex: 1 1 0;
+		place-items: center;
+		min-width: 0;
+		height: var(--dock-cell);
+		color: var(--dim);
+		background: none;
+		border: 0;
+		cursor: pointer;
+		transition: color var(--dur-fast) var(--ease-out);
+	}
+	.dock__cell:hover,
+	.dock__cell:focus-visible {
+		color: var(--accent);
+	}
+	.dock__cell[aria-current='page'] {
+		color: var(--accent);
+	}
+	/* The current page is marked in the dock's own margin, not by a fill — a
+	   filled cell would be a second elevation level for no reason. */
+	.dock__cell[aria-current='page']::before {
+		content: '';
+		position: absolute;
+		top: -1px;
+		left: 50%;
+		width: 18px;
+		height: 2px;
+		background: var(--accent);
+		transform: translateX(-50%);
+	}
+	/* The bar covers the end of the page — give the document its height back
+	   so the footer stays reachable. */
+	.dock-clear {
+		padding-bottom: calc(var(--dock-cell) + 1px);
+	}
+	.dock__rule,
+	.dock__label,
+	/* A tenth cell would leave each one too narrow to hit on a phone, and
+	   "back to top" is the most optional thing in here. */
+	.dock__cell--top {
+		display: none;
+	}
+
+	@media (min-width: 900px) and (min-height: 560px) {
+		.dock {
+			top: 50%;
+			right: var(--space-8);
+			bottom: auto;
+			left: auto;
+			width: var(--dock-w);
+			flex-direction: column;
+			justify-content: flex-start;
+			padding-block: var(--space-2);
+			padding-inline: 0;
+			border: 1px solid var(--border);
+			transform: translateY(-50%);
+		}
+		.dock-clear {
+			padding-bottom: 0;
+		}
+		.dock__cell {
+			flex: 0 0 auto;
+			min-width: var(--dock-cell);
+		}
+		.dock__cell--top {
+			display: grid;
+		}
+		.dock__cell[aria-current='page']::before {
+			top: 50%;
+			left: -1px;
+			width: 2px;
+			height: 18px;
+			transform: translateY(-50%);
+		}
+		.dock__rule {
+			display: block;
+			height: 1px;
+			margin: var(--space-2) var(--space-3);
+			background: var(--border);
+		}
+		/* Icon-only needs a name somewhere: revealed on hover AND on focus,
+		   so it is reachable from the keyboard and not mouse-only. */
+		.dock__label {
+			position: absolute;
+			top: 50%;
+			right: calc(100% + var(--space-3));
+			display: block;
+			white-space: nowrap;
+			padding: var(--space-1) var(--space-3);
+			background: var(--surface-2);
+			border: 1px solid var(--border-strong);
+			color: var(--white);
+			opacity: 0;
+			pointer-events: none;
+			transform: translateY(-50%);
+			transition: opacity var(--dur-fast) var(--ease-out);
+		}
+		.dock__cell:hover .dock__label,
+		.dock__cell:focus-visible .dock__label {
+			opacity: 1;
+		}
+	}
+
 	/* A page is the shell plus its vertical rhythm. */
 	.page {
 		margin-inline: auto;

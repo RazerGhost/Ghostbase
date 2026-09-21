@@ -10,6 +10,9 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+
+	/** ISO timestamp of this build, replaced by Vite (see vite.config.ts). */
+	const __BUILD_TIME__: string;
 }
 
 export {};

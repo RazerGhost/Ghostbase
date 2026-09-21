@@ -1,9 +1,19 @@
 <script lang="ts">
-	import Music from '@lucide/svelte/icons/music';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
-	import Minus from '@lucide/svelte/icons/minus';
+	import X from '@lucide/svelte/icons/x';
 	import History from '@lucide/svelte/icons/history';
 	import { useLanyard } from '$lib/stores/lanyard.svelte';
+
+	/**
+	 * The live line in the running head (design.md § Chrome).
+	 *
+	 * This used to be a floating pill fixed to the bottom-left corner. A
+	 * panel hovering over the page is screen furniture, and this register is
+	 * paper — so the collapsed state is now one line of type in the head,
+	 * and the card it opens hangs off it rather than off the viewport. The
+	 * detail it holds (progress, today's total, recently played) is
+	 * unchanged; only where it lives is.
+	 */
 
 	interface RecentItem {
 		track: string;
@@ -97,7 +107,7 @@
 		}
 	});
 
-	// Collapse the expanded card back to the pill if playback stops.
+	// Collapse the expanded card back to the line if playback stops.
 	$effect(() => {
 		if (!playing) expanded = false;
 	});
@@ -135,20 +145,41 @@
 	});
 
 	const progressPct = $derived(durationMs ? Math.min(100, (localProgressMs / durationMs) * 100) : 0);
+
+	function onKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape') expanded = false;
+	}
 </script>
 
+<svelte:window onkeydown={expanded ? onKeydown : undefined} />
+
 {#if playing && track}
-	<div class="fixed bottom-6 left-6 z-10 flex flex-col items-start gap-2" data-hero-reveal="0">
+	<div class="relative min-w-0">
+		<button
+			type="button"
+			class="flex max-w-full items-center gap-2.5 text-left"
+			aria-expanded={expanded}
+			aria-label={`Now playing: ${track} by ${artist}. Show details.`}
+			onclick={() => (expanded = !expanded)}
+		>
+			<span class="live-dot shrink-0" aria-hidden="true"></span>
+			<span class="label shrink-0">Listening to</span>
+			<span class="label truncate text-white">{track} &mdash; {artist}</span>
+		</button>
+
 		{#if expanded}
+			<!-- Hangs off the line, not off the viewport: it scrolls away with
+			     the head, because it is part of the page like everything else
+			     that is not the dock. -->
 			<div
-				class="card w-80 rounded-lg border border-border bg-surface/80 p-3 shadow-[var(--shadow-card-hover)] backdrop-blur-md"
+				class="card absolute top-[calc(100%+var(--space-3))] right-0 z-20 w-80 max-w-[calc(100vw-2*var(--pad))] p-3 shadow-[var(--shadow-card-hover)]"
 			>
 				<div class="flex items-center gap-3">
 					{#if albumArt}
 						<img src={albumArt} alt="" class="h-12 w-12 shrink-0 rounded-md object-cover" />
 					{/if}
 					<div class="min-w-0 flex-1">
-						<p class="truncate text-sm font-medium text-white">{track}</p>
+						<p class="truncate text-sm text-white">{track}</p>
 						<p class="meta truncate">{artist}</p>
 					</div>
 					<a
@@ -156,17 +187,17 @@
 						target="_blank"
 						rel="noreferrer"
 						aria-label="Open in Spotify"
-						class="shrink-0 rounded-full p-1.5 text-dim transition-colors hover:text-primary"
+						class="shrink-0 p-1.5 text-dim transition-colors hover:text-primary"
 					>
 						<ExternalLink size={15} aria-hidden="true" />
 					</a>
 					<button
 						type="button"
-						aria-label="Minimize now-playing widget"
-						class="shrink-0 rounded-full p-1.5 text-dim transition-colors hover:text-white"
+						aria-label="Close now-playing details"
+						class="shrink-0 p-1.5 text-dim transition-colors hover:text-white"
 						onclick={() => (expanded = false)}
 					>
-						<Minus size={15} aria-hidden="true" />
+						<X size={15} aria-hidden="true" />
 					</button>
 				</div>
 
@@ -178,20 +209,18 @@
 								style:width="{progressPct}%"
 							></div>
 						</div>
-						<div class="mt-1 flex justify-between text-[11px] text-dim">
-							<span>{formatClock(localProgressMs)}</span>
-							<span>{formatClock(durationMs)}</span>
+						<div class="mt-1 flex justify-between">
+							<span class="mono">{formatClock(localProgressMs)}</span>
+							<span class="mono">{formatClock(durationMs)}</span>
 						</div>
 					</div>
 				{/if}
 
-				<p class="mt-3 text-[11px] text-dim">
-					{formatListened(listenedMsToday)} listened today
-				</p>
+				<p class="meta mt-3">{formatListened(listenedMsToday)} listened today</p>
 
 				{#if recentAvailable && recent.length}
 					<div class="mt-3 border-t border-border pt-3">
-						<p class="flex items-center gap-1.5 text-[11px] font-medium text-dim">
+						<p class="label label--icon">
 							<History size={12} aria-hidden="true" /> Recently played
 						</p>
 						<ul class="mt-2 grid gap-2">
@@ -201,14 +230,10 @@
 										href={item.url}
 										target="_blank"
 										rel="noreferrer"
-										class="flex items-center gap-2 rounded-md transition-colors hover:bg-surface-2"
+										class="flex items-center gap-2 transition-colors hover:text-white"
 									>
 										{#if item.albumArt}
-											<img
-												src={item.albumArt}
-												alt=""
-												class="h-7 w-7 shrink-0 rounded object-cover"
-											/>
+											<img src={item.albumArt} alt="" class="h-7 w-7 shrink-0 rounded object-cover" />
 										{/if}
 										<span class="min-w-0 flex-1">
 											<span class="block truncate text-xs text-gray">{item.track}</span>
@@ -220,30 +245,6 @@
 					</div>
 				{/if}
 			</div>
-		{:else}
-			<button
-				type="button"
-				aria-label={`Now playing: ${track} by ${artist}. Click to expand.`}
-				class="card flex items-center gap-2 rounded-full border border-border bg-surface/80 py-1.5 pr-4 pl-1.5 shadow-[var(--shadow-card-hover)] backdrop-blur-md transition-colors hover:border-primary"
-				onclick={() => (expanded = true)}
-			>
-				<span class="relative h-8 w-8 shrink-0">
-					{#if albumArt}
-						<img src={albumArt} alt="" class="h-8 w-8 rounded-full object-cover" />
-					{:else}
-						<span class="grid h-8 w-8 place-items-center rounded-full bg-surface-2">
-							<Music size={14} class="text-primary" aria-hidden="true" />
-						</span>
-					{/if}
-					<span
-						class="absolute -right-0.5 -bottom-0.5 flex h-3 w-3 items-center justify-center rounded-full bg-surface"
-						aria-hidden="true"
-					>
-						<span class="h-2 w-2 animate-pulse rounded-full bg-primary"></span>
-					</span>
-				</span>
-				<span class="max-w-[9rem] truncate text-xs font-medium text-white">{track}</span>
-			</button>
 		{/if}
 	</div>
 {/if}

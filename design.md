@@ -99,7 +99,7 @@ Exactly three levels.
 **A card never contains another card.** `.card .card` is flattened in CSS. And
 in this register content mostly does not sit in a card at all — it sits on the
 ground, separated by rules. Cards are for controls and chrome: dialogs, the
-admin area, the floating widget.
+admin area, the panel the now-playing line opens.
 
 ## Typography
 
@@ -192,9 +192,37 @@ The RG Digital pointer reads as a footnote — one per page, never repeated.
 
 ## Chrome
 
-- Nav: ghost mark + wordmark left, links right, command palette and theme
-  toggle at the far right. Sticky, hairline bottom edge.
-- Footer: copyright, feeds, socials.
+**The page is printed; only the dock follows you.** Nothing else is sticky —
+no bar hovering over the page, no blurred backdrop. The earlier masthead was
+`sticky top-0` with a backdrop blur, which is a screen convention: a panel
+floating above the document. A paper register does not have one.
+
+- **Running head.** Ghost mark, wordmark, and where you are, in the mono
+  label register; the live line at the far right. Type on the ground — no
+  fill, no border, no rule beneath it. It scrolls away with the page, and
+  that is what earns it the room to say more than a status dot would.
+- **Dock.** The only fixed element on the site. The ghost mark first, as
+  home; six destinations; a rule; then search, the theme toggle, and "back to
+  top" once you have scrolled — nothing else earns a cell. A right-edge rail
+  above 900px, a bottom bar below it, always under the reader's thumb.
+  Icon-only at rest, each name revealed on hover and on focus.
+
+  **Nothing else floats.** A second fixed object in the opposite corner is
+  the exact furniture this design removes, so the old back-to-top button was
+  folded in rather than left beside the dock. The bar cannot hold it — nine
+  cells already divide a 375px phone into 40px each — so it is rail-only.
+- **Footer.** One line. Copyright and the outbound links on the left, the
+  last deploy date on the right. It stays this short only because the dock
+  carries the navigation.
+
+The boundary between dock and footer, so it still holds when a seventh page
+arrives: **where you navigate to is in the dock; where you leave the site for
+is in the footer.** Search and the theme toggle sit in the dock because they
+act on the page you are already standing on.
+
+**One live dot.** Cyan, and only on something that is genuinely changing —
+the now-playing line. A deploy date is a fact, not a signal, and does not get
+one. Two dots would have made them look like the same kind of thing.
 
 ## What pages MUST share
 
