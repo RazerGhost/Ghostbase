@@ -651,6 +651,179 @@
 		background: var(--accent);
 	}
 
+	/* ── Editor ──────────────────────────────────────────────────────────
+	   The private side's writing surface. Kept here rather than scoped to the
+	   component because the two editors and the two "new" pages all wear it,
+	   and because a role is how this site says a decision once. */
+
+	/* Disk → Commit → Push. A row of steps, wrapping on a narrow window
+	   rather than scrolling, since the last step carries the sentence. */
+	.publish {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--space-3) var(--space-6);
+	}
+	.publish__step {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+	}
+	.publish__arrow {
+		color: var(--border-strong);
+	}
+	.publish__dot {
+		width: 7px;
+		height: 7px;
+		border-radius: var(--radius-full);
+		border: 1px solid var(--border-strong);
+	}
+	.publish__dot--done {
+		background: var(--accent);
+		border-color: var(--accent);
+	}
+	.publish__dot--next {
+		border-color: var(--warn);
+	}
+	.publish__note {
+		margin-inline-start: auto;
+	}
+
+	/* The frontmatter rail beside the body. Below 1100px it stacks above,
+	   because a 296px column and a usable writing measure do not both fit. */
+	.editor {
+		display: grid;
+		grid-template-columns: 296px minmax(0, 1fr);
+		gap: var(--space-12);
+		align-items: start;
+	}
+	@media (max-width: 1100px) {
+		.editor {
+			grid-template-columns: minmax(0, 1fr);
+			gap: var(--space-8);
+		}
+	}
+	.editor__rail {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-6);
+		min-width: 0;
+	}
+
+	/* A labelled field. The editor's inputs were placeholder-only, so the
+	   moment you typed, the field stopped saying what it was — and a screen
+	   reader never knew. */
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+		min-width: 0;
+	}
+
+	/* The title, edited in the face it publishes in. */
+	.title-input {
+		width: 100%;
+		border: 0;
+		border-bottom: 1px solid var(--border);
+		background: transparent;
+		padding: 0 0 var(--space-3) 0;
+		font-family: var(--font-display);
+		font-weight: var(--fw-regular);
+		font-size: var(--fs-title);
+		line-height: var(--lh-tight);
+		letter-spacing: var(--track-display);
+		color: var(--white);
+	}
+	.title-input:focus {
+		outline: none;
+		border-bottom-color: var(--accent);
+	}
+
+	/* The markdown toolbar. Icon buttons at 32px sit under the 44px target
+	   guidance on purpose: this is a pointer-and-keyboard tool on a desktop
+	   (every action also has a shortcut), and a row of 44px cells would be
+	   wider than the writing measure it sits above. */
+	.md-bar {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--space-1);
+		padding-bottom: var(--space-3);
+		border-bottom: 1px solid var(--border);
+	}
+	.md-bar__btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		border: 0;
+		border-radius: var(--radius-sm);
+		background: transparent;
+		color: var(--gray);
+		cursor: pointer;
+		transition: color var(--dur-fast), background var(--dur-fast);
+	}
+	.md-bar__btn:hover,
+	.md-bar__btn:focus-visible {
+		color: var(--white);
+		background: var(--surface-2);
+	}
+	.md-bar__sep {
+		width: 1px;
+		height: 18px;
+		margin-inline: var(--space-2);
+		background: var(--border);
+	}
+
+	/* The body itself: no box, because it is the page's main column and a
+	   border around it would make the writing feel like a form field. */
+	.md-body {
+		width: 100%;
+		min-height: 60vh;
+		border: 0;
+		background: transparent;
+		padding: 0;
+		resize: none;
+		font-family: var(--font-mono);
+		font-size: var(--fs-small);
+		line-height: 1.85;
+		color: var(--gray);
+	}
+	.md-body:focus {
+		outline: none;
+	}
+	.md-split {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--space-10);
+	}
+	@media (max-width: 900px) {
+		.md-split {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+
+	/* The outline, which is the contents list the published post builds. */
+	.outline__item {
+		display: block;
+		padding: var(--space-2) 0 var(--space-2) var(--space-3);
+		border-left: 2px solid var(--border);
+		font-size: var(--fs-small);
+		line-height: 1.5;
+		color: var(--dim);
+		transition: color var(--dur-fast), border-color var(--dur-fast);
+	}
+	.outline__item:hover {
+		color: var(--white);
+	}
+	.outline__item--h3 {
+		padding-inline-start: var(--space-6);
+	}
+	.outline__item--skip {
+		border-left-color: var(--warn);
+	}
+
 	/* ── Card / panel ────────────────────────────────────────────────────
 	   Elevation level 1. Editorial uses rules for content, so cards are for
 	   controls and chrome: dialogs, the admin area, the floating widget. */

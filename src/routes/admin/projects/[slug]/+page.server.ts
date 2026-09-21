@@ -2,15 +2,25 @@ import path from 'node:path';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { getRawEntry, writeEntry, deleteEntry } from '$lib/server/content-editor';
 import { toDateString } from '$lib/server/content';
+import { getContentGitState, fileGitState } from '$lib/server/content-git';
 import type { Actions, PageServerLoad } from './$types';
 
 const CONTENT_DIR = path.resolve(process.cwd(), 'src/content/projects');
 
-export const load: PageServerLoad = ({ params }) => {
+export const load: PageServerLoad = async ({ params }) => {
 	const entry = getRawEntry(CONTENT_DIR, params.slug);
 	if (!entry) error(404, 'Project not found');
 
+	const git = await getContentGitState();
+	const state = fileGitState(git, `src/content/projects/${entry.slug}.md`);
+
 	return {
+		adminCrumb: String(entry.meta.name ?? entry.slug),
+		git: {
+			tracked: git !== null,
+			changed: state === 'changed',
+			ahead: git?.ahead ?? null
+		},
 		slug: entry.slug,
 		name: String(entry.meta.name ?? entry.slug),
 		description: entry.meta.description ? String(entry.meta.description) : '',

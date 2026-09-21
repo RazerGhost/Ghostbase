@@ -13,42 +13,43 @@
 <Seo title="Import Spotify history — RazerGhost" description="Private import tool." path="/spotify-import" noindex />
 
 <main class="page page--narrow">
-	<a href="/admin" class="meta link transition-colors hover:text-primary">← Admin</a>
-	<h1 class="h-page mt-2">Import Spotify history</h1>
+	<h1 class="h-page">Import Spotify history</h1>
+	<p class="lead mt-2">The back catalogue the live API cannot give you.</p>
 
-	<div class="mt-6 grid grid-cols-2 gap-3 rounded-lg border border-border p-4 text-sm sm:grid-cols-4">
+	<!-- The same numeral register the listens page sets its own totals in. -->
+	<div class="rule mt-9 grid grid-cols-2 gap-8 border-b border-border py-7 sm:grid-cols-4">
 		<div>
-			<div class="meta">Total plays</div>
-			<div class="mt-0.5 font-medium text-white">{data.totalPlays.toLocaleString()}</div>
+			<p class="num num-sm">{data.totalPlays.toLocaleString()}</p>
+			<p class="meta mt-2">plays held</p>
 		</div>
 		<div>
-			<div class="meta">Earliest</div>
-			<div class="mt-0.5 font-medium text-white">{formatDate(data.firstPlayedAt)}</div>
+			<p class="num num-sm">{formatDate(data.firstPlayedAt)}</p>
+			<p class="meta mt-2">earliest</p>
 		</div>
 		<div>
-			<div class="meta">Latest</div>
-			<div class="mt-0.5 font-medium text-white">{formatDate(data.lastPlayedAt)}</div>
+			<p class="num num-sm">{formatDate(data.lastPlayedAt)}</p>
+			<p class="meta mt-2">latest</p>
 		</div>
 		<div>
-			<div class="meta">Pending scrobbles</div>
-			<div class="mt-0.5 font-medium text-white">{data.pendingScrobbles.toLocaleString()}</div>
+			<p class="num num-sm">{data.pendingScrobbles.toLocaleString()}</p>
+			<p class="meta mt-2">scrobbled, not yet exported</p>
 		</div>
 	</div>
 	{#if data.pendingScrobbles > 0}
 		<p class="meta mt-2">
-			{data.pendingScrobbles} row{data.pendingScrobbles === 1 ? '' : 's'} were added by the live scrobbler
+			{data.pendingScrobbles} row{data.pendingScrobbles === 1 ? '' : 's'} came from the live scrobbler
 			with estimated play length — importing an export covering that date range replaces them with
 			real data.
 		</p>
 	{/if}
 
-	<p class="mt-6 text-gray">
+	<p class="measure mt-7 text-gray">
 		Upload the JSON files from Spotify's
 		<a
 			href="https://support.spotify.com/us/article/understanding-your-data/"
 			target="_blank"
 			rel="noreferrer"
-			class="link text-primary hover:opacity-85"
+			class="link"
 		>
 			extended streaming history export
 		</a>
@@ -59,7 +60,7 @@
 
 	<form method="POST" enctype="multipart/form-data" class="mt-8 flex flex-col gap-4">
 		{#if form && 'error' in form && form.error}
-			<p class="text-sm text-red-400">{form.error}</p>
+			<p class="text-sm text-danger-text">{form.error}</p>
 		{/if}
 
 		<input
@@ -68,7 +69,7 @@
 			accept="application/json"
 			multiple
 			required
-			class="rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-white file:mr-3 file:rounded-md file:border-0 file:bg-primary/10 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-primary"
+			class="input file:mr-3 file:rounded-full file:border file:border-border file:bg-transparent file:px-3 file:py-1 file:text-[13px] file:text-gray"
 		/>
 
 		<button
@@ -81,8 +82,8 @@
 
 	{#if form?.results}
 		{@const results = form.results}
-		<div class="mt-8 rounded-lg border border-border p-4 text-sm">
-			<p class="font-medium text-white">
+		<div class="card mt-8 text-sm">
+			<p class="h-card">
 				{form.totalInserted} new play{form.totalInserted === 1 ? '' : 's'} added
 				({form.totalParsed} parsed across {results.length} file{results.length === 1 ? '' : 's'}).
 			</p>
@@ -98,7 +99,7 @@
 					<li>
 						{result.name} —
 						{#if result.error}
-							<span class="text-red-400">{result.error}</span>
+							<span class="text-danger-text">{result.error}</span>
 						{:else}
 							{result.inserted}/{result.parsed} new
 						{/if}
@@ -109,6 +110,6 @@
 	{/if}
 
 	<p class="mt-8 text-sm">
-		<a href="/listens" class="link text-primary hover:opacity-85">View the Listens page →</a>
+		<a href="/listens" class="link">View the Listens page →</a>
 	</p>
 </main>
