@@ -211,6 +211,14 @@ floating above the document. A paper register does not have one.
   the exact furniture this design removes, so the old back-to-top button was
   folded in rather than left beside the dock. The bar cannot hold it — nine
   cells already divide a 375px phone into 40px each — so it is rail-only.
+
+  **The bar's cells are 40×44, not 44×44**, and that is a decision rather
+  than an oversight. Nine cells at a fixed 44 overflow a 375px phone, so the
+  choices were a narrower cell or a shorter dock. Keeping the dock's contents
+  identical across breakpoints is worth more than 4px: 40×44 clears the WCAG
+  AA target minimum comfortably and misses only the 44-square a platform
+  would prefer. If that ever stops being the trade, the cheapest cut is the
+  theme toggle, which puts the bar back to eight cells at a full 44.
 - **Footer.** One line. Copyright and the outbound links on the left, the
   last deploy date on the right. It stays this short only because the dock
   carries the navigation.
@@ -236,10 +244,42 @@ Hero shape; whether the body is a stream, a shelf, a ranking or prose; how much
 of the page the primary number takes. The data pages may be denser than the
 reading pages.
 
+## Light mode
+
+Not a second theme file: every theme-varying token is one
+`light-dark(light, dark)` declaration in `tokens.css`, and `color-scheme`
+decides which half is used. The values used to be written three times — once
+dark, then the light set repeated under `[data-theme='light']` and again under
+the `prefers-color-scheme` query — which is the mechanism by which a second
+theme rots, and it had already rotted:
+
+- `--danger` and `--warn` were never given light values at all, so the
+  dark-mode red and amber were being painted onto near-white at 3.06:1 and
+  1.93:1. Both are text colours.
+- `--accent` was chosen against `--bg` alone at 5.09:1 and measured 4.26:1 on
+  `--surface-2`, which is where an accent link sits inside a code block or an
+  active filter.
+- `--accent-action` — the "something just fired" colour — was *lighter* than
+  the resting accent on a light ground, so the site's only flash was quieter
+  than an ordinary link.
+- `--shadow-card-hover` was 35% black in both themes: right over a dark
+  ground, a bruise over a light one.
+
+Every ink token is now measured against all three surfaces in both themes.
+The floor is AA (4.5:1) for text; the worst pair is 4.96 dark and 4.70 light.
+**Check a new colour against `--surface-2`, not just `--bg`** — every failure
+above came from checking one surface and assuming the rest.
+
+The cost is a browser floor: `light-dark()` needs Chrome 123, Safari 17.5 or
+Firefox 120, and below that the page loses its colours rather than degrading.
+
 ## Open
 
 - **The accent itself.** Cyan was originally chosen as "lime, but not lime". It
   now has a readable light-mode counterpart, but whether cyan is the colour this
   site wants — rather than the not-RG-Digital one — is still unsettled.
-- **Light mode** is a neutral inversion of a register designed dark. It is
-  legible and AA-clean, but it has not had a pass of its own.
+- **The light accent, as a choice rather than a derivation.** Light mode now
+  has its own values (below), but they were reached by taking the dark hues
+  down until they measured, not by asking what this design wants to look like
+  on paper. That question is still open, and it is the same question as the
+  cyan one above.

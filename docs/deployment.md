@@ -29,3 +29,21 @@ See the top-level README's [Persistent data](../README.md#persistent-data) secti
 **Before the first real deploy**, go to the app's **Storages** tab in Coolify and add a persistent volume mounted at `/app/data` (any volume name works). Skipping this step means `spotify-history.db` — irreplaceable, real user content — gets wiped on the very next redeploy.
 
 A persistent volume only protects against redeploys, not against the server disappearing entirely — see [backups.md](backups.md) for off-box backups.
+
+## Cloudflare sits in front of this
+
+razerghost.xyz is proxied through Cloudflare, which matters in two ways when you go to check whether a deploy landed.
+
+**It overrides the app's cache headers.** `og.png/+server.ts` asks for `Cache-Control: public, max-age=3600`; the edge serves `max-age=14400` (`cf-cache-status: HIT`, with an `Age` header counting up). That's Cloudflare's Browser Cache TTL setting winning over the origin's header, so a changed OG image can keep serving the old bytes for up to four hours after a successful deploy. If social previews need to update now rather than eventually, purge `/devlog/*/og.png` and `/projects/*/og.png` from the Cloudflare dashboard — and remember that some platforms cache the image on their own side once they have fetched it.
+
+**So verify a deploy with a cache-buster, never a plain GET.** A plain `curl` of a cached asset can report "unchanged" indefinitely while the new build is live:
+
+```bash
+curl -s "https://razerghost.xyz/devlog/<slug>/og.png?cb=$(date +%s)" -o /dev/null -w '%{size_download}\n'
+```
+
+The cheapest honest signal that a deploy landed is the footer, which prints the build timestamp (`src/lib/deployed.ts`):
+
+```bash
+curl -s "https://razerghost.xyz/?cb=$(date +%s)" | grep -o 'Last deployed [^<]*'
+```
