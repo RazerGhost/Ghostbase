@@ -29,11 +29,12 @@
 	}
 </script>
 
+<!-- Lifted clear of the dock, which is a bottom bar below 900px. -->
 <button
 	type="button"
 	onclick={scrollToTop}
 	aria-label="Back to top"
-	class="fixed right-6 bottom-6 z-10 grid h-10 w-10 place-items-center rounded-full border border-border bg-surface/80 text-gray shadow-[var(--shadow-card-hover)] backdrop-blur-md transition-[opacity,transform,color,border-color] duration-200 hover:border-primary hover:text-primary"
+	class="fixed right-6 bottom-[calc(var(--dock-cell)+var(--space-6))] z-10 grid min-[900px]:bottom-6 h-10 w-10 place-items-center rounded-full border border-border bg-surface/80 text-gray shadow-[var(--shadow-card-hover)] backdrop-blur-md transition-[opacity,transform,color,border-color] duration-200 hover:border-primary hover:text-primary"
 	class:opacity-0={!visible}
 	class:pointer-events-none={!visible}
 	class:opacity-100={visible}

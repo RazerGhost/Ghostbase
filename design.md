@@ -99,7 +99,7 @@ Exactly three levels.
 **A card never contains another card.** `.card .card` is flattened in CSS. And
 in this register content mostly does not sit in a card at all — it sits on the
 ground, separated by rules. Cards are for controls and chrome: dialogs, the
-admin area, the floating widget.
+admin area, the panel the now-playing line opens.
 
 ## Typography
 
@@ -192,9 +192,32 @@ The RG Digital pointer reads as a footnote — one per page, never repeated.
 
 ## Chrome
 
-- Nav: ghost mark + wordmark left, links right, command palette and theme
-  toggle at the far right. Sticky, hairline bottom edge.
-- Footer: copyright, feeds, socials.
+**The page is printed; only the dock follows you.** Nothing else is sticky —
+no bar hovering over the page, no blurred backdrop. The earlier masthead was
+`sticky top-0` with a backdrop blur, which is a screen convention: a panel
+floating above the document. A paper register does not have one.
+
+- **Running head.** Ghost mark, wordmark, and where you are, in the mono
+  label register; the live line at the far right. Type on the ground — no
+  fill, no border, no rule beneath it. It scrolls away with the page, and
+  that is what earns it the room to say more than a status dot would.
+- **Dock.** The only fixed element on the site. Six destinations, a rule,
+  then search and the theme toggle — nothing else earns a cell. A right-edge
+  rail above 900px, a bottom bar below it: the same cells either way, always
+  under the reader's thumb. Icon-only at rest, each name revealed on hover
+  and on focus.
+- **Footer.** One line. Copyright and the outbound links on the left, the
+  last deploy date on the right. It stays this short only because the dock
+  carries the navigation.
+
+The boundary between dock and footer, so it still holds when a seventh page
+arrives: **where you navigate to is in the dock; where you leave the site for
+is in the footer.** Search and the theme toggle sit in the dock because they
+act on the page you are already standing on.
+
+**One live dot.** Cyan, and only on something that is genuinely changing —
+the now-playing line. A deploy date is a fact, not a signal, and does not get
+one. Two dots would have made them look like the same kind of thing.
 
 ## What pages MUST share
 
