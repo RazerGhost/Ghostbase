@@ -73,7 +73,7 @@
 			<h1 class="h-page">Gear</h1>
 			<p class="lead mt-3">Tools and gear in regular rotation.</p>
 		</div>
-		<span class="meta">{items.length} things, written out</span>
+		<span class="meta">{items.length} things</span>
 	</div>
 
 	<div class="rule mt-10 flex flex-col gap-12 pt-10" data-hero-reveal="1">
