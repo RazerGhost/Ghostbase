@@ -692,4 +692,27 @@
 			transform: none;
 		}
 	}
+
+	@media (min-width: 900px) and (min-height: 560px) {
+		/* Reserve the rail's band in the document.
+
+		   The dock is fixed, so it does not take part in layout — but it is
+		   still occupying screen, and every container here ran its right edge
+		   to --pad (72px) while the dock's inner edge sits 86px in. Fourteen
+		   pixels of overlap, invisible on pages whose right gutter is empty
+		   and very visible on a post, where the table of contents ends up
+		   underneath it.
+
+		   This is the same job .dock-clear does for the bottom bar, which is
+		   why that one was noticed and this one was not: the bar covers
+		   content everyone sees, the rail only covers the right margin.
+
+		   The gutter is asymmetric on purpose. The left edge is the one every
+		   heading, rule and footer line hangs off, so it stays at --pad; the
+		   right one belongs to the dock now. */
+		.shell,
+		.page {
+			padding-right: calc(var(--space-8) + var(--dock-w) + var(--space-5));
+		}
+	}
 }
