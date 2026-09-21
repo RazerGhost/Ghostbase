@@ -101,9 +101,6 @@ ever read. Now it's four paragraphs, and the page has a voice.
 
 ## What it actually cost
 
-The clock is the wrong measure — commit timestamps say when I pressed commit,
-not how long anything took. The diffstat is the honest one.
-
 Every page came out as a single commit touching one or two files: about, one
 file; watchlist, two; gear, two; projects, three. The only commit that touched
 eight was the type system itself. That is the entire argument, visible in a
