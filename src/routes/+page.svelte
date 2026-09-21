@@ -35,10 +35,9 @@
 			     photograph anywhere, the voice has to do this work, so the first
 			     screen says who is typing rather than leaving a gap. -->
 			<p class="measure mt-6 leading-[1.8] text-gray">
-				I&rsquo;m Dimitri de Jong. I run
-				<a href="https://rg-digital.dev" class="link">RG Digital</a> by day; this is where
-				everything else ends up &mdash; what I&rsquo;m building, what I&rsquo;m watching, and what
-				I have had on repeat since 2015.
+				I&rsquo;m Dimitri de Jong. I run RG Digital by day; this is where everything else
+				ends up &mdash; what I&rsquo;m building, what I&rsquo;m watching, and what I have had
+				on repeat since 2015.
 			</p>
 			<ul class="mt-7 flex flex-wrap items-center gap-5">
 				{#each socialLinks as link}
@@ -174,8 +173,13 @@
 
 	<!-- The one RG Digital pointer. Placement is deliberate — after the projects
 	     and the devlog, not in the first 200 pixels next to the name — and the
-	     styling is a line of text, not a CTA band (design.md § CTA voice). -->
-	<p class="meta rule mt-16 pt-6 text-center">
+	     styling is a line of text, not a CTA band (design.md § CTA voice).
+
+	     Left-aligned, because it was the only centred text on the site: on a
+	     ruled, left-hung register, a centred line under a rule reads as a
+	     closing band whatever its words say. The gear page's closing line is
+	     the same role and has always been left-aligned; this now matches it. -->
+	<p class="meta rule mt-16 pt-6">
 		Client work lives elsewhere —
 		<a
 			href="https://rg-digital.dev/about"
