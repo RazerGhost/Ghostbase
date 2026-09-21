@@ -51,7 +51,15 @@ Package manager is pnpm (`packageManager: pnpm@11.3.0`).
 
 ## Testing gated pages locally
 
-`/admin` and `/spotify-import` are both auth-gated in [src/hooks.server.ts](src/hooks.server.ts) (`PROTECTED_PREFIXES`), which redirects/401s anyone without a valid session cookie — including a local dev browser session that isn't logged in via GitHub OAuth. When verifying a change to one of these pages in a browser preview, it's fine to temporarily comment out the relevant prefix (or the whole gate) in `hooks.server.ts` to test without going through the OAuth flow — but **always restore the gate before committing**. Diff `hooks.server.ts` as part of pre-commit review to make sure no gate was left disabled.
+`/admin` and `/spotify-import` redirect/401 anyone without a valid session cookie — including a local dev browser that isn't logged in via GitHub OAuth. When verifying a change to one of these pages in a browser preview, it's fine to temporarily disable the gate to test without going through the OAuth flow — but **always restore it before committing**.
+
+**There are three gates, not one**, and disabling only the first still redirects:
+
+- [src/hooks.server.ts](src/hooks.server.ts) — `PROTECTED_PREFIXES`, the outer gate for both prefixes.
+- [src/routes/admin/+layout.server.ts](src/routes/admin/+layout.server.ts) — its own `redirect(303, '/auth/login…')`.
+- [src/routes/spotify-import/+layout.server.ts](src/routes/spotify-import/+layout.server.ts) — the same, for that route.
+
+Diff all three as part of pre-commit review to make sure none was left disabled. `git checkout -- <the three paths>` is the cleanest restore, since none of them should ever be part of a feature change.
 
 ## Icons
 
