@@ -73,7 +73,7 @@
 			<h1 class="h-page">Gear</h1>
 			<p class="lead mt-3">Tools and gear in regular rotation.</p>
 		</div>
-		<span class="meta">{items.length} things, written out</span>
+		<span class="meta">{items.length} things</span>
 	</div>
 
 	<div class="rule mt-10 flex flex-col gap-12 pt-10" data-hero-reveal="1">
@@ -136,8 +136,8 @@
 			<p class="measure text-[17px] leading-[1.8] text-gray">
 				And when I&rsquo;m not working: a <a class="link" href={g('MOZA R3 Racing Kit')}>MOZA R3</a>
 				wheel, a <a class="link" href={g('GameSir G7 Pro (Shadow Ember)')}>GameSir G7 Pro</a>, a
-				<a class="link" href={g('Steam Controller')}>Steam Controller</a> Valve stopped making years
-				ago, and an <a class="link" href={g('Elgato Stream Deck MK.1')}>Elgato Stream Deck</a>.
+				<a class="link" href={g('Steam Controller')}>Steam Controller</a> Valve finally started
+				making again, and an <a class="link" href={g('Elgato Stream Deck MK.1')}>Elgato Stream Deck</a>.
 			</p>
 		</div>
 
@@ -152,6 +152,4 @@
 			</div>
 		{/if}
 	</div>
-
-	<p class="meta rule mt-14 pt-6">Every name links out to the thing itself.</p>
 </main>
