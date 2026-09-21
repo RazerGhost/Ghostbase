@@ -290,6 +290,34 @@ act on the page you are already standing on.
 the now-playing line. A deploy date is a fact, not a signal, and does not get
 one. Two dots would have made them look like the same kind of thing.
 
+## The private side
+
+`/admin/*` and `/spotify-import` are the same site, not a second one. They
+were furnished before the redesign and kept RG Digital's tiles, circled
+accent icons and `text-red-400` long after the public pages stopped.
+
+- **The same chrome, pointed elsewhere.** One fixed element is the whole rule,
+  so admin does not get a second bar: it gets the same running head with a
+  breadcrumb trail, and the same dock with its cells aimed at the tools plus
+  one cell back to the site. The old `← Admin` strip is what you end up
+  building when the dock points at the wrong place.
+- **Cards are allowed here** (§ Elevation) — this is the controls-and-chrome
+  half of the site. Content still sits on the ground, separated by rules.
+- **A list is the same list from both sides.** The admin devlog index is the
+  public `.stream-row`, plus one column: a dot for whether the file on disk is
+  ahead of the last commit. Two shapes for the same content would be two
+  things to keep in agreement.
+- **Every field has a `<label>`.** Placeholder-only inputs stop saying what
+  they are the moment you type, and never said it to a screen reader.
+- **Say the state, do not assert it.** Content is baked into the image at
+  build time, so saving is the first of three steps. `Disk → Commit → Push`
+  reads the repo. Where it cannot — production is not a checkout — the pages
+  say that, and a file's state is `unknown`, never `clean`.
+- **The editor shows what the published page computes.** Reading time, the
+  contents list, the social card and the embed registry all existed and were
+  shown to everyone except the person writing. Where a number appears in both
+  places it comes from one constant, so the two cannot drift.
+
 ## What pages MUST share
 
 Token consumption from `tokens.css` (no inline colours, no raw hex in
