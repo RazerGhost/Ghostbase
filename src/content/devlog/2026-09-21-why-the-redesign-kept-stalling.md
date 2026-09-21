@@ -101,15 +101,25 @@ ever read. Now it's four paragraphs, and the page has a voice.
 
 ## What it actually cost
 
-Here's the number that surprised me. Once the role layer existed, rebuilding
-every page in the new register took **eight commits inside twenty minutes** —
-type system, devlog, gear, home, about, listens, watchlist, projects. The
-whole visible redesign, the thing I'd failed at repeatedly for months, was an
-evening's work.
+The clock is the wrong measure — commit timestamps say when I pressed commit,
+not how long anything took. The diffstat is the honest one.
 
-Everything before it took the rest of the day: writing down what the site was
-supposed to be, pulling the recipes into roles, and drawing the three
-directions far enough to tell them apart. None of that produced a screenshot.
+Every page came out as a single commit touching one or two files: about, one
+file; watchlist, two; gear, two; projects, three. The only commit that touched
+eight was the type system itself. That is the entire argument, visible in a
+diffstat — the register changed in one place, and each page then asked for it
+by name. Before `roles.css`, the same change meant editing the card treatment
+in fifteen files at once and hoping they came out matching.
+
+The totals barely moved either: **1,421 lines added against 1,339 removed**
+across 22 files. The new design replaced the old one close to line for line
+instead of piling on top of it, which is what it looks like when the thing
+you're changing actually exists somewhere.
+
+What took real time was everything that produced no screenshot — writing down
+what the site was supposed to be, pulling the recipes into roles, and drawing
+three directions far enough apart to choose between. The visible rebuild came
+last and was the smallest part of it.
 
 That's the part worth keeping. **A design you can't change in one place isn't
 a design, it's an accumulation.** I'd assumed for months that I didn't know
