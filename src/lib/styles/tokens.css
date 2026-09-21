@@ -16,6 +16,10 @@
    ──────────────────────────────────────────────────────────────────── */
 
 :root {
+	/* light-dark() resolves against this; dark is listed first so a machine
+	   with no stated preference gets the dark ground the design was drawn on. */
+	color-scheme: dark light;
+
 	/* ── Fonts — three roles, three faces, all self-hosted (see the
 	   @fontsource imports in app.css; no third-party CDN).
 
@@ -105,42 +109,76 @@
 	/* ── Surfaces — three elevation levels (see design.md § Elevation).
 	   Every neutral carries a slight warm tint (hue ~50°) so the page reads
 	   as paper-in-the-dark rather than as a screen. Never zero-chroma grey,
-	   never pure #fff text. ── */
-	--bg: #0c0c0d; /* level 0 */
-	--surface: #131312; /* level 1 */
-	--surface-2: #1c1c1b; /* level 2 */
-	--border: #232322;
-	--border-strong: #333331;
-	--white: #f3f1ed; /* primary ink */
-	--gray: #c9c6c1; /* body copy */
-	/* Measured in-browser against every surface it lands on: 5.69:1 on --bg,
-	   5.41:1 on --surface, 4.96:1 on --surface-2. This token carries dates,
-	   meta lines and empty states, so it has to clear AA on all three. */
-	--dim: #8d8a85;
-	--black: #0c0c0d; /* ink-on-accent, e.g. ::selection */
+	   never pure #fff text.
+
+	   Every theme-varying token is one `light-dark(light, dark)` declaration.
+	   It used to be three: the dark value here, and the light value written
+	   out twice more, once under [data-theme='light'] and once under the
+	   prefers-color-scheme query. Keeping three copies in step by hand is
+	   exactly how light mode drifts, and it already had — see § Light mode
+	   below for what the two copies were hiding. ── */
+	--bg: light-dark(#faf9f6, #0c0c0d); /* level 0 */
+	--surface: light-dark(#f2f0ec, #131312); /* level 1 */
+	--surface-2: light-dark(#e8e5df, #1c1c1b); /* level 2 */
+	--border: light-dark(#e0ddd6, #232322);
+	--border-strong: light-dark(#c9c5bc, #333331);
+	--white: light-dark(#14130f, #f3f1ed); /* primary ink */
+	--gray: light-dark(#4a4843, #c9c6c1); /* body copy */
+	/* Measured in-browser against every surface it lands on. Dark: 5.69:1 on
+	   --bg, 5.41:1 on --surface, 4.96:1 on --surface-2. Light: 5.79 / 5.36 /
+	   4.85. This token carries dates, meta lines and empty states, so it has
+	   to clear AA on all three in both themes. The first light value tried,
+	   #6b6862, measured 4.42:1 on --surface-2 — under AA, which the
+	   arithmetic it was picked by had not caught. */
+	--dim: light-dark(#656259, #8d8a85);
+	--black: light-dark(#faf9f6, #0c0c0d); /* ink-on-accent, e.g. ::selection */
 
 	/* ── Accent — two tiers, see header.
 	   Cyan is readable on the dark ground but fails badly on the light one
 	   (#22d3ee on near-white is 1.8:1), so light mode gets a deepened
-	   version of the same hue rather than the same hex. ── */
-	--accent: #22d3ee;
-	--accent-action: #00e5ff;
+	   version of the same hue rather than the same hex.
 
-	--primary-glow: rgba(34, 211, 238, 0.08);
-	--primary-glow-border: rgba(34, 211, 238, 0.25);
+	   The light value is checked against all three surfaces. #0e7490 was
+	   picked against --bg alone (5.09) and measured 4.26 on --surface-2 —
+	   under AA anywhere an accent link sits in a level-2 block, which is
+	   where a code sample or an active filter puts it. #0d6d87 clears all
+	   three at 5.61 / 5.19 / 4.70. ── */
+	--accent: light-dark(#0d6d87, #22d3ee);
+	/* "Something just fired" has to read as MORE than the resting accent, and
+	   on a light ground more means darker, not brighter. The light value was
+	   #0891b2 — lighter than --accent, so the one flash this site has was
+	   quieter than an ordinary link, at 35% alpha over near-white. It is only
+	   ever a ring (.flash-in), never text, so it is held to 3:1 rather than
+	   4.5, but it was failing its own job regardless. */
+	--accent-action: light-dark(#05576d, #00e5ff);
+
+	--primary-glow: light-dark(rgba(14, 116, 144, 0.07), rgba(34, 211, 238, 0.08));
+	--primary-glow-border: light-dark(rgba(14, 116, 144, 0.3), rgba(34, 211, 238, 0.25));
 	/* Derived from --color-action so the token is the single source; changing
 	   the action colour changes the flash. */
 	--action-glow: color-mix(in srgb, var(--accent-action) 35%, transparent);
 
-	/* ── Semantic feedback ── */
-	--danger: #ff5050;
-	--danger-text: #ff6464;
-	--warn: #ffa03c;
+	/* ── Semantic feedback ──
+	   These are text colours (.text-danger, .text-warn, the draft badge on a
+	   post) and they were a single value for both themes, which meant the
+	   dark-mode reds and ambers were being painted onto near-white: #ff5050
+	   measured 3.06:1 there and #ffa03c 1.93:1, both under AA, while passing
+	   comfortably at 6.07 and 9.64 on the dark ground. Light mode gets the
+	   same hues taken down until they read as text — checked against all
+	   three surfaces, not just --bg. The first amber tried, #b45309, cleared
+	   --bg at 4.77 and failed --surface at 4.41, which is the same one-surface
+	   mistake --dim made above. ── */
+	--danger: light-dark(#b91c1c, #ff5050);
+	--danger-text: light-dark(#b91c1c, #ff6464);
+	--warn: light-dark(#9c4a07, #ffa03c);
 
 	--focus-ring: var(--accent);
 
-	/* ── Shadows / rings ── */
-	--shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.35);
+	/* ── Shadows / rings ──
+	   35% black is right over a dark ground and a bruise over a light one, so
+	   the alpha is the part that flips. light-dark() only takes colours, so it
+	   wraps the colour rather than the whole shadow. ── */
+	--shadow-card-hover: 0 8px 32px light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.35));
 	--ring-action: 0 0 0 3px var(--action-glow); /* live event — .flash-in */
 
 	/* ── Motion ── */
@@ -155,56 +193,26 @@
 }
 
 /* ── Light mode ──────────────────────────────────────────────────────
-   Overrides the neutral surfaces, the ink and the accent — spacing, radii,
-   type and motion stay identical across themes. Applied when the OS prefers
-   light AND there's no explicit override, or when the user has explicitly
-   picked "light" via the theme toggle (which stamps data-theme on <html>
-   and persists to localStorage). */
+   There is no second set of values any more: every theme-varying token is
+   one light-dark() declaration in :root above, and all this has to do is
+   decide WHICH half of each one is used.
+
+   `color-scheme: dark light` on :root means "dark first, light supported",
+   so with no explicit choice the OS decides and a machine with no preference
+   gets dark — the same behaviour the two duplicated blocks had. The two
+   rules below are the theme toggle's override, which stamps data-theme on
+   <html> and persists to localStorage.
+
+   The floor this sets is light-dark(): Chrome 123, Safari 17.5, Firefox 120.
+   Below that the custom properties are invalid and the page loses its
+   colours rather than degrading, which is the trade for not keeping three
+   copies of every value in step by hand. ── */
 :root[data-theme='light'] {
 	color-scheme: light;
-
-	--bg: #faf9f6;
-	--surface: #f2f0ec;
-	--surface-2: #e8e5df;
-	--border: #e0ddd6;
-	--border-strong: #c9c5bc;
-	--white: #14130f;
-	--gray: #4a4843;
-	/* 5.79:1 on --bg, 5.36:1 on --surface, 4.85:1 on --surface-2. The first
-	   value tried here, #6b6862, measured 4.42:1 on --surface-2 — under AA,
-	   which the arithmetic it was picked by had not caught. */
-	--dim: #656259;
-	--black: #faf9f6;
-
-	/* Same hue, deepened until it is readable as text: 5.09:1 on --bg,
-	   against 1.83:1 for the dark-mode cyan. */
-	--accent: #0e7490;
-	--accent-action: #0891b2;
-
-	--primary-glow: rgba(14, 116, 144, 0.07);
-	--primary-glow-border: rgba(14, 116, 144, 0.3);
 }
 
-@media (prefers-color-scheme: light) {
-	:root:not([data-theme='dark']):not([data-theme='light']) {
-		color-scheme: light;
-
-		--bg: #faf9f6;
-		--surface: #f2f0ec;
-		--surface-2: #e8e5df;
-		--border: #e0ddd6;
-		--border-strong: #c9c5bc;
-		--white: #14130f;
-		--gray: #4a4843;
-		--dim: #656259;
-		--black: #faf9f6;
-
-		--accent: #0e7490;
-		--accent-action: #0891b2;
-
-		--primary-glow: rgba(14, 116, 144, 0.07);
-		--primary-glow-border: rgba(14, 116, 144, 0.3);
-	}
+:root[data-theme='dark'] {
+	color-scheme: dark;
 }
 
 /* Narrow screens: the editorial gutter collapses to something usable. */
@@ -229,7 +237,12 @@
 	}
 
 	html {
-		color-scheme: dark;
+		/* color-scheme lives on :root above, not here: this rule is inside
+		   @layer base, and unlayered CSS beats layered CSS whatever the
+		   specificity, so a hardcoded `dark` here could never have won
+		   against it anyway — it would just have sat there looking
+		   authoritative. Now that the scheme is what light-dark() reads, a
+		   second opinion on it is worse than useless. */
 		scroll-behavior: smooth;
 		/* Belongs on html, not body: setting overflow-x alone on an element
 		   forces the UA to compute its overflow-y as 'auto' too (CSS Overflow
