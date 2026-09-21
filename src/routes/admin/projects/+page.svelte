@@ -1,90 +1,93 @@
 <script lang="ts">
+	/**
+	 * The projects index, private side. Projects follow the devlog on the
+	 * public site (design.md § Lists), so they follow it here too — same
+	 * stream, same state dot.
+	 */
 	import Seo from '$lib/components/Seo.svelte';
-	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 
 	let query = $state('');
-	let draftsOnly = $state(false);
-	let pendingDelete = $state<{ slug: string; name: string } | null>(null);
-	let confirmOpen = $state(false);
-	let deleteForm: HTMLFormElement | undefined = $state();
 
 	const filtered = $derived(
 		data.entries.filter((entry) => {
-			if (draftsOnly && !entry.draft) return false;
 			if (!query.trim()) return true;
-			return entry.name.toLowerCase().includes(query.trim().toLowerCase());
+			const q = query.trim().toLowerCase();
+			return entry.name.toLowerCase().includes(q) || entry.stack.some((t) => t.toLowerCase().includes(q));
 		})
 	);
+
+	function formatDate(iso: string): string {
+		return new Date(iso).toLocaleDateString('en-GB', {
+			day: '2-digit',
+			month: 'short',
+			year: 'numeric'
+		});
+	}
+
+	const changed = $derived(data.entries.filter((e) => e.changed).length);
+	const lede = $derived.by(() => {
+		const n = data.entries.length;
+		const noun = n === 1 ? 'entry' : 'entries';
+		if (!data.tracked) return `${n} ${noun} on disk.`;
+		if (!changed) return `${n} ${noun}, all of them committed.`;
+		return `${n} ${noun}. ${changed === 1 ? 'One is' : `${changed} are`} ahead of the last commit.`;
+	});
 </script>
 
-<Seo title="Projects editor — RazerGhost" description="Private projects editor." path="/admin/projects" noindex />
+<Seo title="Projects — RazerGhost" description="Private projects editor." path="/admin/projects" noindex />
 
-<main class="page page--prose">
-	<div class="flex items-center justify-between">
-		<h1 class="h-page">Projects</h1>
-		<a
-			href="/admin/projects/new"
-			class="btn btn--accent link"
-		>
-			New project
-		</a>
+<main class="page">
+	<div class="flex flex-wrap items-end justify-between gap-6">
+		<div>
+			<h1 class="h-page">Projects</h1>
+			<p class="lead mt-2">{lede}</p>
+		</div>
+		<a href="/admin/projects/new" class="btn btn--accent link">Add one</a>
 	</div>
-	<p class="mt-2 text-sm text-dim">
-		Edits write straight to <code>src/content/projects</code> on this machine's disk — commit and
-		push to actually publish.
-	</p>
 
-	<div class="mt-6 flex flex-wrap items-center gap-3">
+	<div class="mt-8">
+		<label for="projects-filter" class="sr-only">Filter projects</label>
 		<input
+			id="projects-filter"
 			type="search"
 			bind:value={query}
-			placeholder="Filter by name…"
-			class="input flex-1 text-sm"
+			placeholder="Filter by name or stack…"
+			class="input max-w-sm"
 		/>
-		<label class="flex items-center gap-2 text-sm text-gray">
-			<input type="checkbox" bind:checked={draftsOnly} class="accent-primary" />
-			Drafts only
-		</label>
 	</div>
 
-	<ul class="mt-6 divide-y divide-border">
+	<div class="rule mt-7">
 		{#each filtered as entry (entry.slug)}
-			<li class="flex items-center justify-between gap-4 py-3">
-				<div class="min-w-0">
-					<a href="/admin/projects/{entry.slug}" class="link truncate font-medium text-white hover:text-primary">
+			<a href="/admin/projects/{entry.slug}" class="entry stream-row stream-row--state">
+				<span
+					class="stream-row__dot"
+					class:stream-row__dot--changed={entry.changed}
+					class:stream-row__dot--draft={!entry.changed && entry.draft}
+					aria-hidden="true"
+				></span>
+				<span class="mono">{formatDate(entry.date)}</span>
+				<span class="mono stream-row__len">{entry.status}</span>
+				<span class="min-w-0">
+					<span class="stream-row__title entry__title block">
 						{entry.name}
-					</a>
-					<div class="meta mt-0.5 flex items-center gap-2">
-						<span>{entry.date}</span>
-						{#if entry.draft}<span class="rounded-full bg-primary/10 px-2 py-0.5 text-primary">draft</span>{/if}
-					</div>
-				</div>
-				<button
-					type="button"
-					onclick={() => {
-						pendingDelete = { slug: entry.slug, name: entry.name };
-						confirmOpen = true;
-					}}
-					class="meta link shrink-0 hover:text-red-400"
-				>
-					Delete
-				</button>
-			</li>
+						{#if entry.draft}<span class="label ml-2.5">Draft</span>{/if}
+					</span>
+				</span>
+				<span class="mono stream-row__tags truncate text-right">{entry.stack.join('  ')}</span>
+			</a>
 		{:else}
-			<li class="py-6 text-sm text-dim">No projects match.</li>
+			<p class="meta py-6">Nothing matches.</p>
 		{/each}
-	</ul>
+	</div>
+
+	<p class="meta mt-6">
+		{#if data.tracked}
+			An amber dot means the file on disk is ahead of the last commit.
+		{:else}
+			This build is not a git checkout, so nothing here can tell you what is committed.
+		{/if}
+	</p>
 </main>
-
-<form method="POST" action="?/delete" bind:this={deleteForm} class="hidden">
-	<input type="hidden" name="slug" value={pendingDelete?.slug ?? ''} />
-</form>
-
-<ConfirmDialog
-	bind:open={confirmOpen}
-	title={`Delete "${pendingDelete?.name ?? ''}"?`}
-	onconfirm={() => deleteForm?.requestSubmit()}
-/>

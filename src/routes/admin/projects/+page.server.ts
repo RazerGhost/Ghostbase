@@ -1,30 +1,26 @@
 import path from 'node:path';
-import { fail, redirect } from '@sveltejs/kit';
-import { listRawEntries, deleteEntry } from '$lib/server/content-editor';
+import { listRawEntries } from '$lib/server/content-editor';
 import { toDateString } from '$lib/server/content';
-import type { Actions, PageServerLoad } from './$types';
+import { getContentGitState } from '$lib/server/content-git';
+import type { PageServerLoad } from './$types';
 
 const CONTENT_DIR = path.resolve(process.cwd(), 'src/content/projects');
 
-export const load: PageServerLoad = () => {
+export const load: PageServerLoad = async () => {
+	const git = await getContentGitState();
+	const changed = new Set(git?.changed ?? []);
+
 	const entries = listRawEntries(CONTENT_DIR)
 		.map((e) => ({
 			slug: e.slug,
 			name: String(e.meta.name ?? e.slug),
 			date: toDateString(e.meta.date),
-			draft: e.meta.draft === true
+			draft: e.meta.draft === true,
+			status: e.meta.status ? String(e.meta.status) : 'active',
+			stack: Array.isArray(e.meta.stack) ? e.meta.stack.map(String) : [],
+			changed: changed.has(`src/content/projects/${e.slug}.md`)
 		}))
 		.sort((a, b) => (a.date > b.date ? -1 : a.date < b.date ? 1 : a.slug.localeCompare(b.slug)));
 
-	return { entries };
-};
-
-export const actions: Actions = {
-	delete: async ({ request }) => {
-		const data = await request.formData();
-		const slug = String(data.get('slug') ?? '');
-		if (!slug) return fail(400, { error: 'Missing slug' });
-		deleteEntry(CONTENT_DIR, slug);
-		redirect(303, '/admin/projects');
-	}
+	return { entries, tracked: git !== null };
 };

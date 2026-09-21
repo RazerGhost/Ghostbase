@@ -14,6 +14,14 @@
 	import { page } from '$app/state';
 	import { navLinks, site } from '$lib/config';
 	import SpotifyWidget from '$lib/components/SpotifyWidget.svelte';
+	import type { Snippet } from 'svelte';
+
+	// The admin area nests two levels deep (Admin / Devlog / a post), so it
+	// passes its own trail rather than one derived label, and puts its own
+	// line where the now-playing widget sits on the public side. Both stay
+	// optional: the public head is still `<RunningHead />` with no props.
+	let { crumbs, trailing }: { crumbs?: { label: string; href?: string }[]; trailing?: Snippet } =
+		$props();
 
 	// Where you are, in the head's own words. Home gets nothing — the
 	// wordmark already said it.
@@ -30,11 +38,26 @@
 			<!-- alt="" because the wordmark beside it is the accessible name. -->
 			<img src="/brand/ghost-outline.svg" width="16" height="16" alt="" />
 			<a href="/" class="label text-white transition-colors hover:text-primary">{site.name}</a>
-			{#if here}
+			{#if crumbs}
+				{#each crumbs as crumb}
+					<span class="label" aria-hidden="true">/</span>
+					{#if crumb.href}
+						<a href={crumb.href} class="label transition-colors hover:text-primary"
+							>{crumb.label}</a
+						>
+					{:else}
+						<span class="label text-white">{crumb.label}</span>
+					{/if}
+				{/each}
+			{:else if here}
 				<span class="label">/ {here}</span>
 			{/if}
 		</div>
 
-		<SpotifyWidget />
+		{#if trailing}
+			{@render trailing()}
+		{:else}
+			<SpotifyWidget />
+		{/if}
 	</div>
 </header>
