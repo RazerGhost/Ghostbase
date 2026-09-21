@@ -2,27 +2,31 @@
 title: Ankerd Con — a restyle, trip-shaped navigation, and two security audits
 date: 2026-09-19
 tags: [react, fastapi, supabase, security, design, side-project]
-excerpt: Coming late to the event app my own convention crew uses (React + FastAPI + Supabase), rebuilding its navigation around trips, restyling every screen by remapping Tailwind palettes, and closing two rounds of security findings.
+excerpt: Coming late to the event app my own group is building (React + FastAPI + Supabase), rebuilding its navigation around trips, restyling every screen by remapping Tailwind palettes, and closing two rounds of security findings.
 draft: true
 ---
 
-Ankerd Con is the private PWA our convention crew uses for its trips:
-rides, meals, hotel rooms, shared expenses and the event calendar. It's
-React 18 + Vite + Tailwind on the front, FastAPI on the back, with Supabase
-for Postgres and Discord OAuth. [Gavin](https://github.com/Gavin132) started it and
-[Ayoub](https://ayoublfatmi.nl/#home) wrote most of it. I'm one of Ankerd's
-original members, so I'm one of its users too; I came to the code in September,
-when the app already had real users and real data. It's open at
-[Gavin132/ankerdcon](https://github.com/Gavin132/ankerdcon). Here's what I did
-in the week that followed.
+Ankerd Con is the private PWA my own group is building for its convention
+trips: rides, meals, hotel rooms, shared expenses and the event calendar.
+It's React 18 + Vite + Tailwind on the front, FastAPI on the back, with
+Supabase for Postgres and Discord OAuth. [Gavin](https://github.com/Gavin132)
+started it in June, and [Ayoub](https://ayoublfatmi.nl/#home) built the app
+itself — the routers and models on the backend, the migrations, and most of
+the screens and services on the front. I came to the code in September, when
+it worked and held real data but hadn't been through a convention yet. It's
+open at [Gavin132/ankerdcon](https://github.com/Gavin132/ankerdcon). The
+group's public site is a separate project, written up in
+[the ankerd.nl entry](/devlog/2026-09-19-ankerd-nl). Here's what I did in the
+week that followed.
 
 ## Proposal first
 
 Gavin's complaint was that on desktop it looked like a generic AI-built
 app: a `max-w-2xl` column, a bottom tab bar, and slate/sky/glass/Inter. I
 wrote the proposal as a standalone HTML page with mock-ups of the key
-screens, so the crew could react to it before any real code changed. The
-feedback settled the direction quickly:
+screens, so Gavin could react to it before any real code changed. The design
+was settled between the two of us rather than by the group, and the
+back-and-forth over that page went quickly:
 
 - The look comes from the anchor mascot: ink outlines, one brand fill, and
   status colours only for status.
