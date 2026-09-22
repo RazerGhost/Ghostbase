@@ -7,6 +7,14 @@ import { renderOgImage } from './og';
  * ships in a format it can't parse (woff2), it doesn't throw — it renders
  * tofu, or silently drops to a fallback. These tests are the only thing
  * standing between that and a month of wrong social previews.
+ *
+ * The timeout is deliberate. The first render in this file pays the whole
+ * cold start — three font files parsed by satori, then rasterised by resvg —
+ * and the rest hit renderOgImage's cache and finish in about 30ms. That first
+ * one takes ~800ms on a warm dev machine and was measured at 6.9s on a cold
+ * CI runner, which is over vitest's 5s default: the suite failed on a PR that
+ * had not touched this code. Real work that is genuinely slow needs a budget
+ * that says so, rather than a rerun until the runner is fast enough.
  */
 describe('renderOgImage', () => {
 	const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
@@ -16,7 +24,7 @@ describe('renderOgImage', () => {
 		expect(png.subarray(0, 4)).toEqual(PNG_MAGIC);
 		// 1200x630 of type on a dark ground compresses small, but not this small.
 		expect(png.byteLength).toBeGreaterThan(5_000);
-	});
+	}, 30_000);
 
 	it('renders every face it asks for, and the punctuation the titles use', async () => {
 		// Serif title, mono labels, and curly quotes / em dashes — all outside
