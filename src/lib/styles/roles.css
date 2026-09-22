@@ -607,6 +607,12 @@
 		align-items: flex-end;
 		gap: 2px;
 		width: 100%;
+		/* The height belongs to the role, not to each call site. It was an
+		   h-20 on one plot and an h-24 on the other — invisible while they
+		   were stacked full-width sections, and 16px of mismatched baseline
+		   the moment they were paired side by side. A value typed twice
+		   drifts; a role is typed once. */
+		height: 96px;
 		border-bottom: 1px solid var(--border);
 	}
 	/* 46% rather than a quieter tint because a bar is a graphical object you

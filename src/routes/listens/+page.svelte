@@ -78,6 +78,21 @@
             href: trackHref(t.spotifyUri),
         })),
     );
+    // Discovered-in is ranked by plays now (see getDiscoveries), so it IS a
+    // ranking and gets the numerals its neighbour has. Ordered by recency it
+    // was a flat list because nothing about it was ordered.
+    const discoveryRanking = $derived(
+        data.discoveries.map((d) => ({
+            key: d.artist,
+            title: d.artist,
+            sub:
+                data.selectedYear != null
+                    ? `since ${formatDate(d.firstPlayedAt)}`
+                    : formatDate(d.firstPlayedAt),
+            value: d.plays.toLocaleString(),
+            valueLabel: "plays",
+        })),
+    );
     const albumRanking = $derived(
         data.topAlbums.map((a) => ({
             key: `${a.album}-${a.artist}`,
@@ -177,8 +192,18 @@
         const byMonth = new Map(data.monthlyTrend.map((m) => [m.month, m]));
         let months: string[];
         if (data.selectedYear != null) {
+            // The current year stops at the current month. A zero month draws
+            // nothing — it is a month with no plays, and the baseline rule
+            // already says so — which is right for a gap inside a year and
+            // wrong for months that have not happened yet: three invisible
+            // columns at the end made this chart span 321px of its 429px
+            // figure while the clock beside it spanned all of it, and read as
+            // the two plots being different sizes.
+            const now = new Date();
+            const lastMonth =
+                data.selectedYear === now.getUTCFullYear() ? now.getUTCMonth() + 1 : 12;
             months = Array.from(
-                { length: 12 },
+                { length: lastMonth },
                 (_, i) => `${data.selectedYear}-${String(i + 1).padStart(2, "0")}`,
             );
         } else {
@@ -546,26 +571,34 @@
         </div>
 
         <div
-            class="mt-4 grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+            class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
         >
                 {#if data.stats.topArtists.length}
-                    <div>
+                    <div class="flex flex-col">
                         <p class="label label--icon">
                             <Music size={12} aria-hidden="true" /> Top artists
                         </p>
                         <div class="mt-3">
                             <Ranking items={artistRanking} expandedContent={artistTrackList} />
                         </div>
+                        <p class="meta mt-auto pt-4">
+                            Ranked by time spent, so an artist with long tracks climbs on fewer
+                            plays. Pick one to see what of theirs I played most.
+                        </p>
                     </div>
                 {/if}
                 {#if data.stats.topTracks.length}
-                    <div>
+                    <div class="flex flex-col">
                         <p class="label label--icon">
                             <Music size={12} aria-hidden="true" /> Top tracks
                         </p>
                         <div class="mt-3">
                             <Ranking items={trackRanking} />
                         </div>
+                        <p class="meta mt-auto pt-4">
+                            Ranked by play count rather than time — the one measure on this page
+                            where a short track is not at a disadvantage.
+                        </p>
                     </div>
                 {/if}
         </div>
@@ -576,117 +609,189 @@
              736px list inside a 1247px column — 511px of ragged nothing. A
              fixed pair keeps the lone list at its column width, which is the
              same measure it has in the common case. -->
+        <!-- Every column in a pair carries a caption, and every caption is
+             pushed to the bottom of its column with mt-auto. The grid
+             stretches a row to its taller side either way; anchoring the
+             captions spends that slack between the list and its note instead
+             of leaving it as a ragged gap under the shorter list. Same move as
+             the home page masthead: a hole at the end of a column reads as
+             something missing, the same space in the middle reads as room. -->
         {#if data.topAlbums.length || data.discoveries.length}
             <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                 {#if data.topAlbums.length}
-                    <div>
+                    <div class="flex flex-col">
                         <p class="label label--icon">
                             <Disc size={12} aria-hidden="true" /> Top albums
                         </p>
                         <div class="mt-3">
                             <Ranking items={albumRanking} />
                         </div>
+                        <p class="meta mt-auto pt-4">
+                            By time spent as well, which is why a record can sit above one with
+                            more plays against it.
+                        </p>
                     </div>
                 {/if}
 
                 {#if data.discoveries.length}
-                    <div>
+                    <div class="flex flex-col">
                         <p class="label label--icon">
                             <Sparkle size={12} aria-hidden="true" />
                             {data.selectedYear != null
                                 ? `Discovered in ${data.selectedYear}`
                                 : "Where it started"}
                         </p>
-                        <ul class="ledger mt-3">
-                            {#each data.discoveries as discovery}
-                                <li class="ledger__row">
-                                    <span class="h-card ledger__name"
-                                        >{discovery.artist}</span
-                                    >
-                                    <span class="meta ledger__val">
-                                        {formatDate(discovery.firstPlayedAt)}
-                                    </span>
-                                </li>
-                            {/each}
-                        </ul>
+                        <div class="mt-3">
+                            <Ranking items={discoveryRanking} />
+                        </div>
+                        {#if data.selectedYear != null}
+                            <p class="meta mt-auto pt-4">
+                                The ones that stuck, out of {data.discoveryCount.toLocaleString()}
+                                artists heard for the first time that year.
+                            </p>
+                        {/if}
                     </div>
                 {/if}
             </div>
         {/if}
 
-        {#if hourlyByHour.some((n) => n > 0)}
-            <div
-                class="rule mt-8 pt-8"
-            >
-                <div class="flex items-baseline justify-between gap-4">
-                    <p class="label">Listening clock</p>
-                    <p class="meta">
-                        busiest at {peakHour % 12 || 12}{peakHour < 12
-                            ? "am"
-                            : "pm"}
-                    </p>
-                </div>
-                <div class="plot-figure mt-4" style:--plot-cols={24}>
-                    <div class="plot h-20">
-                        {#each hourlyByHour as plays, hour}
-                            <div
-                                class="plot__col"
-                                class:plot__col--peak={hour === peakHour}
-                                style:height="{plays
-                                    ? Math.max(2, (plays / maxHourly) * 100)
-                                    : 0}%"
-                                title="{hour}:00 — {plays.toLocaleString()} plays"
-                            ></div>
-                        {/each}
+        <!-- The two short time lists, paired. Each holds about 46rem of
+             content, so either one alone under a full-width rule left ~500px
+             of empty grid beside it. They belong together as well as fit
+             together: one is what turned up lately, the other is what was
+             playing on this date in every year before. -->
+        {#if data.latestArtists.length || data.onThisDay.length}
+            <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                {#if data.latestArtists.length}
+                    <div class="rule flex flex-col pt-8">
+                        <p class="label">Latest additions</p>
+                        <ul class="ledger mt-3 max-w-none">
+                            {#each data.latestArtists as artist (artist.artist)}
+                                <li class="ledger__row">
+                                    <span class="h-card ledger__name">{artist.artist}</span>
+                                    <span class="meta ledger__val">
+                                        {formatDate(artist.firstPlayedAt)} · {artist.plays}
+                                        {artist.plays === 1 ? "play" : "plays"}
+                                    </span>
+                                </li>
+                            {/each}
+                        </ul>
+                        <p class="meta mt-auto pt-4">
+                            Newest first, three plays or more — below that it is a radio tail rather
+                            than something I went looking for.
+                        </p>
                     </div>
-                    <div class="plot__scale">
-                        <span class="meta">12am</span>
-                        <span class="meta">12pm</span>
-                        <span class="meta">11pm</span>
+                {/if}
+
+                {#if data.onThisDay.length}
+                    <div class="rule flex flex-col pt-8">
+                        <p class="label">On this day</p>
+                        <ul class="ledger mt-3 max-w-none">
+                            {#each data.onThisDay as entry}
+                                {@const href = trackHref(entry.spotifyUri)}
+                                <li class="ledger__row">
+                                    <span class="mono ledger__lead">{entry.year}</span>
+                                    <span class="h-card ledger__name">
+                                        {#if href}
+                                            <a {href} target="_blank" rel="noreferrer" class="link"
+                                                >{entry.track}</a
+                                            >
+                                        {:else}
+                                            {entry.track}
+                                        {/if}
+                                        <span class="meta"> — {entry.artist}</span>
+                                    </span>
+                                    <span class="meta ledger__val">
+                                        {entry.plays} play{entry.plays === 1 ? "" : "s"}
+                                    </span>
+                                </li>
+                            {/each}
+                        </ul>
+                        <p class="meta mt-auto pt-4">The most-played track on this date, each year.</p>
                     </div>
-                </div>
+                {/if}
             </div>
         {/if}
 
-        {#if monthlyBars.length}
-            <div
-                class="rule mt-8 pt-8"
-            >
-                <div class="flex items-baseline justify-between gap-4">
-                    <p class="label">Monthly trend</p>
-                    {#if peakMonth >= 0}
-                        <p class="meta">
-                            busiest {formatMonth(monthlyBars[peakMonth].month)}
-                        </p>
-                    {/if}
-                </div>
+        <!-- The two plots, paired. Neither filled the row alone — the clock
+             drew 1104px of 1247 and a single year's monthly trend 744 — and
+             both are the same kind of thing: one is the shape of a day, the
+             other the shape of a year. -->
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {#if hourlyByHour.some((n) => n > 0)}
                 <div
-                    class="plot-figure plot-figure--wide mt-4"
-                    style:--plot-cols={monthlyBars.length}
+                    class="rule mt-8 pt-8"
                 >
-                    <div class="plot h-24">
-                        {#each monthlyBars as m, i}
-                            <div
-                                class="plot__col"
-                                class:plot__col--peak={i === peakMonth}
-                                style:height="{m.plays
-                                    ? Math.max(2, (m.plays / maxMonthly) * 100)
-                                    : 0}%"
-                                title="{formatMonth(m.month)} — {m.plays.toLocaleString()} plays"
-                            ></div>
-                        {/each}
+                    <div class="flex items-baseline justify-between gap-4">
+                        <p class="label">Listening clock</p>
+                        <p class="meta">
+                            busiest at {peakHour % 12 || 12}{peakHour < 12
+                                ? "am"
+                                : "pm"}
+                        </p>
                     </div>
-                    <div class="plot__scale">
-                        <span class="meta">{formatMonth(monthlyBars[0].month)}</span>
-                        <span class="meta"
-                            >{formatMonth(
-                                monthlyBars[monthlyBars.length - 1].month,
-                            )}</span
-                        >
+                    <div class="plot-figure mt-4" style:--plot-cols={24}>
+                        <div class="plot">
+                            {#each hourlyByHour as plays, hour}
+                                <div
+                                    class="plot__col"
+                                    class:plot__col--peak={hour === peakHour}
+                                    style:height="{plays
+                                        ? Math.max(2, (plays / maxHourly) * 100)
+                                        : 0}%"
+                                    title="{hour}:00 — {plays.toLocaleString()} plays"
+                                ></div>
+                            {/each}
+                        </div>
+                        <div class="plot__scale">
+                            <span class="meta">12am</span>
+                            <span class="meta">12pm</span>
+                            <span class="meta">11pm</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {/if}
+            {/if}
+
+            {#if monthlyBars.length}
+                <div
+                    class="rule mt-8 pt-8"
+                >
+                    <div class="flex items-baseline justify-between gap-4">
+                        <p class="label">Monthly trend</p>
+                        {#if peakMonth >= 0}
+                            <p class="meta">
+                                busiest {formatMonth(monthlyBars[peakMonth].month)}
+                            </p>
+                        {/if}
+                    </div>
+                    <div
+                        class="plot-figure plot-figure--wide mt-4"
+                        style:--plot-cols={monthlyBars.length}
+                    >
+                        <div class="plot">
+                            {#each monthlyBars as m, i}
+                                <div
+                                    class="plot__col"
+                                    class:plot__col--peak={i === peakMonth}
+                                    style:height="{m.plays
+                                        ? Math.max(2, (m.plays / maxMonthly) * 100)
+                                        : 0}%"
+                                    title="{formatMonth(m.month)} — {m.plays.toLocaleString()} plays"
+                                ></div>
+                            {/each}
+                        </div>
+                        <div class="plot__scale">
+                            <span class="meta">{formatMonth(monthlyBars[0].month)}</span>
+                            <span class="meta"
+                                >{formatMonth(
+                                    monthlyBars[monthlyBars.length - 1].month,
+                                )}</span
+                            >
+                        </div>
+                    </div>
+                </div>
+            {/if}
+        </div>
 
         {#if heatmapWeeks.length}
             <div
@@ -754,37 +859,6 @@
                     {/each}
                     <span class="meta">More</span>
                 </div>
-            </div>
-        {/if}
-
-        {#if data.onThisDay.length}
-            <div
-                class="rule mt-8 pt-8"
-            >
-                <p class="label">
-                    On this day
-                </p>
-                <ul class="ledger mt-3">
-                    {#each data.onThisDay as entry}
-                        {@const href = trackHref(entry.spotifyUri)}
-                        <li class="ledger__row">
-                            <span class="mono ledger__lead">{entry.year}</span>
-                            <span class="h-card ledger__name">
-                                {#if href}
-                                    <a {href} target="_blank" rel="noreferrer" class="link"
-                                        >{entry.track}</a
-                                    >
-                                {:else}
-                                    {entry.track}
-                                {/if}
-                                <span class="meta"> — {entry.artist}</span>
-                            </span>
-                            <span class="meta ledger__val">
-                                {entry.plays} play{entry.plays === 1 ? "" : "s"}
-                            </span>
-                        </li>
-                    {/each}
-                </ul>
             </div>
         {/if}
     {/if}

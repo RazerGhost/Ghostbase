@@ -465,16 +465,28 @@ export function getMonthlyTrend(opts: { year?: number } = {}): MonthlyTrendPoint
 export type Discovery = { artist: string; firstPlayedAt: string; plays: number };
 
 // Artists whose true first-ever play (across all history, not just the
-// filtered year) falls within `year` — "discovered this year". Deliberately
-// not year-filtered in WHERE: needs every row to compute each artist's real
-// MIN(played_at), then filters on that in HAVING.
+// filtered year) falls within `year`. Deliberately not year-filtered in
+// WHERE: needs every row to compute each artist's real MIN(played_at), then
+// filters on that in HAVING.
 //
-// `year: null` is the all-time filter, and it asks the opposite question: the
-// artists the history *opens* with, oldest first. It used to return nothing
-// there, which left the page with one lone column and 500px of empty grid
-// beside it — and there is a real answer for all-time, it is just the other
-// end of the same ordering.
-export function getDiscoveries(year: number | null, limit = 10): Discovery[] {
+// Ordered by PLAYS, not by recency. Ordered by recency it answered a question
+// nobody was asking: measured against the real library, 56% of a year's 1,326
+// "discoveries" were played exactly once, so the ten most recent first-plays
+// were, almost entirely, the ten most recent accidents — a radio tail, a
+// shuffled playlist, an autoplay. What "discovered" is worth saying about is
+// the handful you found and then kept, which is what a play count knows.
+//
+// The one-play noise is left in the data rather than filtered out here: this
+// ordering buries it anyway, and getLatestArtists() below needs a floor it
+// can set for itself.
+//
+// `year: null` is the all-time filter, where "discovered" has no meaning —
+// every artist was new once. It asks the other end instead: the artists the
+// history opens with, oldest first.
+// Five, like every other top-N on this page — artists, tracks, albums and the
+// on-this-day pick are all five. Ten made the grid row it shares with Top
+// albums twice as tall as its neighbour needed, so half that column was empty.
+export function getDiscoveries(year: number | null, limit = 5): Discovery[] {
 	return memoized(`discoveries:${year ?? 'all'}:${limit}`, () => {
 		const select = `SELECT artist, MIN(played_at) as firstPlayedAt, COUNT(*) as plays
 				 FROM plays GROUP BY artist`;
@@ -488,9 +500,59 @@ export function getDiscoveries(year: number | null, limit = 10): Discovery[] {
 			.prepare(
 				`${select}
 				 HAVING firstPlayedAt >= @yearStart AND firstPlayedAt < @yearEnd
-				 ORDER BY firstPlayedAt DESC LIMIT @limit`
+				 ORDER BY plays DESC, firstPlayedAt ASC LIMIT @limit`
 			)
 			.all({ yearStart, yearEnd, limit }) as Discovery[];
+	});
+}
+
+// How many artists that year turned up in total, so the page can say what
+// fraction of them the top ten is. Without it the list just stops at ten and
+// reads as though that was all of them.
+export function getDiscoveryCount(year: number | null): number {
+	return memoized(`discoveryCount:${year ?? 'all'}`, () => {
+		if (year == null) {
+			return (getDb().prepare(`SELECT COUNT(DISTINCT artist) as n FROM plays`).get() as { n: number })
+				.n;
+		}
+		const { yearStart, yearEnd } = yearRange(year);
+		return (
+			getDb()
+				.prepare(
+					`SELECT COUNT(*) as n FROM (
+						SELECT artist, MIN(played_at) as firstPlayedAt FROM plays GROUP BY artist
+						HAVING firstPlayedAt >= @yearStart AND firstPlayedAt < @yearEnd
+					)`
+				)
+				.get({ yearStart, yearEnd }) as { n: number }
+		).n;
+	});
+}
+
+// The genuinely recent end: artists who turned up most recently, with a floor
+// on plays so a single autoplay does not count as turning up. The floor is
+// what separates this from the ordering getDiscoveries() used to have — at
+// three plays, a year's 1,326 first-appearances become 382.
+export function getLatestArtists(
+	year: number | null,
+	{ minPlays = 3, limit = 5 }: { minPlays?: number; limit?: number } = {}
+): Discovery[] {
+	return memoized(`latestArtists:${year ?? 'all'}:${minPlays}:${limit}`, () => {
+		const select = `SELECT artist, MIN(played_at) as firstPlayedAt, COUNT(*) as plays
+				 FROM plays GROUP BY artist`;
+		if (year == null) {
+			return getDb()
+				.prepare(`${select} HAVING plays >= @minPlays ORDER BY firstPlayedAt DESC LIMIT @limit`)
+				.all({ minPlays, limit }) as Discovery[];
+		}
+		const { yearStart, yearEnd } = yearRange(year);
+		return getDb()
+			.prepare(
+				`${select}
+				 HAVING firstPlayedAt >= @yearStart AND firstPlayedAt < @yearEnd AND plays >= @minPlays
+				 ORDER BY firstPlayedAt DESC LIMIT @limit`
+			)
+			.all({ yearStart, yearEnd, minPlays, limit }) as Discovery[];
 	});
 }
 

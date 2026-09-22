@@ -9,6 +9,8 @@ import {
 	getSkipShuffleStats,
 	getMonthlyTrend,
 	getDiscoveries,
+	getDiscoveryCount,
+	getLatestArtists,
 	getActiveDates
 } from '$lib/server/spotify-history';
 import { computeStreaks } from '$lib/server/listening-streaks';
@@ -36,6 +38,8 @@ export const load: PageServerLoad = ({ url }) => {
 	const skipShuffle = getSkipShuffleStats(yearOpts);
 	const monthlyTrend = getMonthlyTrend(yearOpts);
 	const discoveries = getDiscoveries(year);
+	const discoveryCount = getDiscoveryCount(year);
+	const latestArtists = getLatestArtists(year);
 	const streaks = computeStreaks(getActiveDates());
 
 	const today = new Date();
@@ -57,6 +61,8 @@ export const load: PageServerLoad = ({ url }) => {
 		skipShuffle,
 		monthlyTrend,
 		discoveries,
+		discoveryCount,
+		latestArtists,
 		streaks
 	};
 };

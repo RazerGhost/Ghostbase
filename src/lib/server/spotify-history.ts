@@ -25,6 +25,8 @@ export {
 	getSkipShuffleStats,
 	getMonthlyTrend,
 	getDiscoveries,
+	getDiscoveryCount,
+	getLatestArtists,
 	getActiveDates,
 	getDistinctArtistCount
 } from './spotify-history-db';
