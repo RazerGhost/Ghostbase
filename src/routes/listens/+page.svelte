@@ -712,7 +712,7 @@
                         </p>
                     </div>
                     <div class="plot-figure mt-4" style:--plot-cols={24}>
-                        <div class="plot h-20">
+                        <div class="plot">
                             {#each hourlyByHour as plays, hour}
                                 <div
                                     class="plot__col"
@@ -749,7 +749,7 @@
                         class="plot-figure plot-figure--wide mt-4"
                         style:--plot-cols={monthlyBars.length}
                     >
-                        <div class="plot h-24">
+                        <div class="plot">
                             {#each monthlyBars as m, i}
                                 <div
                                     class="plot__col"
