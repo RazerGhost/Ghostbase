@@ -262,14 +262,28 @@
 	border-color: var(--accent);
 }
 
-/* ── Hero stagger animation (ported from RG-Digital/Site) ────────── */
+/* ── Hero entrance ───────────────────────────────────────────────
+   One orchestrated entrance per page, on the hero (design.md § Motion) —
+   but the content must never depend on that entrance having run.
+
+   This used to fade from `opacity: 0`, and `animation-fill-mode: both`
+   applies the `from` keyframe BEFORE the animation starts. So anything
+   that stopped the animation running — a throttled or backgrounded tab,
+   Android's battery saver, a browser that defers animations on a
+   client-side navigation — rendered the page blank rather than plain.
+   It is not a small blast radius: measured against the live site, 94% of
+   /about and 100% of /gear sits inside a reveal block, which is exactly
+   the "some pages don't seem to load" report that found this.
+
+   That is the same failure the scroll-reveal port caused and was deleted
+   for (§ Divergence, "No borrowed motion"); the stagger kept the
+   mechanism and so kept the bug. The entrance is transform-only now: if
+   it never runs you get the page, just without the movement. */
 @keyframes hero-in {
 	from {
-		opacity: 0;
 		transform: translateY(22px);
 	}
 	to {
-		opacity: 1;
 		transform: none;
 	}
 }
@@ -292,7 +306,6 @@
 @media (prefers-reduced-motion: reduce) {
 	[data-hero-reveal] {
 		animation: none !important;
-		opacity: 1 !important;
 		transform: none !important;
 	}
 }
