@@ -171,6 +171,7 @@ export const navLinks = [
 export const adminLinks = [
   { label: "Devlog", href: "/admin/devlog" },
   { label: "Projects", href: "/admin/projects" },
+  { label: "Pages", href: "/admin/pages" },
   { label: "Right now", href: "/admin/status" },
   { label: "Media", href: "/admin/media" },
   { label: "Spotify import", href: "/spotify-import" },

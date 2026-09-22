@@ -29,6 +29,9 @@
 		'/admin/projects': s.projects.changed
 			? { note: `${s.projects.changed} uncommitted`, tone: 'warn' }
 			: { note: `${s.projects.total} ${s.projects.total === 1 ? 'entry' : 'entries'}` },
+		'/admin/pages': s.pages.changed
+			? { note: `${s.pages.changed} uncommitted`, tone: 'warn' }
+			: { note: `${s.pages.total} ${s.pages.total === 1 ? 'page' : 'pages'}` },
 		'/admin/status': { note: 'home page' },
 		'/admin/media': { note: `${s.media.files} files` },
 		'/spotify-import': { note: s.listens.plays ? `${nf.format(s.listens.plays)} plays` : 'nothing yet' },
@@ -45,6 +48,7 @@
 	const descriptions: Record<string, string> = {
 		'/admin/devlog': 'Posts in src/content/devlog',
 		'/admin/projects': 'Entries in src/content/projects',
+		'/admin/pages': 'About, and whatever joins it',
 		'/admin/status': 'The "Right now" card on the home page',
 		'/admin/media': 'Covers, galleries and body images',
 		'/spotify-import': 'Backfill from an extended history export',
@@ -56,7 +60,7 @@
 	// written). Only things you could act on today get a sentence.
 	const attention = $derived.by(() => {
 		const items: string[] = [];
-		const changed = s.devlog.changed + s.projects.changed;
+		const changed = s.devlog.changed + s.projects.changed + s.pages.changed;
 		if (changed) {
 			items.push(
 				changed === 1

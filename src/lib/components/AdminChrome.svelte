@@ -21,11 +21,11 @@
 	import NotebookText from '@lucide/svelte/icons/notebook-text';
 	import FolderGit2 from '@lucide/svelte/icons/folder-git-2';
 	import Activity from '@lucide/svelte/icons/activity';
+	import FileText from '@lucide/svelte/icons/file-text';
 	import Image from '@lucide/svelte/icons/image';
 	import Music from '@lucide/svelte/icons/music';
 	import Database from '@lucide/svelte/icons/database';
 	import ArchiveRestore from '@lucide/svelte/icons/archive-restore';
-	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import type { Component, Snippet } from 'svelte';
 
 	let { user, children }: { user?: { username: string } | null; children: Snippet } = $props();
@@ -33,6 +33,7 @@
 	const icons: Record<string, Component> = {
 		'/admin/devlog': NotebookText,
 		'/admin/projects': FolderGit2,
+		'/admin/pages': FileText,
 		'/admin/status': Activity,
 		'/admin/media': Image,
 		'/spotify-import': Music,
@@ -66,11 +67,18 @@
 
 {@render children()}
 
+<!-- No exit cell: the wordmark in the running head already links to "/", so a
+     "back to the site" cell was the same link twice — and the bar has one more
+     destination than the public one, so a duplicate is the first thing to cut.
+     Measured at 375px: ten cells give 35.9x44, eleven gave 32.6. Neither
+     reaches the public dock's 40x44 (design.md § Chrome) because admin has
+     more destinations than the public side and no search cell to drop; it
+     clears the AA 24x24 minimum, and these editors are a desktop tool by
+     design. Cutting the duplicate was still the right first move. -->
 <Dock
 	links={adminLinks}
 	home={{ href: '/admin', label: 'Admin' }}
 	{icons}
-	exit={{ href: '/', label: 'The site', icon: ArrowLeft }}
 	showSearch={false}
 	ariaLabel="Admin tools"
 />

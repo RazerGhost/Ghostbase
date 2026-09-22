@@ -494,6 +494,17 @@ export function getDiscoveries(year: number | null, limit = 10): Discovery[] {
 	});
 }
 
+// How many different artists the history holds, all-time. Kept out of
+// ListeningStats because nothing else wants it and that type is recomputed on
+// every /listens filter change; this is one COUNT that About asks for once.
+export function getDistinctArtistCount(): number {
+	return memoized(
+		'distinctArtists',
+		() =>
+			(getDb().prepare(`SELECT COUNT(DISTINCT artist) as n FROM plays`).get() as { n: number }).n
+	);
+}
+
 // Distinct calendar dates with at least one play, all-time — feeds streak
 // calculation (listening-streaks.ts). Not year-scoped, like peakYear, since a
 // streak spanning a year boundary shouldn't be truncated by the year filter.
