@@ -14,6 +14,8 @@ import {
 	getSkipShuffleStats,
 	getMonthlyTrend,
 	getDiscoveries,
+	getDiscoveryCount,
+	getLatestArtists,
 	getActiveDates
 } from './spotify-history-db';
 import type { PlayRecord } from './spotify-history-db';
@@ -298,13 +300,19 @@ describe('getDiscoveries', () => {
 		expect(discoveries.map((d) => d.artist)).toEqual(['Artist B']);
 	});
 
-	it('orders by first-played date, most recent discovery first', () => {
+	// Ordered by recency this list was, measured against the real library,
+	// 56% single plays — the ten most recent first-plays were the ten most
+	// recent accidents. What "discovered" is worth saying about is what you
+	// kept, so it ranks by how much you went on to play them.
+	it('ranks by plays, not by how recently the artist first turned up', () => {
 		insertPlays([
-			play({ artist: 'Artist Early', spotifyUri: 'a', playedAt: '2025-02-01T00:00:00.000Z' }),
-			play({ artist: 'Artist Late', spotifyUri: 'b', playedAt: '2025-09-01T00:00:00.000Z' })
+			play({ artist: 'Kept', spotifyUri: 'a', playedAt: '2025-02-01T00:00:00.000Z' }),
+			play({ artist: 'Kept', spotifyUri: 'a2', playedAt: '2025-02-02T00:00:00.000Z' }),
+			play({ artist: 'Kept', spotifyUri: 'a3', playedAt: '2025-02-03T00:00:00.000Z' }),
+			// Later, so recency would have put it first — but heard once.
+			play({ artist: 'Autoplayed Once', spotifyUri: 'b', playedAt: '2025-09-01T00:00:00.000Z' })
 		]);
-		const discoveries = getDiscoveries(2025);
-		expect(discoveries.map((d) => d.artist)).toEqual(['Artist Late', 'Artist Early']);
+		expect(getDiscoveries(2025).map((d) => d.artist)).toEqual(['Kept', 'Autoplayed Once']);
 	});
 
 	// The all-time filter used to get an empty array, which left the page a
@@ -324,6 +332,18 @@ describe('getDiscoveries', () => {
 		]);
 	});
 
+	it('counts every artist of the year, not just the ones it returns', () => {
+		insertPlays([
+			play({ artist: 'A', spotifyUri: 'a', playedAt: '2025-02-01T00:00:00.000Z' }),
+			play({ artist: 'B', spotifyUri: 'b', playedAt: '2025-03-01T00:00:00.000Z' }),
+			play({ artist: 'C', spotifyUri: 'c', playedAt: '2024-01-01T00:00:00.000Z' })
+		]);
+		// The page says "10 of N" — N has to be the year's real total, or the
+		// list reads as though ten was all there was.
+		expect(getDiscoveryCount(2025)).toBe(2);
+		expect(getDiscoveries(2025, 1)).toHaveLength(1);
+	});
+
 	it('counts an artist from their first play, not from the filter window', () => {
 		insertPlays([
 			play({ artist: 'Artist A', spotifyUri: 'a', playedAt: '2015-01-01T00:00:00.000Z' }),
@@ -332,6 +352,28 @@ describe('getDiscoveries', () => {
 		const [first] = getDiscoveries(null);
 		expect(first.firstPlayedAt).toBe('2015-01-01T00:00:00.000Z');
 		expect(first.plays).toBe(2);
+	});
+});
+
+describe('getLatestArtists', () => {
+	it('is newest first, and needs more than one play to count as turning up', () => {
+		insertPlays([
+			play({ artist: 'Three Plays', spotifyUri: 'a', playedAt: '2025-01-01T00:00:00.000Z' }),
+			play({ artist: 'Three Plays', spotifyUri: 'a2', playedAt: '2025-01-02T00:00:00.000Z' }),
+			play({ artist: 'Three Plays', spotifyUri: 'a3', playedAt: '2025-01-03T00:00:00.000Z' }),
+			// More recent, so it would lead on recency alone — one play.
+			play({ artist: 'Radio Tail', spotifyUri: 'b', playedAt: '2025-09-01T00:00:00.000Z' })
+		]);
+		expect(getLatestArtists(2025, { minPlays: 3 }).map((d) => d.artist)).toEqual(['Three Plays']);
+	});
+
+	it('orders by first play descending once the floor is met', () => {
+		const three = (artist: string, month: string) =>
+			[1, 2, 3].map((i) =>
+				play({ artist, spotifyUri: `${artist}${i}`, playedAt: `2025-${month}-0${i}T00:00:00.000Z` })
+			);
+		insertPlays([...three('Early', '02'), ...three('Late', '09')]);
+		expect(getLatestArtists(2025, { minPlays: 3 }).map((d) => d.artist)).toEqual(['Late', 'Early']);
 	});
 });
 
