@@ -309,6 +309,15 @@ accent icons and `text-red-400` long after the public pages stopped.
   things to keep in agreement.
 - **Every field has a `<label>`.** Placeholder-only inputs stop saying what
   they are the moment you type, and never said it to a screen reader.
+- **The admin bar is denser than the public one**, and knowingly: ten cells at
+  375px measure 35.9x44 against the public dock's 40x44. Admin has more
+  destinations and no search cell to drop. It clears the AA 24x24 minimum, and
+  the editors are a desktop tool by design. The first cut was the duplicate —
+  a "back to the site" cell, when the wordmark beside it already links there.
+- **Prose that has no date is content, not markup.** Standing pages live in
+  `src/content/pages/*.md` on the devlog's renderer and are edited at
+  `/admin/pages`. What stays in the route is anything that changes on its own:
+  numbers, presence, links. Markdown is for the copy.
 - **Say the state, do not assert it.** Content is baked into the image at
   build time, so saving is the first of three steps. `Disk → Commit → Push`
   reads the repo. Where it cannot — production is not a checkout — the pages

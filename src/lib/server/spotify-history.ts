@@ -25,7 +25,8 @@ export {
 	getSkipShuffleStats,
 	getMonthlyTrend,
 	getDiscoveries,
-	getActiveDates
+	getActiveDates,
+	getDistinctArtistCount
 } from './spotify-history-db';
 
 // Spotify's "Extended streaming history" export (requested from

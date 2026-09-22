@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { listRawEntries } from '$lib/server/content-editor';
+import { listPages } from '$lib/server/pages';
 import { listMediaFiles } from '$lib/server/media';
 import { listAllDetails } from '$lib/server/simkl-cache';
 import { getListeningStats } from '$lib/server/spotify-history';
@@ -17,6 +18,7 @@ import { backupConfigured, getLastBackupInfo } from '$lib/server/backup';
 export type AdminState = {
 	devlog: { total: number; drafts: number; changed: number; latest: string | null };
 	projects: { total: number; changed: number };
+	pages: { total: number; changed: number };
 	media: { files: number };
 	cache: { rows: number; missingRuntime: number; oldestFetch: string | null };
 	listens: { plays: number; lastPlayedAt: string | null };
@@ -98,6 +100,10 @@ export async function getAdminState(): Promise<AdminState> {
 		projects: {
 			total: projectEntries.length,
 			changed: countChanged(git, 'src/content/projects')
+		},
+		pages: {
+			total: listPages().length,
+			changed: countChanged(git, 'src/content/pages')
 		},
 		media: { files: mediaFiles },
 		cache: { rows, missingRuntime, oldestFetch },
