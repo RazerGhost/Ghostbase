@@ -27,19 +27,27 @@
 
 <main class="page">
 	<div class="grid gap-12 md:grid-cols-[1.5fr_1fr] md:gap-16">
-		<div data-hero-reveal="0">
+		<div class="flex flex-col" data-hero-reveal="0">
 			<h1 class="h-hero">{site.name}</h1>
 			<p class="lead mt-4">{site.tagline}</p>
-			<!-- The masthead column was a name, a tagline and then dead space to
-			     the rule. design.md § Personality without a face: with no
-			     photograph anywhere, the voice has to do this work, so the first
-			     screen says who is typing rather than leaving a gap. -->
-			<p class="measure mt-6 leading-[1.8] text-gray">
-				I&rsquo;m Dimitri de Jong. I run RG Digital by day; this is where everything else
-				ends up &mdash; what I&rsquo;m building, what I&rsquo;m watching, and what I have had
-				on repeat since 2015.
-			</p>
-			<ul class="mt-7 flex flex-wrap items-center gap-5">
+			<!-- No paragraph of prose here, deliberately. This column used to
+			     carry a line introducing me, which did two things wrong once
+			     About became a real page: it introduced me a second time, in
+			     nearly the same words, and it named RG Digital on the one page
+			     § CTA voice had decided carries no pointer to it.
+
+			     § Personality without a face says the numbers are the portrait.
+			     The band directly below this is three of them, "Right now" is
+			     beside it, and the devlog is under that — the first screen says
+			     plenty about who is typing without a sentence claiming to. -->
+			<!-- mt-auto, not a margin: with the paragraph gone this column is
+			     shorter than the "Right now" card beside it, and the grid
+			     stretches the row to the taller one either way. Pushing the
+			     links to the bottom turns that slack into the gap between the
+			     tagline and the links, and lands them on the same baseline as
+			     the card — a hole at the end of a column reads as something
+			     missing; the same space in the middle reads as room. -->
+			<ul class="mt-auto flex flex-wrap items-center gap-5 pt-10">
 				{#each socialLinks as link}
 					{@const Icon = icons[link.icon]}
 					<li>
