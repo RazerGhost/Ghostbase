@@ -483,7 +483,10 @@ export type Discovery = { artist: string; firstPlayedAt: string; plays: number }
 // `year: null` is the all-time filter, where "discovered" has no meaning —
 // every artist was new once. It asks the other end instead: the artists the
 // history opens with, oldest first.
-export function getDiscoveries(year: number | null, limit = 10): Discovery[] {
+// Five, like every other top-N on this page — artists, tracks, albums and the
+// on-this-day pick are all five. Ten made the grid row it shares with Top
+// albums twice as tall as its neighbour needed, so half that column was empty.
+export function getDiscoveries(year: number | null, limit = 5): Discovery[] {
 	return memoized(`discoveries:${year ?? 'all'}:${limit}`, () => {
 		const select = `SELECT artist, MIN(played_at) as firstPlayedAt, COUNT(*) as plays
 				 FROM plays GROUP BY artist`;
@@ -532,7 +535,7 @@ export function getDiscoveryCount(year: number | null): number {
 // three plays, a year's 1,326 first-appearances become 382.
 export function getLatestArtists(
 	year: number | null,
-	{ minPlays = 3, limit = 8 }: { minPlays?: number; limit?: number } = {}
+	{ minPlays = 3, limit = 5 }: { minPlays?: number; limit?: number } = {}
 ): Discovery[] {
 	return memoized(`latestArtists:${year ?? 'all'}:${minPlays}:${limit}`, () => {
 		const select = `SELECT artist, MIN(played_at) as firstPlayedAt, COUNT(*) as plays
