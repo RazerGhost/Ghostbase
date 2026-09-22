@@ -21,6 +21,7 @@
 	import { page } from '$app/state';
 	import { navLinks } from '$lib/config';
 	import { commandPalette } from '$lib/stores/command-palette.svelte';
+	import { shouldShowBackToTop } from '$lib/back-to-top';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import Search from '@lucide/svelte/icons/search';
 	import ArrowUp from '@lucide/svelte/icons/arrow-up';
@@ -71,15 +72,15 @@
 
 	$effect(() => {
 		const onScroll = () => {
-			const doc = document.documentElement;
-			const maxScroll = doc.scrollHeight - window.innerHeight;
-			// A fixed 480px threshold assumes the page has at least that much
-			// scrollable distance — on a short page, or zoomed out enough that
-			// more content fits per screen (shrinking the scrollable range),
-			// you'd hit the bottom before ever crossing it. Scale the
-			// threshold to the actual scrollable distance instead.
-			const threshold = Math.min(480, maxScroll * 0.5);
-			scrolled = maxScroll > 0 && window.scrollY > threshold;
+			// The rule itself is in back-to-top.ts, with the measurements that
+			// produced it — it has been wrong in both directions already, and
+			// it is not the sort of thing to keep re-deciding inside a scroll
+			// handler.
+			scrolled = shouldShowBackToTop(
+				window.scrollY,
+				window.innerHeight,
+				document.documentElement.scrollHeight
+			);
 		};
 		onScroll();
 		window.addEventListener('scroll', onScroll, { passive: true });
