@@ -571,26 +571,34 @@
         </div>
 
         <div
-            class="mt-4 grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+            class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
         >
                 {#if data.stats.topArtists.length}
-                    <div>
+                    <div class="flex flex-col">
                         <p class="label label--icon">
                             <Music size={12} aria-hidden="true" /> Top artists
                         </p>
                         <div class="mt-3">
                             <Ranking items={artistRanking} expandedContent={artistTrackList} />
                         </div>
+                        <p class="meta mt-auto pt-4">
+                            Ranked by time spent, so an artist with long tracks climbs on fewer
+                            plays. Pick one to see what of theirs I played most.
+                        </p>
                     </div>
                 {/if}
                 {#if data.stats.topTracks.length}
-                    <div>
+                    <div class="flex flex-col">
                         <p class="label label--icon">
                             <Music size={12} aria-hidden="true" /> Top tracks
                         </p>
                         <div class="mt-3">
                             <Ranking items={trackRanking} />
                         </div>
+                        <p class="meta mt-auto pt-4">
+                            Ranked by play count rather than time — the one measure on this page
+                            where a short track is not at a disadvantage.
+                        </p>
                     </div>
                 {/if}
         </div>
@@ -601,21 +609,32 @@
              736px list inside a 1247px column — 511px of ragged nothing. A
              fixed pair keeps the lone list at its column width, which is the
              same measure it has in the common case. -->
+        <!-- Every column in a pair carries a caption, and every caption is
+             pushed to the bottom of its column with mt-auto. The grid
+             stretches a row to its taller side either way; anchoring the
+             captions spends that slack between the list and its note instead
+             of leaving it as a ragged gap under the shorter list. Same move as
+             the home page masthead: a hole at the end of a column reads as
+             something missing, the same space in the middle reads as room. -->
         {#if data.topAlbums.length || data.discoveries.length}
             <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                 {#if data.topAlbums.length}
-                    <div>
+                    <div class="flex flex-col">
                         <p class="label label--icon">
                             <Disc size={12} aria-hidden="true" /> Top albums
                         </p>
                         <div class="mt-3">
                             <Ranking items={albumRanking} />
                         </div>
+                        <p class="meta mt-auto pt-4">
+                            By time spent as well, which is why a record can sit above one with
+                            more plays against it.
+                        </p>
                     </div>
                 {/if}
 
                 {#if data.discoveries.length}
-                    <div>
+                    <div class="flex flex-col">
                         <p class="label label--icon">
                             <Sparkle size={12} aria-hidden="true" />
                             {data.selectedYear != null
@@ -626,7 +645,7 @@
                             <Ranking items={discoveryRanking} />
                         </div>
                         {#if data.selectedYear != null}
-                            <p class="meta mt-4">
+                            <p class="meta mt-auto pt-4">
                                 The ones that stuck, out of {data.discoveryCount.toLocaleString()}
                                 artists heard for the first time that year.
                             </p>
@@ -644,7 +663,7 @@
         {#if data.latestArtists.length || data.onThisDay.length}
             <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                 {#if data.latestArtists.length}
-                    <div class="rule pt-8">
+                    <div class="rule flex flex-col pt-8">
                         <p class="label">Latest additions</p>
                         <ul class="ledger mt-3 max-w-none">
                             {#each data.latestArtists as artist (artist.artist)}
@@ -657,7 +676,7 @@
                                 </li>
                             {/each}
                         </ul>
-                        <p class="meta mt-4">
+                        <p class="meta mt-auto pt-4">
                             Newest first, three plays or more — below that it is a radio tail rather
                             than something I went looking for.
                         </p>
@@ -665,7 +684,7 @@
                 {/if}
 
                 {#if data.onThisDay.length}
-                    <div class="rule pt-8">
+                    <div class="rule flex flex-col pt-8">
                         <p class="label">On this day</p>
                         <ul class="ledger mt-3 max-w-none">
                             {#each data.onThisDay as entry}
@@ -688,7 +707,7 @@
                                 </li>
                             {/each}
                         </ul>
-                        <p class="meta mt-4">The most-played track on this date, each year.</p>
+                        <p class="meta mt-auto pt-4">The most-played track on this date, each year.</p>
                     </div>
                 {/if}
             </div>
