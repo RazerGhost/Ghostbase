@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { env } from '$env/dynamic/private';
 import {
@@ -99,6 +102,39 @@ describe('rate-limit backoff', () => {
 		noteSpotifyRateLimit(rateLimitResponse('600'));
 		noteSpotifyRateLimit(rateLimitResponse('5'));
 		expect(spotifyCooldownMs()).toBeGreaterThan(500_000);
+	});
+
+	// The cooldown is written to the data volume, because it used to be a bare
+	// module variable: Spotify hands out penalties in hours — one run was told
+	// to retry in 30,000 seconds — and a redeploy replaced the container and
+	// forgot it, so every deploy during a penalty went straight back at
+	// Spotify. On a day with eleven deploys that is eleven fresh starts.
+	it('survives a restart, which is the whole point of writing it down', async () => {
+		const file = path.join(
+			fs.mkdtempSync(path.join(os.tmpdir(), 'ghostbase-backoff-')),
+			'backoff.json'
+		);
+		__resetSpotifyForTests(file);
+		noteSpotifyRateLimit(rateLimitResponse('3600'));
+		expect(spotifyCooldownMs()).toBeGreaterThan(3_500_000);
+
+		// A redeploy: fresh module, same volume.
+		vi.resetModules();
+		const fresh = await import('./spotify');
+		fresh.__resetSpotifyForTests(file);
+		expect(fresh.spotifyCooldownMs()).toBeGreaterThan(3_500_000);
+	});
+
+	it('treats an unreadable backoff file as not rate limited', async () => {
+		const file = path.join(
+			fs.mkdtempSync(path.join(os.tmpdir(), 'ghostbase-backoff-')),
+			'backoff.json'
+		);
+		fs.writeFileSync(file, 'not json at all', 'utf-8');
+		vi.resetModules();
+		const fresh = await import('./spotify');
+		fresh.__resetSpotifyForTests(file);
+		expect(fresh.spotifyCooldownMs()).toBe(0);
 	});
 
 	it('does not call Spotify while cooling down', async () => {

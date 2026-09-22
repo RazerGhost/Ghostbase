@@ -87,13 +87,33 @@
 	const trackUrl = $derived(spotify ? `https://open.spotify.com/track/${spotify.track_id}` : undefined);
 	const durationMs = $derived(spotify ? spotify.timestamps.end - spotify.timestamps.start : undefined);
 
+	// Polling stops while the tab is hidden, and catches up when it comes
+	// back. Without this a backgrounded tab kept asking every 60s forever —
+	// and because the server caches recently-played for everyone at once, one
+	// forgotten tab was enough to hold the whole app at its upstream floor
+	// against Spotify all night. Nobody was looking at any of it.
 	$effect(() => {
 		lanyard.start();
-		pollRecent();
-		const recentInterval = setInterval(pollRecent, 60_000);
+
+		let interval: ReturnType<typeof setInterval> | undefined;
+		const stop = () => {
+			clearInterval(interval);
+			interval = undefined;
+		};
+		const start = () => {
+			if (interval) return;
+			pollRecent();
+			interval = setInterval(pollRecent, 60_000);
+		};
+		const onVisibility = () => (document.hidden ? stop() : start());
+
+		if (!document.hidden) start();
+		document.addEventListener('visibilitychange', onVisibility);
+
 		return () => {
 			lanyard.stop();
-			clearInterval(recentInterval);
+			stop();
+			document.removeEventListener('visibilitychange', onVisibility);
 		};
 	});
 
