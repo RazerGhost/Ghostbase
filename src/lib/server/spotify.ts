@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { env } from '$env/dynamic/private';
 
 // In-memory access-token cache (per server process). Refreshed lazily once
@@ -34,7 +37,42 @@ export function spotifyConfigured(): boolean {
 // recently-played poll and the scrobble job) check this before going upstream,
 // so one rate-limited response quiets the whole process rather than just the
 // caller that happened to hit it.
-let rateLimitedUntil = 0;
+//
+// It is written to the data volume because it used to be a bare module
+// variable, and Spotify hands out penalties in hours — one observed run was
+// told to retry in 30,000 seconds, which is eight and a half. A redeploy
+// replaces the container, so every deploy during a penalty forgot it and went
+// straight back at Spotify, which is how a short ban becomes a long one. On a
+// day with eleven deploys that is eleven fresh starts.
+let backoffPathOverride: string | null = null;
+
+const BACKOFF_FILE = () =>
+	backoffPathOverride ?? path.join(process.cwd(), 'data', 'spotify-backoff.json');
+
+let rateLimitedUntil = readBackoff();
+
+function readBackoff(): number {
+	try {
+		const raw = JSON.parse(fs.readFileSync(BACKOFF_FILE(), 'utf-8')) as { until?: unknown };
+		return typeof raw.until === 'number' && Number.isFinite(raw.until) ? raw.until : 0;
+	} catch {
+		// No file yet, unreadable, or malformed — all mean "not rate limited",
+		// which is the same answer a fresh process gave before.
+		return 0;
+	}
+}
+
+function writeBackoff(until: number): void {
+	try {
+		const file = BACKOFF_FILE();
+		fs.mkdirSync(path.dirname(file), { recursive: true });
+		fs.writeFileSync(file, JSON.stringify({ until }), 'utf-8');
+	} catch (e) {
+		// A read-only or missing volume must not break scrobbling; the backoff
+		// just falls back to being process-local, as it was before.
+		console.warn('[spotify] could not persist backoff:', e instanceof Error ? e.message : e);
+	}
+}
 
 /** Milliseconds left on the shared Spotify backoff; 0 when not rate limited. */
 export function spotifyCooldownMs(): number {
@@ -51,6 +89,7 @@ export function noteSpotifyRateLimit(res: Response): number {
 	const seconds = header && /^\d+$/.test(header) ? Number(header) : 60;
 	const ms = Math.min(seconds, 86_400) * 1000;
 	rateLimitedUntil = Math.max(rateLimitedUntil, Date.now() + ms);
+	writeBackoff(rateLimitedUntil);
 	console.warn(
 		`[spotify] rate limited (429), backing off ${seconds}s` +
 			(header ? ' (Retry-After)' : ' (no Retry-After header, using default)')
@@ -153,13 +192,28 @@ async function refreshAccessToken(): Promise<string> {
  * per-process state so one test's rate-limit or token cache cannot leak into
  * the next.
  */
-export function __resetSpotifyForTests(): void {
+/**
+ * `backoffPath` is not optional decoration: noteSpotifyRateLimit writes the
+ * cooldown to disk now, and the existing rate-limit tests call it several
+ * times. Without redirecting the file they write a real backoff into data/,
+ * and local dev then quietly refuses to call Spotify for as long as the last
+ * test's Retry-After said — ten minutes, in the case that caught this.
+ */
+let resetCount = 0;
+
+export function __resetSpotifyForTests(backoffPath?: string): void {
 	cachedToken = null;
 	refreshInFlight = null;
 	rotatedRefreshToken = null;
-	rateLimitedUntil = 0;
 	recentCache = null;
 	recentInFlight = null;
+	// A path of its own each time, so one test's cooldown cannot leak into
+	// the next through the file. Given a path, it loads what is there instead
+	// — which is what lets a test model a redeploy: same volume, new process.
+	backoffPathOverride =
+		backoffPath ??
+		path.join(os.tmpdir(), `ghostbase-spotify-backoff-${process.pid}-${++resetCount}.json`);
+	rateLimitedUntil = readBackoff();
 }
 
 export async function getSpotifyAccessToken(): Promise<string> {
@@ -189,12 +243,20 @@ export interface RecentlyPlayed {
 	reason?: 'missing_scope';
 }
 
-// SpotifyWidget is mounted on every page and polls this every 60s while
-// open — with several visitors' tabs open at once that's still several
-// upstream calls a minute against the one shared refresh token. A short
-// cache collapses concurrent pollers into a single upstream call, same
-// idea as unsplash.ts's photo cache and calendar.ts's ICS cache.
-const RECENT_CACHE_MS = 30_000;
+// SpotifyWidget is mounted on every page and polls this while open, so this
+// cache collapses concurrent pollers into a single upstream call.
+//
+// It was 30s, which made the cache a FLOOR as much as a ceiling: while any
+// tab anywhere was open — a hidden one, a crawler's — this sustained two
+// upstream calls a minute forever. Measured against a 15-minute scrobble
+// schedule that is 2,880 calls a day here against 96 there, so ~96% of
+// everything this app asks Spotify for came from a widget nobody was looking
+// at. That is what earned the 429, not the scrobble job it surfaced on.
+//
+// 150s is chosen against the data rather than against a feeling: the list is
+// "recently played", and an entry cannot appear faster than a track can end.
+// Nothing is lost, and the upstream floor drops fivefold.
+const RECENT_CACHE_MS = 150_000;
 let recentCache: { data: RecentlyPlayed; fetchedAt: number } | null = null;
 let recentInFlight: Promise<RecentlyPlayed> | null = null;
 

@@ -22,7 +22,13 @@ const RATE_LIMITED_ROUTES: { prefix: string; limit: number; windowSeconds: numbe
 	{ prefix: '/auth/login', limit: 10, windowSeconds: 60 },
 	{ prefix: '/auth/callback', limit: 10, windowSeconds: 60 },
 	{ prefix: '/api/backup', limit: 5, windowSeconds: 60 },
-	{ prefix: '/api/spotify/scrobble', limit: 5, windowSeconds: 60 }
+	{ prefix: '/api/spotify/scrobble', limit: 5, windowSeconds: 60 },
+	// The only public route that can cost an upstream Spotify call. It was the
+	// one secretless endpoint here with no limit at all, which made it the
+	// cheapest way for anything — a crawler, a stuck tab, a script — to spend
+	// our shared refresh token's quota. The server cache absorbs bursts; this
+	// stops a single client sustaining one.
+	{ prefix: '/api/spotify/recent', limit: 20, windowSeconds: 60 }
 ];
 
 export const handle: Handle = ({ event, resolve }) => {
