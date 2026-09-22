@@ -192,8 +192,18 @@
         const byMonth = new Map(data.monthlyTrend.map((m) => [m.month, m]));
         let months: string[];
         if (data.selectedYear != null) {
+            // The current year stops at the current month. A zero month draws
+            // nothing — it is a month with no plays, and the baseline rule
+            // already says so — which is right for a gap inside a year and
+            // wrong for months that have not happened yet: three invisible
+            // columns at the end made this chart span 321px of its 429px
+            // figure while the clock beside it spanned all of it, and read as
+            // the two plots being different sizes.
+            const now = new Date();
+            const lastMonth =
+                data.selectedYear === now.getUTCFullYear() ? now.getUTCMonth() + 1 : 12;
             months = Array.from(
-                { length: 12 },
+                { length: lastMonth },
                 (_, i) => `${data.selectedYear}-${String(i + 1).padStart(2, "0")}`,
             );
         } else {
