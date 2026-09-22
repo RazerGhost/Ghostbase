@@ -571,7 +571,7 @@
         </div>
 
         <div
-            class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+            class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2"
         >
                 {#if data.stats.topArtists.length}
                     <div class="flex flex-col">

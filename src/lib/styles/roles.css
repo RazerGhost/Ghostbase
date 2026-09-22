@@ -636,10 +636,15 @@
 	}
 	/* Min / mid / max under a plot, in the mono register the rest of the
 	   page's dates and labels already use. */
+	/* No width: 100% here. A block-level flex container already fills its
+	   parent, and 100% *plus* a margin does not — the habits grid's axis
+	   carries ml-11 to clear its day labels, so the explicit width pushed it
+	   44px past the page and put a horizontal scrollbar on /listens at every
+	   width. The plots' own scales were unaffected, which is why it survived
+	   the pass that added it. */
 	.plot__scale {
 		display: flex;
 		justify-content: space-between;
-		width: 100%;
 		margin-top: var(--space-2);
 	}
 
