@@ -79,7 +79,10 @@
 	// still needs a real Spotify scope Lanyard doesn't expose, so that part
 	// keeps hitting /api/spotify/recent, just at a much lower rate (60s here,
 	// vs. the old currently-playing poll which tightened down to every 4s).
-	const spotify = $derived(lanyard.data?.listening_to_spotify ? lanyard.data.spotify : null);
+	// spotifyAt drops a track Lanyard has stopped vouching for (long past its
+	// end, or the connection down for a while) — without it, a dropped
+	// presence left the last track on screen as if it were still playing.
+	const spotify = $derived(lanyard.spotifyAt(now));
 	const playing = $derived(Boolean(spotify));
 	const track = $derived(spotify?.song);
 	const artist = $derived(spotify?.artist);
@@ -132,33 +135,35 @@
 		if (!playing) expanded = false;
 	});
 
-	// Local 1s ticker while playing: drives the progress bar between Lanyard
-	// polls and accumulates today's listening time, without hitting any API.
+	// Local 1s ticker: drives the progress bar between Lanyard updates, lets
+	// a stale track expire on its own (spotifyAt reads `now`), and, while
+	// playing, accumulates today's listening time — without hitting any API.
 	// listenedDate tracks which day the counter belongs to — a tab left open
 	// across midnight resets to zero instead of carrying yesterday's total
 	// into the new day's localStorage key.
 	let listenedDate = dateKey();
 	$effect(() => {
-		if (!playing) return;
 		let last = Date.now();
 		const id = setInterval(() => {
 			const current = Date.now();
-			const today = dateKey();
-			if (today !== listenedDate) {
-				listenedDate = today;
-				listenedMsToday = 0;
+			if (playing) {
+				const today = dateKey();
+				if (today !== listenedDate) {
+					listenedDate = today;
+					listenedMsToday = 0;
+				}
+				listenedMsToday += current - last;
+				saveListenedMs(listenedMsToday);
 			}
-			listenedMsToday += current - last;
 			last = current;
 			now = current;
-			saveListenedMs(listenedMsToday);
 		}, 1000);
 		return () => clearInterval(id);
 	});
 
 	// Computed straight from Lanyard's absolute start/end timestamps rather
 	// than "progress at last fetch + elapsed", so it stays accurate regardless
-	// of how stale the last Lanyard poll is.
+	// of when Lanyard last said anything.
 	const localProgressMs = $derived.by(() => {
 		if (!spotify || durationMs == null) return 0;
 		return Math.min(durationMs, Math.max(0, now - spotify.timestamps.start));
