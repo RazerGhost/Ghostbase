@@ -265,7 +265,10 @@ and it follows the rest of this file rather than inventing its own look.
   missing and offers Retry (`LoadFailed.svelte`), in the same place the
   content would have been. A whole page that fails goes to `+error.svelte`,
   which tells a dropped connection apart from a broken page and retries by
-  itself when the connection comes back.
+  itself when the connection comes back. A navigation that is offline before
+  it starts gets `OfflineNotice.svelte`; a full page load that cannot reach the
+  network gets the service worker's offline page (docs/service-worker.md) —
+  same copy, same ghost, never the browser's own screen.
 
 ## Microinteractions
 
@@ -307,13 +310,18 @@ floating above the document. A paper register does not have one.
   folded in rather than left beside the dock. The bar cannot hold it — nine
   cells already divide a 375px phone into 40px each — so it is rail-only.
 
-  **The bar's cells are 40×44, not 44×44**, and that is a decision rather
-  than an oversight. Nine cells at a fixed 44 overflow a 375px phone, so the
-  choices were a narrower cell or a shorter dock. Keeping the dock's contents
-  identical across breakpoints is worth more than 4px: 40×44 clears the WCAG
-  AA target minimum comfortably and misses only the 44-square a platform
-  would prefer. If that ever stops being the trade, the cheapest cut is the
-  theme toggle, which puts the bar back to eight cells at a full 44.
+  **The bar's cells are 40 wide and 56 tall, with 22px icons**; the rail's
+  are 44 square with 16–17px icons. The width is a decision rather than an
+  oversight: nine cells at a fixed 44 overflow a 375px phone, and keeping the
+  dock's contents identical across breakpoints is worth more than 4px — 40
+  clears the WCAG AA target minimum comfortably and misses only the 44 a
+  platform would prefer. If that ever stops being the trade, the cheapest cut
+  is the theme toggle, which puts the bar back to eight cells at a full 44.
+  The height is where the bar gets its size back. It used to be the rail's 44
+  too, which under a browser zoomed to 90% was a 40px strip of 15px icons —
+  small for a thumb, and short of the ~56px bar with ~24px icons that phones
+  are designed around. Height costs the page nothing but the strip the bar
+  already covers (`.dock-clear` gives it back).
 - **Footer.** One line. Copyright and the outbound links on the left, the
   last deploy date on the right. It stays this short only because the dock
   carries the navigation.

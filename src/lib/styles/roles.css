@@ -116,7 +116,7 @@
 		flex: 1 1 0;
 		place-items: center;
 		min-width: 0;
-		height: var(--dock-cell);
+		height: var(--dock-bar-cell);
 		color: var(--dim);
 		background: none;
 		border: 0;
@@ -145,7 +145,7 @@
 	/* The bar covers the end of the page — give the document its height back
 	   so the footer stays reachable. */
 	.dock-clear {
-		padding-bottom: calc(var(--dock-cell) + 1px + max(env(safe-area-inset-bottom), 10px));
+		padding-bottom: calc(var(--dock-bar-cell) + 1px + max(env(safe-area-inset-bottom), 10px));
 	}
 	.dock__rule,
 	.dock__label,
@@ -153,6 +153,20 @@
 	   "back to top" is the most optional thing in here. */
 	.dock__cell--top {
 		display: none;
+	}
+
+	/* Bar only: the icons are drawn at the rail's size in Dock.svelte (16-17px)
+	   and scaled up here, rather than the markup knowing which layout it is
+	   in. Height with width: auto keeps the ghost mark, which is not square,
+	   in proportion. The negated query is exactly "not the rail" below. */
+	@media not all and (min-width: 900px) and (min-height: 560px) {
+		.dock__cell > svg {
+			width: auto;
+			height: var(--dock-bar-icon);
+		}
+		.dock__cell[aria-current='page']::before {
+			width: 24px;
+		}
 	}
 
 	@media (min-width: 900px) and (min-height: 560px) {
@@ -175,6 +189,7 @@
 		.dock__cell {
 			flex: 0 0 auto;
 			min-width: var(--dock-cell);
+			height: var(--dock-cell);
 		}
 		.dock__cell--top {
 			display: grid;

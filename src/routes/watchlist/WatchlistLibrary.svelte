@@ -9,6 +9,7 @@
      * genre it resets are bound from there.
      */
     import { invalidateAll, replaceState } from "$app/navigation";
+    import { browser } from "$app/environment";
     import { page } from "$app/state";
     import Tv from "@lucide/svelte/icons/tv";
     import RefreshCw from "@lucide/svelte/icons/refresh-cw";
@@ -33,7 +34,14 @@
 
     type SortMode = "added" | "title" | "progress" | "rating";
 
-    const initialParams = page.url.searchParams;
+    // The address bar, not page.url, once in the browser. The filters below
+    // are kept in the URL with replaceState, which moves the address bar but
+    // leaves page.url where the page was loaded. That did not matter while
+    // this lived in the page and never remounted; as its own component it
+    // remounts whenever the library reloads (the stale banner's Retry), and
+    // reading page.url then reset the reader's search, sort and genre to
+    // whatever they were on arrival — and wrote that back to the URL.
+    const initialParams = browser ? new URL(location.href).searchParams : page.url.searchParams;
     const initialSortMode: SortMode = (["added", "title", "progress", "rating"] as const).includes(
         initialParams.get("sort") as SortMode,
     )
