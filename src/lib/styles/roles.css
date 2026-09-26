@@ -602,10 +602,17 @@
 	.plot-figure--wide {
 		--plot-col: 62px;
 	}
+	/* The gap is 2px until the plot runs out of room, and then it shrinks so
+	   the gaps never take more than half the width. A fixed 2px gap with a
+	   2px minimum column made every point cost 4px whatever the width: the
+	   all-time series (129 months and growing) needed 514px, and on a phone
+	   it pushed the page 126px wider than the screen — sideways scrolling,
+	   and a dock that could no longer be reached. A percentage gap in flexbox
+	   resolves against the plot's own width, so this needs no measuring. */
 	.plot {
 		display: flex;
 		align-items: flex-end;
-		gap: 2px;
+		gap: min(2px, calc(50% / var(--plot-cols, 1)));
 		width: 100%;
 		/* The height belongs to the role, not to each call site. It was an
 		   h-20 on one plot and an h-24 on the other — invisible while they
@@ -619,9 +626,13 @@
 	   need in order to read the chart, so WCAG 1.4.11 wants 3:1 against the
 	   ground. Measured with transitions frozen: 22% gave 1.83:1 on the dark
 	   theme. 46% clears 3:1 in both. */
+	/* No minimum width, for the same reason: any floor times enough months is
+	   wider than a phone. Past a few hundred points a column drops under a
+	   device pixel and the series reads as a filled silhouette, which is
+	   still the right shape — and better than a page that scrolls sideways. */
 	.plot__col {
 		flex: 1 1 0;
-		min-width: 2px;
+		min-width: 0;
 		background: color-mix(in srgb, var(--white) 46%, transparent);
 		transition: background var(--dur-fast);
 	}
