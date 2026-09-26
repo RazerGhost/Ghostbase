@@ -18,7 +18,8 @@
 	 * these cells pointed somewhere else rather than a second bar of its own.
 	 * `links`, `home` and `exit` are what differ; everything below is shared.
 	 */
-	import { page } from '$app/state';
+	import { page, navigating } from '$app/state';
+	import { offlineNavigation } from '$lib/stores/offline-navigation.svelte';
 	import { navLinks } from '$lib/config';
 	import { commandPalette } from '$lib/stores/command-palette.svelte';
 	import { shouldShowBackToTop } from '$lib/back-to-top';
@@ -63,10 +64,18 @@
 
 	const isMac = typeof navigator !== 'undefined' && /Mac/.test(navigator.platform);
 
+	// Where the reader is going, not where they were. On a phone the tap is
+	// where loading starts (there is no hover to preload on), so the load
+	// can take long enough to notice — and a dock still marking the previous
+	// page over the next page's skeleton reads as the tap not having landed.
+	const path = $derived(
+		navigating.to?.url.pathname ?? offlineNavigation.target?.pathname ?? page.url.pathname
+	);
+
 	// The home cell is matched exactly: every path starts with "/", so the
 	// prefix test the other cells use would mark "/" current everywhere. The
 	// admin dashboard has the same problem against its own children.
-	const atHome = $derived(page.url.pathname === home.href);
+	const atHome = $derived(path === home.href);
 
 	let scrolled = $state(false);
 
@@ -123,7 +132,7 @@
 
 	{#each links as link}
 		{@const Icon = icons[link.href]}
-		{@const active = page.url.pathname.startsWith(link.href)}
+		{@const active = path.startsWith(link.href)}
 		<a
 			href={link.href}
 			class="dock__cell"

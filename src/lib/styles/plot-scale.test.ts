@@ -32,3 +32,22 @@ describe('.plot__scale', () => {
 		expect(rule('.plot__scale')).not.toMatch(/^\s*width:/m);
 	});
 });
+
+/**
+ * A plot may not have a minimum width per point.
+ *
+ * `.plot__col` had `min-width: 2px` inside a `.plot` with a fixed 2px gap, so
+ * each month cost 4px however narrow the screen. The all-time series on
+ * /listens has 129 months, which is 514px — wider than a phone's column, so
+ * the page scrolled sideways and the dock went out of reach. The series only
+ * grows, so any per-point floor comes back as the same bug eventually.
+ */
+describe('.plot', () => {
+	it('lets its columns shrink to nothing', () => {
+		expect(rule('.plot__col')).toMatch(/min-width:\s*0\s*;/);
+	});
+
+	it('caps its gap as a share of the width, not a fixed length', () => {
+		expect(rule('.plot')).toMatch(/gap:\s*min\(\s*2px\s*,\s*calc\(\s*50%\s*\/\s*var\(--plot-cols/);
+	});
+});

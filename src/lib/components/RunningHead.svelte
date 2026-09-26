@@ -11,7 +11,8 @@
 	 * voice. Wears `.shell`, so the wordmark starts on the same vertical line
 	 * as that h1 and as the footer.
 	 */
-	import { page } from '$app/state';
+	import { page, navigating } from '$app/state';
+	import { offlineNavigation } from '$lib/stores/offline-navigation.svelte';
 	import { navLinks, site } from '$lib/config';
 	import SpotifyWidget from '$lib/components/SpotifyWidget.svelte';
 	import type { Snippet } from 'svelte';
@@ -24,8 +25,12 @@
 		$props();
 
 	// Where you are, in the head's own words. Home gets nothing — the
-	// wordmark already said it.
-	const here = $derived(navLinks.find((l) => page.url.pathname.startsWith(l.href))?.label);
+	// wordmark already said it. Follows a pending navigation like the dock
+	// does, so it names the skeleton under it rather than the page just left.
+	const path = $derived(
+		navigating.to?.url.pathname ?? offlineNavigation.target?.pathname ?? page.url.pathname
+	);
+	const here = $derived(navLinks.find((l) => path.startsWith(l.href))?.label);
 </script>
 
 <!-- The full-width element is the <header>; .shell goes on the inner div.

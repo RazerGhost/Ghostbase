@@ -602,10 +602,17 @@
 	.plot-figure--wide {
 		--plot-col: 62px;
 	}
+	/* The gap is 2px until the plot runs out of room, and then it shrinks so
+	   the gaps never take more than half the width. A fixed 2px gap with a
+	   2px minimum column made every point cost 4px whatever the width: the
+	   all-time series (129 months and growing) needed 514px, and on a phone
+	   it pushed the page 126px wider than the screen — sideways scrolling,
+	   and a dock that could no longer be reached. A percentage gap in flexbox
+	   resolves against the plot's own width, so this needs no measuring. */
 	.plot {
 		display: flex;
 		align-items: flex-end;
-		gap: 2px;
+		gap: min(2px, calc(50% / var(--plot-cols, 1)));
 		width: 100%;
 		/* The height belongs to the role, not to each call site. It was an
 		   h-20 on one plot and an h-24 on the other — invisible while they
@@ -619,9 +626,13 @@
 	   need in order to read the chart, so WCAG 1.4.11 wants 3:1 against the
 	   ground. Measured with transitions frozen: 22% gave 1.83:1 on the dark
 	   theme. 46% clears 3:1 in both. */
+	/* No minimum width, for the same reason: any floor times enough months is
+	   wider than a phone. Past a few hundred points a column drops under a
+	   device pixel and the series reads as a filled silhouette, which is
+	   still the right shape — and better than a page that scrolls sideways. */
 	.plot__col {
 		flex: 1 1 0;
-		min-width: 2px;
+		min-width: 0;
 		background: color-mix(in srgb, var(--white) 46%, transparent);
 		transition: background var(--dur-fast);
 	}
@@ -1033,8 +1044,55 @@
 		}
 	}
 
+	/* ── Loading ─────────────────────────────────────────────────────────
+	   design.md § Loading. A skeleton is the page's own layout with the
+	   values missing, not a separate design: headings, rules and poster
+	   frames render as themselves, and only the parts that are data become a
+	   .skel block. It never shimmers or pulses — chrome does not animate on a
+	   loop (§ Motion) — so the only motion is the fade that brings it in.
+
+	   --surface-2, not --surface: level 1 measures 1.05:1 against the ground
+	   in dark mode, which on a phone at arm's length is no block at all. */
+	.skel {
+		display: block;
+		background: var(--surface-2);
+		border-radius: var(--radius-sm);
+	}
+	/* A line of text that has not arrived. Inline, and sized in em, so it
+	   sits inside the role it stands in for (`<p class="h-page"><span
+	   class="skel skel--text">`) and inherits that role's size and line
+	   height — the block below it lands where the real text will push it. */
+	.skel--text {
+		display: inline-block;
+		height: 0.72em;
+		max-width: 100%;
+		vertical-align: middle;
+	}
+	/* Fades in rather than cutting in, because it only appears once a load
+	   has already taken long enough to notice (SKELETON_DELAY_MS). Starts at
+	   0.4, not 0, and has no fill mode — the hero entrance has already shown
+	   what an opacity-0 start does when a browser stalls the animation
+	   (hero-reveal.test.ts). */
+	.skel-in {
+		animation: skel-in var(--dur-base) var(--ease-out);
+	}
+	@keyframes skel-in {
+		from {
+			opacity: 0.4;
+		}
+	}
+	/* A section that is being replaced in place (the listens year switch):
+	   the old values stay readable, just clearly not current. */
+	.is-pending {
+		opacity: 0.5;
+		transition: opacity var(--dur-base) var(--ease-out);
+	}
+
 	@media (prefers-reduced-motion: reduce) {
 		.flash-in {
+			animation: none;
+		}
+		.skel-in {
 			animation: none;
 		}
 		.shelf__item:hover {

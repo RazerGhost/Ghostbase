@@ -230,6 +230,43 @@ own numbers are set as quiet type.
 - Animate transform/opacity/colour only. Instant focus rings.
 - Everything respects `prefers-reduced-motion`.
 
+## Loading
+
+Most pages here are data, and some of it is slow: Simkl is a network call
+whenever its snapshot is old, and the listening aggregates take around a
+second to compute after every scrobble. So there is a loading state,
+and it follows the rest of this file rather than inventing its own look.
+
+- **A skeleton is the page with its values missing.** It is built from the
+  same roles as the page it stands in for — headings, labels, rules, poster
+  frames and ranking numerals render as themselves; only the data becomes a
+  `.skel` block. Anything known before the data (a list page's title, a tag's
+  name, a section's label) is real text. When the page lands, it fills in; it
+  does not change shape.
+- **Mobile is the case to design for.** A desktop usually has the data before
+  the click (hover preloading); a phone has no hover and starts on the tap.
+  Check skeletons at phone width, on a throttled connection.
+- **Nothing flashes.** A navigation only shows a skeleton after
+  `SKELETON_DELAY_MS` (150ms, `navigation-skeleton.ts`). A cached page lands
+  first and shows none.
+- **No shimmer, no pulse.** § Motion: chrome does not animate on a loop. A
+  skeleton fades in once (`.skel-in`, never from 0 opacity) and then holds
+  still.
+- **Slow parts stream; the rest does not wait for them.** On navigation, a
+  page's slow data is returned as a promise (`src/lib/server/stream.ts`) and
+  rendered with `{#await}`, so the header and whatever is fast arrive first.
+  On a full page load the same data is awaited and rendered as HTML, so a
+  crawler or a first visit never sees a page of skeletons.
+- **A change in place dims; it does not blank.** Switching the listens year
+  keeps the old figures up at `.is-pending` until the new ones arrive.
+- **The dock marks where you are going.** It follows the pending navigation,
+  so the tapped cell lights at the tap rather than when the load finishes.
+- **Every skeleton has a failure.** A streamed section that fails says what is
+  missing and offers Retry (`LoadFailed.svelte`), in the same place the
+  content would have been. A whole page that fails goes to `+error.svelte`,
+  which tells a dropped connection apart from a broken page and retries by
+  itself when the connection comes back.
+
 ## Microinteractions
 
 - One hover signal per interactive element (colour OR movement, not both).

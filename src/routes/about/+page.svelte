@@ -16,6 +16,7 @@
 	import LinkedinIcon from '$lib/components/icons/LinkedinIcon.svelte';
 	import MailIcon from '@lucide/svelte/icons/mail';
 	import User from '@lucide/svelte/icons/user';
+	import LoadFailed from '$lib/components/LoadFailed.svelte';
 	import { socialLinks } from '$lib/config';
 	import type { PageData } from './$types';
 
@@ -24,7 +25,7 @@
 	const icons = { github: GithubIcon, linkedin: LinkedinIcon, mail: MailIcon };
 
 	const nf = new Intl.NumberFormat('en-GB');
-	const since = $derived(data.firstPlayedAt ? new Date(data.firstPlayedAt).getUTCFullYear() : null);
+	const yearOf = (iso: string | null) => (iso ? new Date(iso).getUTCFullYear() : null);
 </script>
 
 <Seo title={data.page.title} description={data.page.description} path="/about" />
@@ -55,16 +56,30 @@
 
 			<p class="label mt-8">By the numbers</p>
 			<div class="mt-5 grid gap-5">
-				{#if since}
+				{#await data.listening}
 					<div class="rule pt-5 first:border-t-0 first:pt-0">
-						<p class="num num-sm">{since}</p>
+						<p class="num num-sm"><span class="skel skel--text" style:width="4ch"></span></p>
 						<p class="meta mt-2">first play on record — the handle is about that old</p>
 					</div>
-				{/if}
-				<div class="rule pt-5">
-					<p class="num num-sm">{nf.format(data.artists)}</p>
-					<p class="meta mt-2">artists listened to since</p>
-				</div>
+					<div class="rule pt-5">
+						<p class="num num-sm"><span class="skel skel--text" style:width="4ch"></span></p>
+						<p class="meta mt-2">artists listened to since</p>
+					</div>
+				{:then listening}
+					{@const since = yearOf(listening.firstPlayedAt)}
+					{#if since}
+						<div class="rule pt-5 first:border-t-0 first:pt-0">
+							<p class="num num-sm">{since}</p>
+							<p class="meta mt-2">first play on record — the handle is about that old</p>
+						</div>
+					{/if}
+					<div class="rule pt-5 first:border-t-0 first:pt-0">
+						<p class="num num-sm">{nf.format(listening.artists)}</p>
+						<p class="meta mt-2">artists listened to since</p>
+					</div>
+				{:catch}
+					<LoadFailed class="first:border-t-0" message="The listening numbers didn't load." />
+				{/await}
 				<div class="rule pt-5">
 					<p class="num num-sm">{data.postCount}</p>
 					<p class="meta mt-2">devlog posts since the rebuild</p>
