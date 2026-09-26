@@ -47,6 +47,8 @@ Package manager is pnpm (`packageManager: pnpm@11.3.0`).
 
 **Backups**: [src/routes/api/backup/+server.ts](src/routes/api/backup/+server.ts), secret-gated via `BACKUP_SECRET` (same pattern as the scrobble endpoint above), dumps the `data/` SQLite DBs to plain-text SQL ([backup.ts](src/lib/server/backup.ts) — schema + `INSERT` statements, not the raw binary file, so it diffs cleanly in git) plus `media/`, and commits + pushes them to a private git repo (`BACKUP_GIT_REMOTE`, an HTTPS URL with an embedded PAT). Intended to be hit on a schedule the same way the scrobble endpoint is. Requires `git` in the runtime image (see [Dockerfile](Dockerfile)).
 
+**Service worker**: [src/service-worker.ts](src/service-worker.ts) only answers a page load that fails at the network level, with an offline page; it caches no pages, data or app code and passes every HTTP response (404/500/502 included) through untouched. It's registered from [+layout.svelte](src/routes/+layout.svelte) and never under `pnpm dev`, but `pnpm preview` does register it on `localhost:4173` — a stopped preview server then shows the offline page (a 503 with `X-Ghostbase-SW: offline-fallback`), not a connection error. `SERVICE_WORKER_ENABLED` in [policy.ts](src/lib/service-worker/policy.ts) is the kill switch. See [docs/service-worker.md](docs/service-worker.md).
+
 **Rate limiting**: `checkRateLimit()` in [rate-limit.ts](src/lib/server/rate-limit.ts), applied in [hooks.server.ts](src/hooks.server.ts) to auth (`/auth/login`, `/auth/callback`) and secret-gated endpoints (scrobble, backup). In-memory, per-process — resets on redeploy/restart, not shared across multiple instances.
 
 ## Testing gated pages locally

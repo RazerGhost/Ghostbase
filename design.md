@@ -265,7 +265,10 @@ and it follows the rest of this file rather than inventing its own look.
   missing and offers Retry (`LoadFailed.svelte`), in the same place the
   content would have been. A whole page that fails goes to `+error.svelte`,
   which tells a dropped connection apart from a broken page and retries by
-  itself when the connection comes back.
+  itself when the connection comes back. A navigation that is offline before
+  it starts gets `OfflineNotice.svelte`; a full page load that cannot reach the
+  network gets the service worker's offline page (docs/service-worker.md) —
+  same copy, same ghost, never the browser's own screen.
 
 ## Microinteractions
 

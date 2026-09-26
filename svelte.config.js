@@ -8,7 +8,10 @@ const config = {
 	extensions: ['.svelte', ...mdsvexConfig.extensions],
 	preprocess: [vitePreprocess(), mdsvex(mdsvexConfig)],
 	kit: {
-		adapter: adapter()
+		adapter: adapter(),
+		// Registered by hand in +layout.svelte, so it can be left out of
+		// `pnpm dev` — see docs/service-worker.md.
+		serviceWorker: { register: false }
 	}
 };
 

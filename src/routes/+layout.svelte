@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import { untrack } from 'svelte';
+	import { dev } from '$app/environment';
 	import { beforeNavigate, afterNavigate } from '$app/navigation';
 	import { page, navigating } from '$app/state';
 	import { isAdminPath } from '$lib/config';
@@ -11,6 +12,7 @@
 	import CommandPalette from '$lib/components/CommandPalette.svelte';
 	import PageSkeleton from '$lib/components/skeletons/PageSkeleton.svelte';
 	import OfflineNotice from '$lib/components/OfflineNotice.svelte';
+	import { CACHE_PREFIX, SERVICE_WORKER_ENABLED } from '$lib/service-worker/policy';
 	import { offlineNavigation } from '$lib/stores/offline-navigation.svelte';
 	import type { LayoutProps } from './$types';
 
@@ -68,6 +70,32 @@
 	});
 	afterNavigate(() => {
 		offlineNavigation.target = null;
+	});
+
+	// The service worker (src/service-worker.ts) covers full page loads that
+	// cannot reach the network. Never under `pnpm dev`: a worker there sits
+	// between the browser and Vite, outlives the dev server, and turns "the
+	// dev server is not running" into an offline page. Any registration left
+	// on the dev origin by an earlier build is removed for the same reason,
+	// and the same path is the kill switch's (SERVICE_WORKER_ENABLED).
+	$effect(() => {
+		if (!('serviceWorker' in navigator)) return;
+		if (dev || !SERVICE_WORKER_ENABLED) {
+			void navigator.serviceWorker
+				.getRegistrations()
+				.then((registrations) => registrations.forEach((r) => r.unregister()));
+			// Unregistering leaves the worker's cache behind, and this path
+			// usually runs before a new worker could clear it itself.
+			void caches
+				.keys()
+				.then((keys) => keys.filter((k) => k.startsWith(CACHE_PREFIX)).forEach((k) => caches.delete(k)));
+			return;
+		}
+		navigator.serviceWorker.register('/service-worker.js').catch((err) => {
+			// Not fatal — the site works without it; it just loses the
+			// offline page. Logged so a failure is visible when looked for.
+			console.warn('[service worker] registration failed', err);
+		});
 	});
 </script>
 
