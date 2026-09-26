@@ -10,6 +10,7 @@
 	 * reader. So the layout catches the navigation before it starts and
 	 * renders this instead, keeping the site (and the dock) on screen.
 	 */
+	import { tick } from 'svelte';
 	import { offlineNavigation } from '$lib/stores/offline-navigation.svelte';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
@@ -24,29 +25,33 @@
 	// client-side navigation to the page rejects with "Failed to fetch
 	// dynamically imported module", connection or not. A fresh document
 	// has no such memory.
+	//
+	// Always allowed, even while the device reports itself offline.
+	// navigator.onLine can be wrong, and a button that waits on it would then
+	// be a dead end; still offline, the load just ends on the service
+	// worker's offline page.
 	function retry() {
-		if (!navigator.onLine) return;
 		retrying = true;
 		location.assign(target.href);
 	}
 
+	async function back() {
+		const y = offlineNavigation.scrollY;
+		offlineNavigation.target = null;
+		// The page underneath was never unmounted, only hidden, so it comes
+		// back as it was once it is visible again — scroll position aside.
+		await tick();
+		// Instant, not the root's smooth scroll: this is putting the page
+		// back where it was, not moving through it.
+		window.scrollTo({ top: y, behavior: 'instant' });
+	}
+
 	// Coming back online retries by itself: the reader is most likely still
-	// looking at this, waiting for exactly that. Until then the button has
-	// nothing it could do, so it says so instead of failing on a press.
-	let offline = $state(true);
+	// looking at this, waiting for exactly that.
 	$effect(() => {
-		offline = !navigator.onLine;
-		const reconnect = () => {
-			offline = false;
-			retry();
-		};
-		const disconnect = () => (offline = true);
+		const reconnect = () => retry();
 		window.addEventListener('online', reconnect);
-		window.addEventListener('offline', disconnect);
-		return () => {
-			window.removeEventListener('online', reconnect);
-			window.removeEventListener('offline', disconnect);
-		};
+		return () => window.removeEventListener('online', reconnect);
 	});
 </script>
 
@@ -80,13 +85,13 @@
 		</p>
 
 		<div class="mt-8 flex flex-wrap justify-center gap-3">
-			<button type="button" class="btn btn--accent" onclick={retry} disabled={retrying || offline}>
+			<button type="button" class="btn btn--accent" onclick={retry} disabled={retrying}>
 				<RefreshCw size={15} class={retrying ? 'animate-spin' : ''} aria-hidden="true" />
-				{retrying ? 'Opening…' : offline ? 'Waiting for a connection' : 'Try again'}
+				{retrying ? 'Opening…' : 'Try again'}
 			</button>
 			<!-- The page they tapped away from never went anywhere; it is still
 			     loaded, just not rendered. -->
-			<button type="button" class="btn" onclick={() => (offlineNavigation.target = null)}>
+			<button type="button" class="btn" onclick={back}>
 				<ArrowLeft size={15} aria-hidden="true" /> Back to where I was
 			</button>
 		</div>

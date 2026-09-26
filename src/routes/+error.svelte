@@ -42,6 +42,12 @@
 		location.assign(page.url.href);
 	}
 
+	const detail = $derived(
+		!isNotFound && page.status >= 500 && page.error?.message && page.error.message !== 'Internal Error'
+			? page.error.message
+			: null
+	);
+
 	const heading = $derived(
 		isNotFound ? "There's nothing here" : offline ? "You're offline" : 'Something broke'
 	);
@@ -79,6 +85,14 @@
 		<p class="mt-3 max-w-sm text-gray" data-hero-reveal="3">
 			{message}
 		</p>
+		{#if detail}
+			<!-- The friendly line above replaces the error's own message for a
+			     5xx, which would otherwise hide the one thing that says what
+			     broke — "about.md is missing" is worth seeing, in production as
+			     much as in dev. SvelteKit's generic text adds nothing, so it is
+			     left out. -->
+			<p class="mono mt-3 max-w-sm">{detail}</p>
+		{/if}
 
 		<div class="mt-8 flex flex-wrap justify-center gap-3" data-hero-reveal="3">
 			{#if !isNotFound && (offline || page.status >= 500)}
