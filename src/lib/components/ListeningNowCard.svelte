@@ -12,7 +12,7 @@
 
 	// Currently-playing state comes from Lanyard (shared with SpotifyWidget /
 	// DiscordPresence via stores/lanyard.svelte.ts) rather than a second
-	// independent poll of /api/spotify — see that file for why.
+	// independent request to /api/spotify — see that file for why.
 	const lanyard = useLanyard();
 	let history = $state<HistoryLookup | null>(null);
 	let now = $state(Date.now());
@@ -24,7 +24,9 @@
 	let trackChanged = $state(false);
 	let flashTimer: ReturnType<typeof setTimeout>;
 
-	const spotify = $derived(lanyard.data?.listening_to_spotify ? lanyard.data.spotify : null);
+	// spotifyAt drops a track Lanyard has stopped vouching for — see
+	// lanyard-live.ts.
+	const spotify = $derived(lanyard.spotifyAt(now));
 	const playing = $derived(Boolean(spotify));
 	const track = $derived(spotify?.song);
 	const artist = $derived(spotify?.artist);
@@ -77,7 +79,7 @@
 
 	// Computed straight from Lanyard's absolute start/end timestamps rather
 	// than "progress at last fetch + elapsed", so it stays accurate regardless
-	// of how stale the last Lanyard poll is.
+	// of when Lanyard last said anything.
 	const localProgressMs = $derived.by(() => {
 		if (!spotify || durationMs == null) return 0;
 		return Math.min(durationMs, Math.max(0, now - spotify.timestamps.start));
