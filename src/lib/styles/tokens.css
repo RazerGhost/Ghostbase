@@ -97,6 +97,14 @@
 	   the minimum touch target, which is why it does not shrink on a phone. */
 	--dock-w: 54px;
 	--dock-cell: 44px;
+	/* The phone's bottom bar gets its own, larger cell and icon. 44 was the
+	   rail's number carried over, and on the bar it was the whole height:
+	   under a browser zoomed to 90% that is a 40px strip of 15px icons, well
+	   short of the ~56px bar and 24px icon phones are built around. Only the
+	   height can grow — nine cells still share a 375px width (design.md §
+	   Chrome) — so the bar grows taller and its icons larger. */
+	--dock-bar-cell: 56px;
+	--dock-bar-icon: 22px;
 
 	/* A comfortable line length for body copy. Prose pages keep the full
 	   shell width and set this on the text column itself, rather than
