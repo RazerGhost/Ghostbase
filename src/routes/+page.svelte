@@ -11,6 +11,7 @@
 	import Clapperboard from '@lucide/svelte/icons/clapperboard';
 	import PenLine from '@lucide/svelte/icons/pen-line';
 	import Code from '@lucide/svelte/icons/code';
+	import LoadFailed from '$lib/components/LoadFailed.svelte';
 	import { socialLinks, site } from '$lib/config';
 	import type { PageData } from './$types';
 
@@ -22,6 +23,20 @@
 		return new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 	}
 </script>
+
+<!-- A band figure whose value is still on its way: the unit stays, since it
+     is known, and the caption keeps its line so the band holds its height. -->
+{#snippet pendingStat(caption: string)}
+	<p class="num num-lg mt-3">
+		<span class="skel skel--text" style:width="1.6ch"></span><span class="num-unit">days</span>
+	</p>
+	<p class="meta mt-2 leading-relaxed">{caption}</p>
+{/snippet}
+
+{#snippet failedStat(caption: string)}
+	<p class="num num-lg mt-3 text-dim">—</p>
+	<p class="meta mt-2 leading-relaxed">{caption}</p>
+{/snippet}
 
 <Seo title={site.name} description={site.description} path="/" />
 
@@ -89,19 +104,35 @@
 	<div class="rule mt-14 grid gap-10 border-b border-border py-9 sm:grid-cols-3">
 		<div>
 			<Music size={15} aria-hidden="true" class="text-dim" />
-			<p class="num num-lg mt-3">
-				{data.currentStreak ?? 0}<span class="num-unit">days</span>
-			</p>
-			<p class="meta mt-2 leading-relaxed">
-				listening streak, on {data.totalPlays.toLocaleString()} plays logged
-			</p>
+			{#await data.listening}
+				{@render pendingStat('listening streak, on plays logged')}
+			{:then listening}
+				<p class="num num-lg mt-3">
+					{listening.currentStreak ?? 0}<span class="num-unit">days</span>
+				</p>
+				<p class="meta mt-2 leading-relaxed">
+					listening streak, on {listening.totalPlays.toLocaleString()} plays logged
+				</p>
+			{:catch}
+				{@render failedStat('listening streak — the history didn’t load')}
+			{/await}
 		</div>
 		<div>
 			<Clapperboard size={15} aria-hidden="true" class="text-dim" />
-			<p class="num num-lg mt-3">
-				{data.daysWatched}<span class="num-unit">days</span>
-			</p>
-			<p class="meta mt-2 leading-relaxed">spent watching, across everything tracked</p>
+			{#await data.watch}
+				{@render pendingStat('spent watching, across everything tracked')}
+			{:then watch}
+				{#if watch.ok}
+					<p class="num num-lg mt-3">
+						{watch.daysWatched}<span class="num-unit">days</span>
+					</p>
+					<p class="meta mt-2 leading-relaxed">spent watching, across everything tracked</p>
+				{:else}
+					{@render failedStat('spent watching — Simkl didn’t answer')}
+				{/if}
+			{:catch}
+				{@render failedStat('spent watching — Simkl didn’t answer')}
+			{/await}
 		</div>
 		<div>
 			<PenLine size={15} aria-hidden="true" class="text-dim" />
@@ -133,35 +164,61 @@
 		</div>
 
 		<div class="md:border-l md:border-border md:pl-10">
-			{#if data.watching}
+			{#await data.watch}
+				<!-- Held open at the card's height while Simkl answers, so the
+				     projects under it do not jump when it lands. -->
 				<p class="label label--icon">
 					<Clapperboard size={12} aria-hidden="true" /> Watching
 				</p>
-				<a href="/watchlist" class="mt-4 block">
-					<p class="h-card-lg">{data.watching.title}</p>
-					<p class="meta mt-2">
-						{#if data.watching.totalEpisodes}
-							Episode {data.watching.watchedEpisodes} of {data.watching.totalEpisodes}
-						{/if}
-						{#if data.watching.nextToWatch}
-							· up next {data.watching.nextToWatch}
-						{/if}
+				<div class="mt-4">
+					<p class="h-card-lg"><span class="skel skel--text" style:width="14ch"></span></p>
+					<p class="meta mt-2"><span class="skel skel--text" style:width="22ch"></span></p>
+					<span class="mt-3 block h-px bg-border"></span>
+				</div>
+			{:then watch}
+				{#if watch.watching}
+					{@const watching = watch.watching}
+					<p class="label label--icon">
+						<Clapperboard size={12} aria-hidden="true" /> Watching
 					</p>
-					{#if data.watching.totalEpisodes}
-						<span class="mt-3 block h-px bg-border">
-							<span
-								class="block h-px bg-primary"
-								style:width="{Math.round(
-									(data.watching.watchedEpisodes / data.watching.totalEpisodes) * 100
-								)}%"
-							></span>
-						</span>
-					{/if}
-				</a>
-			{/if}
+					<a href="/watchlist" class="mt-4 block">
+						<p class="h-card-lg">{watching.title}</p>
+						<p class="meta mt-2">
+							{#if watching.totalEpisodes}
+								Episode {watching.watchedEpisodes} of {watching.totalEpisodes}
+							{/if}
+							{#if watching.nextToWatch}
+								· up next {watching.nextToWatch}
+							{/if}
+						</p>
+						{#if watching.totalEpisodes}
+							<span class="mt-3 block h-px bg-border">
+								<span
+									class="block h-px bg-primary"
+									style:width="{Math.round(
+										(watching.watchedEpisodes / watching.totalEpisodes) * 100
+									)}%"
+								></span>
+							</span>
+						{/if}
+					</a>
+				{:else if !watch.ok}
+					<p class="label label--icon">
+						<Clapperboard size={12} aria-hidden="true" /> Watching
+					</p>
+					<LoadFailed class="mt-4" message="Simkl didn’t answer, so this is missing for now." />
+				{/if}
+			{:catch}
+				<p class="label label--icon">
+					<Clapperboard size={12} aria-hidden="true" /> Watching
+				</p>
+				<LoadFailed class="mt-4" message="This didn’t finish loading." />
+			{/await}
 
 			{#if data.projects.length}
-				<p class="label label--icon" class:mt-9={!!data.watching}>
+				<!-- first:, not a flag on the Watching card: that card is now one
+				     of four states, and only three of them render anything. -->
+				<p class="label label--icon mt-9 first:mt-0">
 					<Code size={12} aria-hidden="true" /> Projects
 				</p>
 				<div class="mt-4 grid gap-5">

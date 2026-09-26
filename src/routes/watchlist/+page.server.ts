@@ -1,17 +1,31 @@
 import { getLibraryWithFallback, simklConfigured } from '$lib/server/simkl';
+import { streamOnNavigation } from '$lib/server/stream';
 import type { PageServerLoad } from './$types';
 
-const EMPTY_LIBRARY = { watching: [], completed: [], planToWatch: [], onHold: [], dropped: [] };
-
-export const load: PageServerLoad = async () => {
-	if (!simklConfigured()) {
-		return { configured: false, ...EMPTY_LIBRARY, stale: false, staleSince: null };
-	}
-
+/**
+ * The library, or `error` when Simkl is unreachable and there is no snapshot
+ * to fall back on. Resolves either way rather than rejecting, so a full page
+ * load renders the failure in place instead of the error page.
+ */
+async function loadLibrary() {
 	try {
 		const { library, stale, staleSince } = await getLibraryWithFallback();
-		return { configured: true, ...library, stale, staleSince };
+		return { error: false as const, ...library, stale, staleSince };
 	} catch {
-		return { configured: true, ...EMPTY_LIBRARY, error: true, stale: false, staleSince: null };
+		return { error: true as const };
 	}
+}
+
+export type LoadedLibrary = Extract<Awaited<ReturnType<typeof loadLibrary>>, { error: false }>;
+
+export const load: PageServerLoad = async ({ isDataRequest }) => {
+	if (!simklConfigured()) return { configured: false as const };
+
+	// Simkl is a network call whenever the snapshot is more than fifteen
+	// minutes old, so on navigation the page renders straight away with its
+	// shelves pending (see stream.ts).
+	return {
+		configured: true as const,
+		...(await streamOnNavigation(isDataRequest, { library: loadLibrary() }))
+	};
 };
