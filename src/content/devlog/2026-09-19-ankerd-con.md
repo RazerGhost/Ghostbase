@@ -1,9 +1,9 @@
 ---
-title: Ankerd Con — a restyle, trip-shaped navigation, and two security audits
+title: "Ankerd Con: trips, a restyle and two security audits"
 date: 2026-09-19
 tags: [react, fastapi, supabase, security, design, side-project]
 excerpt: Coming late to the event app my own group is building (React + FastAPI + Supabase), rebuilding its navigation around trips, restyling every screen by remapping Tailwind palettes, and closing two rounds of security findings.
-draft: true
+draft: false
 ---
 
 Ankerd Con is the private PWA my own group is building for its convention
