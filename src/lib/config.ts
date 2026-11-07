@@ -31,7 +31,7 @@ export const socialLinks: { label: string; href: string; icon: SocialIcon }[] = 
   },
   {
     label: "Email",
-    href: "mailto:contact@rg-digital.dev",
+    href: "mailto:info@rg-digital.dev",
     icon: "mail",
   },
 ];
