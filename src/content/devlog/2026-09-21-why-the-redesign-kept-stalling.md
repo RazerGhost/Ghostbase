@@ -1,5 +1,5 @@
 ---
-title: The redesign kept stalling, and it wasn't about taste
+title: Writing the design down
 date: 2026-09-21
 tags: [design, ui, meta]
 excerpt: This site felt flat for months and every attempt to fix it died halfway. The problem wasn't the look — it was that the look wasn't written down anywhere except in 1,040 class attributes.

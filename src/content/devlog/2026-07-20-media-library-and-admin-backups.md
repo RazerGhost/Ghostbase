@@ -1,5 +1,5 @@
 ---
-title: A media library, an admin area that feels like one, and backups that diff
+title: A media library, a real admin area, and backups
 date: 2026-07-20
 tags: [admin, sqlite, backups, media]
 excerpt: Three admin-area gaps that all trace back to the same root cause — nothing here persisted or gave feedback the way it should — and the git-based backup job that ties them together.

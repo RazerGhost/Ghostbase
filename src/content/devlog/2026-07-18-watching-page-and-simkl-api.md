@@ -1,5 +1,5 @@
 ---
-title: The whole Watchlist page, built in a day
+title: Building the Watchlist on Simkl
 date: 2026-07-18
 tags: [watchlist, simkl]
 excerpt: Simkl's bulk sync call doesn't carry genres, overviews, or runtimes — getting those without hammering a per-title endpoint on every load meant a small self-warming cache, plus a full-library snapshot to survive an outage.

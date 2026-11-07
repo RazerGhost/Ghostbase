@@ -1,5 +1,5 @@
 ---
-title: Giving Projects the same treatment as the devlog
+title: Projects are markdown now
 date: 2026-07-16
 tags: [sveltekit, projects]
 excerpt: The projects page was a hardcoded array with one entry. Now it's markdown, like everything else here.

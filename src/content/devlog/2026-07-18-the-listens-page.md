@@ -1,5 +1,5 @@
 ---
-title: Building /listens from a Spotify data export instead of an API
+title: Building /listens from my Spotify export
 date: 2026-07-18
 tags: [spotify, listens, sqlite]
 excerpt: Spotify's API only gives you the last ~50 plays. Getting real history — and years of stats out of it — meant starting from my own data export instead.

@@ -1,5 +1,5 @@
 ---
-title: A weekly heatmap, a project lightbox, and swapping a callout for a sparkline
+title: A heatmap, a lightbox and a sparkline
 date: 2026-07-20
 tags: [listens, spotify, sqlite, ui]
 excerpt: Three small, unrelated features shipped together, tied by the same idea — once data already lives in SQLite, another way to look at it is just another query.
