@@ -1,4 +1,5 @@
-import { error, redirect, type Handle } from '@sveltejs/kit';
+import { error, redirect, type Handle, type RequestEvent } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 import { SESSION_COOKIE_NAME, verifySessionToken } from '$lib/server/session';
 import { startSimklRefreshLoop } from '$lib/server/simkl-refresh';
 import { checkRateLimit } from '$lib/server/rate-limit';
@@ -31,10 +32,48 @@ const RATE_LIMITED_ROUTES: { prefix: string; limit: number; windowSeconds: numbe
 	{ prefix: '/api/spotify/recent', limit: 20, windowSeconds: 60 }
 ];
 
-export const handle: Handle = ({ event, resolve }) => {
+// Requests arrive via Cloudflare -> Traefik -> app, so the socket address is
+// always Traefik's and X-Forwarded-For's last hop is a Cloudflare edge. Keying
+// on either would put every visitor in one bucket, letting anyone exhaust the
+// login or cron limits for everyone. Cloudflare sets CF-Connecting-IP to the
+// real client and overwrites any client-sent value. It's absent on direct
+// calls (the in-container backup/scrobble helpers), which fall back to the
+// socket address. adapter-node's ADDRESS_HEADER isn't used because it throws
+// when the header is missing, which would break those helpers.
+function clientAddress(event: RequestEvent): string {
+	return event.request.headers.get('cf-connecting-ip')?.trim() || event.getClientAddress();
+}
+
+const SECURITY_HEADERS: Record<string, string> = {
+	// No script-src/style-src policy yet: the theme script, embeds and inline
+	// styles would need nonces or hashes first. These directives are safe now.
+	'Content-Security-Policy': "frame-ancestors 'none'; base-uri 'self'; object-src 'none'",
+	'X-Frame-Options': 'DENY',
+	'X-Content-Type-Options': 'nosniff',
+	'Referrer-Policy': 'strict-origin-when-cross-origin',
+	'Permissions-Policy': 'camera=(), microphone=(), geolocation=()'
+};
+
+function applySecurityHeaders(response: Response): Response {
+	const headers = { ...SECURITY_HEADERS };
+	// Only razerghost.xyz itself, no includeSubDomains or preload, so it can't
+	// lock out a subdomain that isn't on HTTPS.
+	if (!dev) headers['Strict-Transport-Security'] = 'max-age=31536000';
+	for (const [name, value] of Object.entries(headers)) {
+		if (!response.headers.has(name)) response.headers.set(name, value);
+	}
+	return response;
+}
+
+// error()/redirect() thrown below bypass applySecurityHeaders, which is fine
+// for 401s and redirects: they carry no page content to frame or sniff.
+export const handle: Handle = async ({ event, resolve }) =>
+	applySecurityHeaders(await handleRequest(event, resolve));
+
+async function handleRequest(event: RequestEvent, resolve: Parameters<Handle>[0]['resolve']): Promise<Response> {
 	const rateLimited = RATE_LIMITED_ROUTES.find((r) => event.url.pathname === r.prefix || event.url.pathname.startsWith(`${r.prefix}/`));
 	if (rateLimited) {
-		const key = `${rateLimited.prefix}:${event.getClientAddress()}`;
+		const key = `${rateLimited.prefix}:${clientAddress(event)}`;
 		const result = checkRateLimit(key, rateLimited.limit, rateLimited.windowSeconds);
 		if (result.limited) {
 			return new Response('Too many requests', {
@@ -61,4 +100,4 @@ export const handle: Handle = ({ event, resolve }) => {
 	}
 
 	return resolve(event);
-};
+}

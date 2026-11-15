@@ -32,7 +32,9 @@ A persistent volume only protects against redeploys, not against the server disa
 
 ## Cloudflare sits in front of this
 
-razerghost.xyz is proxied through Cloudflare, which matters in two ways when you go to check whether a deploy landed.
+razerghost.xyz is proxied through Cloudflare. That affects rate limiting, and it matters in two ways when you go to check whether a deploy landed.
+
+**Rate limiting keys on `CF-Connecting-IP`.** The socket address is always Traefik's and the last `X-Forwarded-For` hop is a Cloudflare edge, so [hooks.server.ts](../src/hooks.server.ts) reads Cloudflare's header and falls back to the socket address when it's missing (the in-container helpers). Anyone who can reach the server directly, skipping Cloudflare, can forge that header and dodge the limits. Restricting the origin's ports 80/443 to [Cloudflare's IP ranges](https://www.cloudflare.com/ips/) closes that.
 
 **It overrides the app's cache headers.** `og.png/+server.ts` asks for `Cache-Control: public, max-age=3600`; the edge serves `max-age=14400` (`cf-cache-status: HIT`, with an `Age` header counting up). That's Cloudflare's Browser Cache TTL setting winning over the origin's header, so a changed OG image can keep serving the old bytes for up to four hours after a successful deploy. If social previews need to update now rather than eventually, purge `/devlog/*/og.png` and `/projects/*/og.png` from the Cloudflare dashboard — and remember that some platforms cache the image on their own side once they have fetched it.
 

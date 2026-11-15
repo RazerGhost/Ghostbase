@@ -45,7 +45,7 @@ Package manager is pnpm (`packageManager: pnpm@11.3.0`).
 
 **Service worker**: only answers failed page loads with an offline page and caches nothing. `pnpm preview` registers it on `localhost:4173`, so a stopped preview shows the offline page. See [docs/service-worker.md](docs/service-worker.md).
 
-**Rate limiting**: `checkRateLimit()` in [rate-limit.ts](src/lib/server/rate-limit.ts), in-memory per process, on auth and the secret-gated endpoints.
+**Rate limiting**: `checkRateLimit()` in [rate-limit.ts](src/lib/server/rate-limit.ts), in-memory per process, on auth and the secret-gated endpoints. Keyed on `CF-Connecting-IP` (Cloudflare fronts the site), not `getClientAddress()`, which is always the proxy. Security headers are set in the same hook.
 
 ## Testing gated pages locally
 
