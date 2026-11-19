@@ -5,10 +5,10 @@ description: >-
   Who's behind RazerGhost, what building in public means here, and how it
   connects to RG Digital.
 ---
-I'm Dimitri de Jong. By day I run [RG Digital](https://rg-digital.dev), building
-web apps and sites for other people's businesses. This is the other half: one
-place for everything that isn't client work, instead of a dozen profiles nobody
-visits twice.
+I'm Dimitri de Jong. I run [RG Digital](https://rg-digital.dev), the home for my own
+projects: Haunt, SHADE, polysyntax and Shade Desk. I also do client work on the
+side. This is the other half: one place for the devlog and everything else,
+instead of a dozen profiles nobody visits twice.
 
 ## What's actually here
 
@@ -29,6 +29,6 @@ ends up being its own longest-running case study —
 
 ## RazerGhost and RG Digital
 
-RG Digital is the client-facing side, and it reads like it: case studies, a
+RG Digital is the company side, and it reads like it: projects, a
 pitch, a contact form. This one has none of that. Same person, different reason
 for existing.
