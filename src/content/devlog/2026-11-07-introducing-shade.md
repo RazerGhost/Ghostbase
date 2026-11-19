@@ -2,13 +2,15 @@
 title: "What I'm building: SHADE"
 date: 2026-11-07
 tags: [projects, shade, self-hosted]
-excerpt: SHADE is a self-hostable data engine for client sites. It is pre-release and still private.
+excerpt: SHADE is self-hosted software for client sites. It is pre-release and still private.
 draft: false
 ---
 
+Update, 19 November 2026: SHADE is now open source under Apache-2.0, a project in its own right for the businesses that run it. Some wording below is out of date.
+
 Most of my time lately goes into SHADE.
 
-SHADE is a data engine that runs underneath client sites. Each client gets their
+SHADE is self-hosted software that runs underneath client sites. Each client gets their
 own instance, on their own server, with their own database.
 
 Editors work in an admin app. Plugins add what a client needs, like
