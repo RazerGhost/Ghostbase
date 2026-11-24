@@ -27,7 +27,7 @@ On `GET /api/backup` with a valid secret:
 5. Otherwise commits (author identity from `BACKUP_GIT_USER_NAME`/`BACKUP_GIT_USER_EMAIL`, both optional) and pushes.
 6. Deletes the temp directory in a `finally` block regardless of outcome.
 
-Gated the same way as the scrobble endpoint: prefer `Authorization: Bearer <BACKUP_SECRET>` over `?secret=`, since query strings tend to end up in proxy/access logs. Returns `503` if `BACKUP_SECRET` or `BACKUP_GIT_REMOTE` is unset.
+Gated the same way as the scrobble endpoint: send `Authorization: Bearer <BACKUP_SECRET>`. A `?secret=` query string is not accepted, since query strings tend to end up in proxy/access logs. Returns `503` if `BACKUP_SECRET` or `BACKUP_GIT_REMOTE` is unset.
 
 ## One-time setup
 

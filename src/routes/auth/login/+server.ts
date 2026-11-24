@@ -1,5 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import { error, redirect } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 import { site } from '$lib/config';
 import { buildAuthorizeUrl, githubAuthConfigured } from '$lib/server/github-auth';
 import type { RequestHandler } from './$types';
@@ -22,6 +23,7 @@ export const GET: RequestHandler = ({ url, cookies }) => {
 	cookies.set('oauth_state', JSON.stringify({ state, redirectTo }), {
 		path: '/',
 		httpOnly: true,
+		secure: !dev,
 		sameSite: 'lax',
 		maxAge: 300
 	});

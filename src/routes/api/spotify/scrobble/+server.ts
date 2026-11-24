@@ -16,15 +16,13 @@ import type { RequestHandler } from './$types';
 // exports — Spotify's recently-played endpoint only returns the last 50
 // plays, so gaps longer than the poll interval are otherwise lost.
 // insertPlays is idempotent on (played_at, spotify_uri, ms_played), so
-// overlapping polls are safe. Prefer the `Authorization: Bearer <secret>`
-// header over `?secret=`, which leaks into proxy/access logs — still
-// accepted so existing cron entries keep working.
-export const GET: RequestHandler = async ({ url, request }) => {
+// overlapping polls are safe. Takes the secret as an
+// `Authorization: Bearer <secret>` header only: a `?secret=` query string
+// would leak into proxy/access logs.
+export const GET: RequestHandler = async ({ request }) => {
 	const secret = env.SPOTIFY_SCROBBLE_SECRET;
 	if (!secret) error(503, 'Scrobbling not configured');
-	const provided =
-		request.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ??
-		url.searchParams.get('secret');
+	const provided = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
 	const a = Buffer.from(provided ?? '');
 	const b = Buffer.from(secret);
 	if (a.length !== b.length || !timingSafeEqual(a, b)) error(401, 'Unauthorized');

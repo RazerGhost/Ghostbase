@@ -27,7 +27,7 @@ The `plays` table has `UNIQUE(played_at, spotify_uri, ms_played)` ([spotify-hist
 
 [`/api/spotify/scrobble`](../src/routes/api/spotify/scrobble/+server.ts) polls Spotify's `recently-played` endpoint and inserts new plays with `platform: 'live-scrobble'`, filling the gap between manual exports. Meant to be hit on a schedule (every 15–30 min — any longer and Spotify's 50-play cap on that endpoint can silently drop history) via something like Coolify's Scheduled Tasks or a GitHub Actions cron.
 
-- Gated by `?secret=<SPOTIFY_SCROBBLE_SECRET>` since it's a side-effecting (DB-writing) GET endpoint that would otherwise be publicly triggerable.
+- Gated by an `Authorization: Bearer <SPOTIFY_SCROBBLE_SECRET>` header since it's a side-effecting (DB-writing) GET endpoint that would otherwise be publicly triggerable.
 - 503s if the secret isn't configured at all; 401s on a wrong secret; 403 if the Spotify refresh token lacks the `user-read-recently-played` scope.
 - `ms_played` here is only an *estimate* (`recently-played` doesn't report actual listen duration, only the track's full length) — this is exactly why step 3 above needs to happen before a real export supersedes it.
 

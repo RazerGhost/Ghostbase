@@ -82,7 +82,7 @@ If set, hit `GET /api/spotify/scrobble` with an `Authorization: Bearer <this val
 node scripts/hit-endpoint.mjs /api/spotify/scrobble SPOTIFY_SCROBBLE_SECRET
 ```
 
-An external scheduler hits the public URL with `curl` instead. `?secret=<this value>` also works, but the header is preferred — query strings tend to end up in proxy/access logs. Leave unset to disable the endpoint (it 503s without this).
+An external scheduler hits the public URL with `curl -H "Authorization: Bearer <this value>"` instead. A `?secret=` query string is not accepted, since query strings tend to end up in proxy/access logs. Leave unset to disable the endpoint (it 503s without this).
 
 ## Simkl (watching/watchlist)
 
