@@ -1,6 +1,6 @@
 ---
 name: SHADE
-description: Open-source software that small businesses run their own systems on, self-hosted. Apache-2.0. Pre-release.
+description: "Hosted by you or for you, shaped to fit, and always yours: what businesses and organisations run their website, shop and bookings on. Open source, still young."
 tags:
   - self-hosted
 stack:
@@ -14,16 +14,16 @@ featured: false
 draft: false
 date: '2026-11-07'
 ---
-SHADE stands for Self-Hosted Adaptive Data Engine. It is open source under
-Apache-2.0. Anyone may host it, run it and change it. I built it.
+SHADE is one of my own projects: the system a business or organisation runs its
+website, its shop and its bookings on, with the admin behind them in one place.
+Usually a developer or a host sets it up, but it stays the business's own, and if
+it ever switches developer or host, it takes its data and its setup with it.
 
-Each instance runs on its own server with its own database. Editors work in an
-admin app. Plugins add what a business needs, like appointments, a shop or its
-own records. Frontends read it over an API, in Astro, Next.js, Nuxt, SvelteKit
-or plain HTTP.
+It's open source under Apache-2.0, so anyone may host it, run it and change it.
+Plugins add what a business needs, like appointments or a shop, and frontends read
+it over an API in Astro, Next.js, Nuxt, SvelteKit or plain HTTP. I also build on
+it for clients.
 
-Whoever runs an instance owns it. There are no licence keys and no outside
-services, and any capable developer can take it over.
-
-SHADE is pre-release. It isn't ready for production yet, and its data formats
-and APIs can still change. The code is private until the first stable release.
+SHADE is still young. It's pre-release, its data formats and APIs can still change,
+and its repositories go public at the first release. The project itself lives at
+[shadehq.dev](https://shadehq.dev).
